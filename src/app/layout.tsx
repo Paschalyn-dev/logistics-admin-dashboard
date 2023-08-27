@@ -1,6 +1,7 @@
+'use client'
 import './globals.css'
 import { Inter } from 'next/font/google'
-
+import Context from './dashboard/context/context';
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
@@ -15,7 +16,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <head>
+        <title>Dashboard Overview -- Logistix</title>
+        <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+        />
+        <link href="https://unpkg.com/ionicons@4.5.10-0/dist/css/ionicons.min.css" rel="stylesheet" />
+      </head>
+      <Context>
+        <body>
+          {children}
+        </body>
+      </Context>
     </html>
   )
 }

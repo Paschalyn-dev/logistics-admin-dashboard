@@ -1,0 +1,18 @@
+export const STAFFSWRKEYS = {
+    staffKey: 'STAFF_CREDENTIALS',
+    adminKey: 'ADMIN_INFO', 
+    forgetPasswordKey: 'FORGET_PASSWORD_KEY',
+    changePassword: 'CHANGE_PASSWORD_KEY',
+    createCustomer: 'CREATE_CUSTOMER',
+    createStaff: 'CREATE_STAFF',
+    fetchStaff: 'FETCH_STAFF',
+    createDispatcher: 'CREATE_DISPATCHER',
+    fetchCustomers: 'FETCH_CUSTOMERS',
+    countDispatcher: 'COUNT_DISPATCHER',
+    countStaff: 'COUNT_STAFF',
+    accountVerify: 'ACCOUNT_VERIFY', 
+    cardVerify: 'CARD_VERIFY',
+    locations: 'LOCATIONS',
+    fetchLocations: 'FETCH_LOCATIONS',
+    postDistancePricing: 'POST_DISTANCE_PRICING',
+}
