@@ -15,18 +15,18 @@ export default function EditParcel({ params }: { params: {id: number}}){
   const handleCloseFill = () => {
     setOpenUIBoxes((prev: any) => ({...prev, customerPopup: false}))
   }
-  useEffect(() => {
-    viewCustomerMutate();
-  }, []);
   const {viewCustomerData,
- viewCustomerError,
+    viewCustomerError,
  viewCustomerIsLoading,
  viewCustomerIsValidating,
  viewCustomerMutate} = useViewCustomers(params.id);
+ useEffect(() => {
+   viewCustomerMutate();
+ }, []);
  const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
-
+ 
  return(
-      <Holder>
+   <Holder>
         <ConstantNav />
         <Section>
           <Link href="/dashboard/customers" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">

@@ -18,16 +18,16 @@ export default function EditParcel({ params }: { params: {id: number}}){
   const handleCloseFill = () => {
     setOpenUIBoxes((prev: any) => ({...prev, administratorPopup: false}))
   }
-  useEffect(() => {
-    viewStaffMutate();
-  }, []);
   const {viewStaffData,
     viewStaffError,
     viewStaffIsLoading,
     viewStaffIsValidating,
     viewStaffMutate} = useViewStaff(params.id)
+    useEffect(() => {
+      viewStaffMutate();
+    }, [viewStaffMutate()]);
     const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
-  let date  = new Date(viewStaffData?.data?.createdAt?.slice(0, 10))
+    let date  = new Date(viewStaffData?.data?.createdAt?.slice(0, 10))
     return(
       <Holder>
         <ConstantNav />

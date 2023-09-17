@@ -38,11 +38,11 @@ export default function Administrators(){
 
     useEffect(() => {
         fetchStaffMutate();
-    }, [openUIBoxes.administratorClearData !== true]);
+    }, [openUIBoxes.administratorClearData !== true || fetchStaffMutate()]);
 
     useEffect(() => {
         administratorsRangeMutate()
-    }, [openUIBoxes.administratorSearch === true]);
+    }, [openUIBoxes.administratorSearch === true || administratorsRangeMutate()]);
 
     return(
     <Holder>

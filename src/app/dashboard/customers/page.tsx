@@ -40,7 +40,7 @@ export default function Customers(){
 
     useEffect(() => {
         customerRangeMutate()
-    }, [openUIBoxes.customerSearch === true]);
+    }, [openUIBoxes.customerSearch === true || customerRangeMutate()]);
 
     return(
         <Holder>
