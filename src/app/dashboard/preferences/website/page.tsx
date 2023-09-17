@@ -1,63 +1,69 @@
 'use client'
-import { useState } from "react";
+import { useState, useContext } from "react";
 import Heading from "../../heading";
 import Holder from "../../holder";
 import PreferencesNav from "../../preferences/preferencesnav";
 import Section from "../../section";
 import ToggleButton from "../shipment/toggleButton";
 import SubHeading from "./subheading";
-import { useBusiness } from "../../services/swr-functions/customer-swr";
+import { useBusiness, useGetBusiness } from "../../services/swr-functions/customer-swr";
 import ButtonAndMessage from "../shipment/buttonandmessage";
+import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
+import { State_data } from "../../context/context";
+import SuccessMessage from "../../successmessage";
 
 export default function WebsitePreferences(){
+    const {getBusinessData, getBusinessError, getBusinessIsLoading, getBusinessIsValidating, getBusinessMutate} = useGetBusiness();
+    console.log(getBusinessData?.data?.title);
+
     const [formData, setFormData] = useState<any>({
-        active: true,
-        additionalInfo: null,
+        active: getBusinessData?.data?.active,
+        additionalInfo: getBusinessData?.data?.additionalInfo,
         address: {
-            city: "",
-            country: 'Nigeria',
-            state: "",
-            street: "",
+            city: getBusinessData?.data?.address?.city,
+            country: getBusinessData?.data?.address?.country,
+            state: getBusinessData?.data?.address?.state,
+            street: getBusinessData?.data?.address?.street,
         },
-        channel: "Social Media",
-        chargeBearer: '',
+        channel: getBusinessData?.data?.channel,
+        chargeBearer: getBusinessData?.data?.chargeBearer,
         contact: {
-            email: "",
-            phone: "",
-            whatsapp: ""
+            email: getBusinessData?.data?.contact?.email,
+            phone: getBusinessData?.data?.contact?.phone,
+            whatsapp: getBusinessData?.data?.contact?.whatsapp
         },
-        createdAt: "",
-        disabled: false,
-        email: "",
-        favRiders: [],
-        fullName: "",
-        image: null,
-        maintenance: true,
-        paymentMethods: [],
-        phone: "",
-        platform: "",
-        pricingPlan: null,
-        rc: null,
-        shippedParcel: null,
-        sitedata: null,
+        createdAt: getBusinessData?.data?.createdAt,
+        disabled: getBusinessData?.data?.disabled,
+        email: getBusinessData?.data?.email,
+        favRiders: getBusinessData?.data?.favRiders,
+        fullName: getBusinessData?.data?.fullName,
+        image: getBusinessData?.data?.image,
+        maintenance: getBusinessData?.data?.maintenance,
+        paymentMethods: getBusinessData?.data?.paymentMethods,
+        phone: getBusinessData?.data?.phone,
+        platform: getBusinessData?.data?.platform,
+        pricingPlan: getBusinessData?.data?.pricingPlan,
+        rc: getBusinessData?.data?.rc,
+        shippedParcel: getBusinessData?.data?.shippedParcel,
+        sitedata: getBusinessData?.data?.sitedata,
         socialAccounts: {
-            facebook: "",
-            instagram: "",
-            linkedln: "",
-            twitter: ""
+            facebook: getBusinessData?.data?.socialAccounts?.facebook,
+            instagram: getBusinessData?.data?.socialAccounts?.instagram,
+            linkedln: getBusinessData?.data?.socialAccounts?.linkedln,
+            twitter: getBusinessData?.data?.socialAccounts?.twitter
         },
-        test: true,
-        title: "",
-        updatedAt: "",
-        verified: true,
-        website: "",
-    })
+        test: getBusinessData?.data?.test,
+        title: getBusinessData?.data?.title,
+        updatedAt: getBusinessData?.data?.updatedAt,
+        verified: getBusinessData?.data?.verified,
+        website: getBusinessData?.data?.whatsapp,
+    });
+    
     const handleToggleOnOff = () => {
         setFormData((prev: any) => ({...prev, maintenance: !formData.maintenance}));
     }
-
-    const {businessChangeData, businessChangeError, businessChangeIsLoading,businessChangeIsValidating, businessChangeMutate} = useBusiness(formData)
-
+    
+    const {successMessage, setSuccessMessage} = useContext(State_data)
     const handleFormData = (event: any) => {
         const {name, value} = event.target;
         setFormData((prev: any) => { 
@@ -65,8 +71,53 @@ export default function WebsitePreferences(){
         })
     }
 
+    const handleSaveSite = () => {
+        setSuccessMessage((prev: any) => ({...prev, saveWebsite: true}))
+    }
+
+    const handleInnerFormData = (event: any) => {
+        const {name, value} = event.target;
+        setFormData((prev: any) => { 
+            return {...prev, address: {...formData.address, [name]: value}}
+        })
+    }
+
+    const handleContact = (event: any) => {
+        const {name, value} = event.target;
+        setFormData((prev: any) => {
+            return{...prev, contact: {...formData.contact, [name]: value}}
+        })
+    }
+
+    const handleSocialAccounts = (event: any) => {
+        const {name, value} = event.target;
+        setFormData((prev: any) => { 
+            return {...prev, socialAccounts: {...formData.socialAccounts, [name]: value}}
+        })
+    }
+
+
+    const {businessChangeData, businessChangeError, businessChangeIsLoading,businessChangeIsValidating, businessChangeMutate} = useBusiness(formData)
+    
     return(
         <Holder>
+            {
+                businessChangeIsLoading || businessChangeIsValidating &&
+                <SkeletonLoading title="website details"  loadingSearching="Updating"/>
+            }
+            {
+                getBusinessIsLoading || getBusinessIsValidating &&
+                <SkeletonLoading title="website details"  loadingSearching="Fetching" />
+            }
+            {
+                getBusinessError && successMessage.websiteError &&
+                <SuccessMessage 
+                 name="websiteError"
+                 successMessageShow={successMessage.websiteError}
+                 id="failed"
+                 messageTitle="Error occured! Check network connection!"
+                />
+            }
             <PreferencesNav />
             <Section>
                 <div className="bg-gray-50 mt-5 p-5 rounded-2xl w-full relative h-full">
@@ -98,40 +149,40 @@ export default function WebsitePreferences(){
                          <p>Default</p>                         
                     </div>
                     <SubHeading subheading="Title" />
-                    <input name="title" value={formData.title} onChange={handleFormData} type="text" className="w-full bg-gray-100 p-3 rounded-lg outline-0 "  />
+                    <input name="title" value={formData?.title} onChange={handleFormData} type="text" className="w-full bg-gray-100 p-3 rounded-lg outline-0 "  />
                     <SubHeading subheading="Entry Text" />
-                    <input name="entry_text" value="Same time every week day from 10am - 4pm daily" onChange={handleFormData} type="text" className="w-full bg-gray-100 p-3 rounded-lg outline-0 "  />
+                    <input name="entry_text" value={getBusinessData?.data?.entryText} onChange={handleFormData} type="text" className="w-full bg-gray-100 p-3 rounded-lg outline-0 "  />
                     <SubHeading subheading="Maintenance Mode"/>
                     <p className="mt-2 text-sm">If for any reason you need to take your website offline, you can turn on maintenance mode.</p>
                     <ToggleButton onOff={formData.maintenance} handleOnOff={handleToggleOnOff} title={formData.maintenance ? "Turn On" : "Turn Off"} />
                     <SubHeading subheading="Contact Information" />
                     <div className="mt-2">
                         <label htmlFor="street" className="text-gray-500 text-base">Office Address</label>
-                        <input name="street" value={formData.address.street} onChange={handleFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
+                        <input name="street" value={formData.address.street} onChange={handleInnerFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
                         <label htmlFor="email" className="text-gray-500 text-base">Email Address</label>
-                        <input name="email" value={formData.email} onChange={handleFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
+                        <input name="email" value={formData?.email} onChange={handleFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
                         <label htmlFor="phone" className="text-gray-500 text-base">Phone</label>
-                        <input name="phone" value={formData.phone} onChange={handleFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
+                        <input name="phone" value={formData?.phone} onChange={handleFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
                         <label htmlFor="whatsapp" className="text-gray-500 text-base">Whatsapp Contact</label>
-                        <input name="whatsapp" value={formData.whatsapp} onChange={handleFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
+                        <input name="whatsapp" value={formData?.whatsapp} onChange={handleFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
                     </div>
                     <div>
                         <SubHeading subheading="Social Media" />
                         <div className="flex items-center my-5 bg-white gap-3 rounded-xl w-full justify-start p-4">
                             <i id="icon" className="icon ion-logo-facebook"></i>
-                            <input name="facebook" type="text" onChange={handleFormData} value={formData.socialAccounts.facebook} className="bg-white outline-0 h-fit w-full" placeholder="username" />
+                            <input name="facebook" type="text" onChange={handleSocialAccounts} value={formData.socialAccounts.facebook} className="bg-white outline-0 h-fit w-full" placeholder="username" />
                         </div>
                         <div className="flex items-center mb-5 bg-white gap-3 rounded-xl w-full justify-start p-4">
                             <i id="icon" className="icon ion-logo-twitter"></i>
-                            <input name="twitter" type="text" onChange={handleFormData} value={formData.socialAccounts.twitter} className="bg-white outline-0 h-fit w-full" placeholder="username" />
+                            <input name="twitter" type="text" onChange={handleSocialAccounts}  value={formData.socialAccounts.twitter} className="bg-white outline-0 h-fit w-full" placeholder="username" />
                         </div>
                         <div className="flex items-center mb-5 bg-white gap-3 rounded-xl w-full justify-start p-4">
                             <i id="icon" className="icon ion-logo-instagram"></i>
-                            <input name="instagram" type="text" onChange={handleFormData} value={formData.socialAccounts.instagram} className="bg-white outline-0 h-fit w-full" placeholder="username" />
+                            <input name="instagram" type="text" onChange={handleSocialAccounts} value={formData.socialAccounts.instagram} className="bg-white outline-0 h-fit w-full" placeholder="username" />
                         </div>
                         <div className="flex items-center mb-5 bg-white gap-3 rounded-xl w-full justify-start p-4">
                             <i id="icon" className="icon ion-logo-linkedin"></i>
-                            <input name="linkedln" type="text" onChange={handleFormData} value={formData.socialAccounts.linkedln} className="bg-white outline-0 h-fit w-full" placeholder="username" />
+                            <input name="linkedln" type="text" onChange={handleSocialAccounts} value={formData.socialAccounts.linkedln} className="bg-white outline-0 h-fit w-full" placeholder="username" />
                         </div>
                     </div>
                   </div>
@@ -139,6 +190,9 @@ export default function WebsitePreferences(){
                   code={businessChangeData?.code}
                   error={businessChangeError}
                   mutate={businessChangeMutate}
+                  title={successMessage.saveWebsite}
+                  name="saveWebsite"
+                  handleClick={handleSaveSite}
                   successmessage="Your website has been updated!"
                   failedmessage="Sorry, your website cannot be updated!"
                   errormessage="Error occured! Check network connection."

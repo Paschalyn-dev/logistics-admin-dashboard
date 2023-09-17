@@ -17,16 +17,12 @@ import useDateHandler from "../date";
 import Link from "next/link";
 
 export default function Customers(){
-    const [openSearchBox, setOpenSearchBox] = useState<boolean>(false)
     const [inputData, setInputData] = useState<string>('');
-    const [successmessage,setSuccessMessage] = useState<boolean>(true)
     const {fetchCustomersData, fetchCustomersError, fetchCustomersIsLoading, fetchCustomersIsValidating, fetchCustomersMutate} = useFetchCustomers();
-    const [clearData, setClearData] = useState<boolean>(false);
-    const {customersRange} = useContext<any | string>(State_data);
+    const {customersRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage} = useContext<any | string>(State_data);
     const {customerRangeData, customerRangeError, customerRangeIsLoading, customerRangeMutate, customerRangeIsValidating} = useCustomerSearchRange(customersRange);
     const handleOpenSearch = () => {
-        setOpenSearchBox(true)
-        setClearData(true);
+        setOpenUIBoxes((prev: any) => ({...prev, customerSearch: true, customerClearData: true}))
     }
 
     const handleInputData = (e: any) => {
@@ -34,17 +30,17 @@ export default function Customers(){
     }
 
     const handleClearData = () => {
-        setClearData(false);
+        setOpenUIBoxes((prev: any) => ({...prev, customerClearData: false}));
     }
 
     useEffect(() => {
         fetchCustomersMutate();
         console.log(customerRangeData);
-    }, [clearData !== true]);
+    }, [openUIBoxes.customerClearData !== true]);
 
     useEffect(() => {
         customerRangeMutate()
-    }, [openSearchBox === true]);
+    }, [openUIBoxes.customerSearch === true]);
 
     return(
         <Holder>
@@ -53,43 +49,44 @@ export default function Customers(){
                 <SkeletonLoading title="all customers."/>
             }
             {
-               (customerRangeIsLoading || customerRangeIsValidating && openSearchBox) &&
+               (customerRangeIsLoading || customerRangeIsValidating && openUIBoxes.customerSearch) &&
                <SkeletonLoading loadingSearching="Searching" title="customers." />                
             }
             <ConstantNav />
             <Section>
                     <Heading heading="My Customers" />
-                    {fetchCustomersData?.data?.length && !clearData && !customerRangeData?.data && <p>You have <span className="font-bold">{fetchCustomersData?.data?.length || 0}</span> customer{fetchCustomersData?.data?.length > 1 && "s"}.</p>}
-                    {customerRangeData !== 'undefined' && clearData && <p><span className="font-bold">{customerRangeData?.data?.length || 0}</span> customers match(es) found.</p>}
+                    {fetchCustomersData?.data?.length && !openUIBoxes.customerClearData && !customerRangeData?.data && <p>You have <span className="font-bold">{fetchCustomersData?.data?.length || 0}</span> customer{fetchCustomersData?.data?.length > 1 && "s"}.</p>}
+                    {customerRangeData !== 'undefined' && openUIBoxes.customerClearData && <p><span className="font-bold">{customerRangeData?.data?.length || 0}</span> customers match(es) found.</p>}
                     <Input
                     link="/dashboard/customers/create"
                     phonetext="Add"
+                    name="customer"
                     laptoptext="New Customer"
                     placeholder="Search Customers"
                     handleClick={handleOpenSearch}
                     handleChange={handleInputData}
                     searchInput={inputData}
                     />
-                    { clearData &&
+                    { openUIBoxes.customerClearData &&
                         <button onClick={handleClearData} className="text-red-500 mt-3 gap-2 flex font-bold text-sm">
                         <span>
                             <i className="icon ion-md-close"></i>
                         </span>Clear Filter</button>
                     }
-                    {openSearchBox && <SearchFilter inputData={inputData} closeFill={setOpenSearchBox} /> }  
+                    {openUIBoxes.customerSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} /> }  
                         {
-                            fetchCustomersError && successmessage &&
+                            fetchCustomersError && successMessage.customer &&
                             <SuccessMessage
-                            successMessageShow={successmessage}
-                            handleShowSuccessMessage={setSuccessMessage}
+                            successMessageShow={successMessage.customer}
+                            name="customer"
                             id="failed"
                             messageTitle="Customers cannot be fetched. Check network connection!"
                             />
                         }
                         {/* {
-                            customerRangeError && !customerRangeData?.data && openSearchBox && successmessage &&
+                            customerRangeError && !customerRangeData?.data && openUIBoxes.customerSearch && successMessage.customer &&
                             <SuccessMessage
-                            successMessageShow={successmessage}
+                            successMessageShow={successMessage.customer}
                             handleShowSuccessMessage={setSuccessMessage}
                             id="failed"
                             messageTitle="Searching failed, check network connection!"
@@ -97,7 +94,7 @@ export default function Customers(){
                         } */}
                     <BoxesHolder>
                     {
-                        fetchCustomersData?.data && !clearData &&
+                        fetchCustomersData?.data && !openUIBoxes.customerClearData &&
                          fetchCustomersData.data.map((customer: any) => {
                             let date  = new Date(customer?.user?.createdAt?.slice(0, 10))
                             return (
@@ -189,8 +186,8 @@ export default function Customers(){
                             )}))}
                                 </BoxesHolder>
                                 
-                                { (customerRangeData?.data?.length === 0 || customerRangeData?.data === 'undefined' || customerRangeData?.code !== 200 && clearData) && (
-                                    <div className={clearData ? "flex flex-col w-full justify-center items-center" : "hidden"}>
+                                { (customerRangeData?.data?.length === 0 || customerRangeData?.data === 'undefined' || customerRangeData?.code !== 200 && openUIBoxes.customerClearData) && (
+                                    <div className={openUIBoxes.customerClearData ? "flex flex-col w-full justify-center items-center" : "hidden"}>
                                     <span className="-mb-16">
                                         <i id="bigger" className="icon ion-md-cube"></i>
                                     </span>

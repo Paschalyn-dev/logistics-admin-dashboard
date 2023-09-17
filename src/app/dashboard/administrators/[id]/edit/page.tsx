@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import Link from "next/link";
@@ -11,10 +11,10 @@ import Loader from "@/app/dashboard/services/Loader/spinner";
 import Hero from "@/app/dashboard/preferences/hero";
 import TextInput from "@/app/dashboard/formik/inputtypes";
 import Button from "@/app/dashboard/button";
-export const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
+import { State_data, phoneRegExp } from "@/app/dashboard/context/context";
 
 export default function editAdministrators({ params }: { params: {id: number}}){
-    const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+    const {successMessage, setSuccessMessage} = useContext(State_data);
     const [saveAndAddNewStaff, setSaveAndAddNewStaff] = useState<boolean>(false);
     const [staffDetails, setStaffDetails] = useState<any>()
     const {viewStaffData, 
@@ -99,7 +99,7 @@ export default function editAdministrators({ params }: { params: {id: number}}){
                   })}
                   onSubmit={(values) => {
                     setTimeout(() => {
-                        setShowSuccessMessage(true);
+                        setSuccessMessage((prev: any) => ({...prev, editAdministrator: true}));
                         setStaffDetails(values);
                     }, 1000);
                   }}

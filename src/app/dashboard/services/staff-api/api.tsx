@@ -224,3 +224,128 @@ export const postDistancePricing = async(distancePrice: any) => {
 }
 
 
+export const getDistancePricing = async() => {
+    const response = await fetch(staffAPIURL.postDistancePricing, {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTExODgzNDZ9.73G4_gAI_mexLVUYQOkaJN7XCaIj0iHqj5b2g9yYIa8"
+        },
+    });
+    const data = await response.json();
+    return data;
+}
+
+
+export const getBankAccount = async() => {
+    const response = await fetch(staffAPIURL.getAccount, {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTExODgzNDZ9.73G4_gAI_mexLVUYQOkaJN7XCaIj0iHqj5b2g9yYIa8"
+        },
+    });
+    const data = await response.json();
+    return data;
+}
+
+
+export const deleteCustomerFetcher = async(id: number) =>{
+    const response = await fetch(staffAPIURL.deleteCustomer(id), {
+        method: 'DELETE',
+        headers: {
+            'Authorization': authorizationKey
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+
+export const deleteStaffFetcher = async(id: number) =>{
+    const response = await fetch(staffAPIURL.deleteStaff(id), {
+        method: 'DELETE',
+        headers: {
+            'Authorization': authorizationKey
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+
+export const deleteDispatcherFetcher = async(id: number) =>{
+    const response = await fetch(staffAPIURL.deleteDispatcher(id), {
+        method: 'DELETE',
+        headers: {
+            'Authorization': authorizationKey
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+
+export const deleteBankAccountFetcher = async(id: number) =>{
+    const response = await fetch(staffAPIURL.deleteBankAccount(id), {
+        method: 'DELETE',
+        headers: {
+            'Authorization': authorizationKey
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+
+export const deleteMessagesFetcher = async(id: number) =>{
+    const response = await fetch(staffAPIURL.deleteMessages(id), {
+        method: 'DELETE',
+        headers: {
+            'Authorization': authorizationKey
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+
+export const deleteDistancePricing = async(id: number) =>{
+    const response = await fetch(staffAPIURL.deleteDistancePricing(id), {
+        method: 'DELETE',
+        headers: {
+            'Authorization': authorizationKey
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+
+
+export const deleteLocationsFetcher = async(id: number) =>{
+    const response = await fetch(staffAPIURL.deleteLocations(id), {
+        method: 'DELETE',
+        headers: {
+            'Authorization': authorizationKey
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+
+export const deletePreferenceFetcher = async(id: number) =>{
+    const response = await fetch(staffAPIURL.deletePreference(id), {
+        method: 'DELETE',
+        headers: {
+            'Authorization': authorizationKey
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+
+export const deleteClassicPricing = async(id: number) =>{
+    const response = await fetch(staffAPIURL.deleteClassicPricing(id), {
+        method: 'DELETE',
+        headers: {
+            'Authorization': authorizationKey
+        }
+    });
+    const data = await response.json();
+    return data;
+}

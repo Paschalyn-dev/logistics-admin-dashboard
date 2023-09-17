@@ -31,11 +31,6 @@ export default function HomeNav(){
       }, [clickIt])
 
     return(
-        <>
-        <head>
-            <link href="https://unpkg.com/ionicons@4.5.10-0/dist/css/ionicons.min.css" rel="stylesheet" />
-        </head>
-
         <div className= "flex z-10 dark:bg-red-500 bg-blue-700 top-0 phone:w-full laptop:w-10/12 overflow-x-auto bg-gray-100 phone:pr-10 laptop:pr-24 fixed justify-between items-center shadow-sm">            
             <div className="pl-5 flex gap-6 justify-start items-center">
             {
@@ -70,6 +65,5 @@ export default function HomeNav(){
             </div>
             </div>
         </div>
-         </>
     )
 }

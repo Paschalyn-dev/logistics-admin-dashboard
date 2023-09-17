@@ -10,80 +10,66 @@ import SuccessMessage from "../successmessage";
 import SkeletonLoading from "../services/eventhandlers/skeleton-loading";
 import SubHeading from "../preferences/website/subheading";
 import useDateHandler from "../date";
-import { UIBOXES } from "../shipments/active/page";
 import { State_data } from "../context/context";
 import SearchFilter from "./search";
 import Popup from "../services/eventhandlers/popup";
 import Input from "../input";
 
 export default function Reviews(){
-    const {reviewsRange} = useContext<any | string>(State_data);
+    const {reviewsRange, openUIBoxes, setOpenUIBoxes} = useContext<any | string>(State_data);
     const {reviewsRangeData, reviewsRangeError, reviewsRangeIsLoading, reviewsRangeIsValidating, reviewsRangeMutate} = useReviewsSearchRange(reviewsRange);
     const {fetchAllReviewsData, fetchAllReviewsError, fetchAllReviewsIsLoading, fetchAllReviewsIsValiddating, fetchAllReviewsMutate} = useAllFetchReviews();
     const [successmessage, setSuccessMessage] = useState<boolean>(true);
     const excellentRatings = fetchAllReviewsData?.data?.filter((data: any) => data.rating === "EXCELLENT").length;
     const goodRatings = fetchAllReviewsData?.data?.filter((data: any) => data.rating === "GOOD").length;
     const poorRatings = fetchAllReviewsData?.data?.filter((data: any) => data.rating === "POOR").length;
-
     const excellentRatings2 = reviewsRangeData?.data?.filter((data: any) => data.rating === "EXCELLENT").length;
     const goodRatings2 = reviewsRangeData?.data?.filter((data: any) => data.rating === "GOOD").length;
     const poorRatings2 = reviewsRangeData?.data?.filter((data: any) => data.rating === "POOR").length;
-    const [openUIBoxes, setOpenUIBoxes] = useState<UIBOXES>(
-        {
-            searchBox: false,
-            popup: false,
-            clearData: false
-        }
-    )
     const [inputData, setInputData] = useState<string>('');
-    const [id, setId] = useState<number>(0);
     const handleOpenSearch = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, searchBox: true, clearData: true}))
+        setOpenUIBoxes((prev: any) => ({...prev, reviewSearch: true, reviewClearData: true}))
     }
     const handleInputData = (e: any) => {
         setInputData(e.target.value)
     }
     const handleClearData = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, clearData: false}))
-    }
-
-    const handleCloseFill = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, popup: false}))
+        setOpenUIBoxes((prev: any) => ({...prev, reviewClearData: false}))
     }
 
     useEffect(() => {
         fetchAllReviewsMutate(fetchAllReviewsData);
-    }, [openUIBoxes.clearData !== true]);
+    }, [openUIBoxes.reviewClearData !== true]);
 
     return(
         <Holder>
                {
-               (fetchAllReviewsIsLoading || fetchAllReviewsIsValiddating && !openUIBoxes.searchBox) &&
+               (fetchAllReviewsIsLoading || fetchAllReviewsIsValiddating && !openUIBoxes.reviewSearch) &&
                <SkeletonLoading title="all reviews." />
                }
                {
-               (reviewsRangeIsLoading || reviewsRangeIsValidating && openUIBoxes.searchBox) &&
+               (reviewsRangeIsLoading || reviewsRangeIsValidating && openUIBoxes.reviewSearch) &&
                <SkeletonLoading loadingSearching="Searching" title="reviews." />                
                }
             <ConstantNav />
             <Section>
                 <Heading heading="Customer Reviews" />
-               {fetchAllReviewsData?.data?.length >= 0 && !openUIBoxes.clearData && <p>You have <span className="font-bold">{fetchAllReviewsData?.data?.length || 0}</span> reviews{fetchAllReviewsData?.data?.length > 1 && "s"}.</p>}
-               {reviewsRangeData !== 'undefined' && openUIBoxes.clearData && <p><span className="font-bold">{reviewsRangeData?.data?.length > 0  || 0}</span> review(s) match(es) found.</p>}                
+               {fetchAllReviewsData?.data?.length >= 0 && !openUIBoxes.reviewClearData && <p>You have <span className="font-bold">{fetchAllReviewsData?.data?.length || 0}</span> review{fetchAllReviewsData?.data?.length > 1 && "s"}.</p>}
+               {reviewsRangeData !== 'undefined' && openUIBoxes.reviewClearData && <p><span className="font-bold">{reviewsRangeData?.data?.length > 0  || 0}</span> review(s) match(es) found.</p>}                
                <Input
+                name="review"
                 handleClick={handleOpenSearch}
                 placeholder="Search Reviews"
                 handleChange={handleInputData}
                 searchInput={inputData}
                 />
-                { openUIBoxes.clearData &&
+                { openUIBoxes.reviewClearData &&
                 <button onClick={handleClearData} className="text-red-500 mt-3 gap-2 flex font-bold text-sm">
                     <span>
                         <i className="icon ion-md-close"></i>
                     </span>Clear Filter</button>
                 }
-               {openUIBoxes.searchBox && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
-               {openUIBoxes.popup && <Popup text="Reviews" closeFill={handleCloseFill} popupShow={openUIBoxes.popup} id={id} />}
+               {openUIBoxes.reviewSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
                {
                    fetchAllReviewsError && successmessage &&
                    <SuccessMessage
@@ -94,7 +80,7 @@ export default function Reviews(){
                 />
             }
                {
-                   reviewsRangeError && openUIBoxes.searchBox && successmessage &&
+                   reviewsRangeError && openUIBoxes.reviewSearch && successmessage &&
                    <SuccessMessage
                    successMessageShow={successmessage}
                    handleShowSuccessMessage={setSuccessMessage}
@@ -119,7 +105,7 @@ export default function Reviews(){
                     </p>
                 </div>
                 <div className="h-full flex flex-wrap tablet:justify-start phone:justify-start m-auto items-start tablet:gap-5 phone:gap-3 mt-5 w-full p-1">
-                    {  fetchAllReviewsData?.data && !openUIBoxes.clearData &&
+                    {  fetchAllReviewsData?.data && !openUIBoxes.reviewClearData &&
                         fetchAllReviewsData.data.map((reviews: any) => {
                             const mydate = new Date(reviews?.updatedAt.slice(0, 10));
                             return(
@@ -140,7 +126,7 @@ export default function Reviews(){
                         })
                     }
 
-                    { !fetchAllReviewsIsLoading && fetchAllReviewsData?.data?.length === 0 && !openUIBoxes.clearData && (
+                    { !fetchAllReviewsIsLoading && fetchAllReviewsData?.data?.length === 0 && !openUIBoxes.reviewClearData && (
                         <div className="flex flex-col w-full justify-center items-center">
                             <span className="-mb-16">
                                 <i id="bigger" className="icon ion-md-star"></i>
@@ -150,7 +136,7 @@ export default function Reviews(){
                         </div>
                     )}
 
-                    {  reviewsRangeData?.data && openUIBoxes.clearData &&
+                    {  reviewsRangeData?.data && openUIBoxes.reviewClearData &&
                         reviewsRangeData.data.map((reviews: any) => {
                             const mydate = new Date(reviews?.updatedAt.slice(0, 10));
                             return(
@@ -171,7 +157,7 @@ export default function Reviews(){
                         })
                     }
 
-                    { (reviewsRangeData?.data?.length === 0 || reviewsRangeData?.data === 'undefined' || reviewsRangeData?.code !== 200 && openUIBoxes.clearData) && (
+                    { (reviewsRangeData?.data?.length === 0 || reviewsRangeData?.data === 'undefined' || reviewsRangeData?.code !== 200 && openUIBoxes.reviewClearData) && (
                         <div className="flex flex-col w-full justify-center items-center">
                             <span className="-mb-16">
                                 <i id="bigger" className="icon ion-md-star"></i>

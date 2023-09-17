@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Formik, Form } from 'formik';
 import SuccessMessage from "../../successmessage";
 import Hero from "../../preferences/hero";
@@ -16,15 +16,14 @@ import { useCreateCustomer } from "../../services/swr-functions/staff-swr";
 import { staffStore } from "../../services/store/store";
 import { useRouter } from "next/navigation";
 import Loader from "../../services/Loader/spinner";
+import { State_data } from "../../context/context";
 
 export default function FormPageCustomers(){
-    const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+    const {successMessage, setSuccessMessage} = useContext(State_data);
     const [saveAndAddNewCustomer, setSaveAndAddNewCustomer] = useState<boolean>(false);
     const [customerDetails, setCustomerDetails] = useState<any>();
     const {createCustomerData, createCustomerMutate, createCustomerIsLoading, createCustomerIsValidating, createCustomerError} = useCreateCustomer(customerDetails);
     let router = useRouter();
-    console.log(staffStore)
-
     const handleSaveAndAddNewCustomer = (e: any) => {
         e.preventDefault();
         setSaveAndAddNewCustomer(!saveAndAddNewCustomer)
@@ -33,29 +32,29 @@ export default function FormPageCustomers(){
         <Holder>
           <ConstantNav />
           <Section>
-           {showSuccessMessage && createCustomerData.code === 200 &&
+           {successMessage.createCustomer && createCustomerData.code === 200 &&
            <SuccessMessage 
-           messageTitle="Customer has been successfully added to the list." 
-            successMessageShow={showSuccessMessage} 
-            handleShowSuccessMessage={setShowSuccessMessage} 
+            name="createCustomer"
+            messageTitle="Customer has been successfully added to the list." 
+            successMessageShow={successMessage.createCustomer} 
            />
            }
           
-          {showSuccessMessage && createCustomerData.code !== 200 &&
+          {successMessage.createCustomer && createCustomerData.code !== 200 &&
            <SuccessMessage 
            id="failed"
            messageTitle="Sorry! Customer cannot be added to the list!" 
-            successMessageShow={showSuccessMessage} 
-            handleShowSuccessMessage={setShowSuccessMessage} 
+           successMessageShow={successMessage.createCustomer} 
+           name="createCustomer"
            />
            }
 
-          {showSuccessMessage && createCustomerError && 
+          {successMessage.createCustomer && createCustomerError && 
            <SuccessMessage 
-           messageTitle="Error occured! Check your network connection." 
-           id='failed'
-            successMessageShow={showSuccessMessage} 
-            handleShowSuccessMessage={setShowSuccessMessage} 
+            messageTitle="Error occured! Check your network connection." 
+            id='failed'
+            successMessageShow={successMessage.createCustomer} 
+            name="createCustomer"
            />
            }
 
@@ -90,7 +89,7 @@ export default function FormPageCustomers(){
                     setTimeout(() => {
                         console.log(customerDetails, createCustomerData)
                         setCustomerDetails(values)
-                        setShowSuccessMessage(true);
+                        setSuccessMessage((prev: any) => ({...prev, createCustomer: true}));
                         if(!saveAndAddNewCustomer && createCustomerData.code === 200){
                           let timer = setTimeout(() => {
                               router.replace('/dashboard/customers')

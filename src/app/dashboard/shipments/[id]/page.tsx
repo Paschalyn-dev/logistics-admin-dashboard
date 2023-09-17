@@ -10,8 +10,9 @@ import MiniText from "../../minitext"
 import useDateHandler from "../../date"
 import { NumberComma } from "../../numberComma"
 import EditHeading from "../../editHeading"
-import {useState } from "react";
+import {useState, useContext } from "react";
 import Popup from "../../services/eventhandlers/popup"
+import { State_data } from "../../context/context"
 
 export default function EditParcel({ params }: { params: {id: number}}){
   const [openUIBoxes, setOpenUIBoxes] = useState(false);
@@ -19,9 +20,7 @@ export default function EditParcel({ params }: { params: {id: number}}){
     setOpenUIBoxes(false)
 } 
  const {viewParcelData} = useViewParcels(params.id)
-  const [id, setId] = useState<number>(0);
-  const {deleteParcelData} = useDeleteParcels(id);
-  console.log(viewParcelData, params.id)
+ const {setDeleteWithId, deleteWithId} = useContext(State_data);
   const date = new Date (viewParcelData?.data?.createdAt.slice(0, 10));
     return(
       <Holder>
@@ -37,12 +36,12 @@ export default function EditParcel({ params }: { params: {id: number}}){
               <button className="bg-red-500 border-4 hover:bg-red-600 py-2 text-gray-50 phone:py-1 phone:px-2 phone:text-base tablet:py-2 tablet:px-3 tablet:text-lg rounded-lg"
                   onClick={() => {
                     setOpenUIBoxes(true);
-                    setId(viewParcelData?.data?.id)
+                    setDeleteWithId((prev: any) => ({...prev, parcels: viewParcelData?.data?.id}));
                 }}>
                 Delete
               </button>
             </div>
-            {openUIBoxes && <Popup closeFill={handleCloseFill} popupShow={openUIBoxes} id={id} />}
+            {openUIBoxes && <Popup text="Shipment" closeFill={handleCloseFill} popupShow={openUIBoxes} name="parcels" id={deleteWithId.parcels} />}
             <EditHeading subheading="Description" />
             <MiniText minitext={viewParcelData?.data?.description || 'N/A'} />
 

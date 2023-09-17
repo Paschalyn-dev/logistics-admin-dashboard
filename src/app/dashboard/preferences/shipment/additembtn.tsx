@@ -13,46 +13,47 @@ type CALCULATOR = {
 
 export default function AddItem({showCalculator, handleShowCalculator}: CALCULATOR){
     const {globalPriceList, setGlobalPriceList} = useContext<any | number[]>(State_data);
+    
     const [checkQuantity, setCheckQuantity] = useState<any>({
         from: 0, 
         to: 0, 
         amount: 0 });
-    const [showPriceList, setShowPriceList] = useState<boolean>(false);
-    const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false)
-    const {postDistancePriceData,
-        postDistancePriceError, 
-        postDistancePriceIsLoading,
-        postDistancePriceIsValidating,
-        postDistancePriceMutate} = usePostDistancePricing(globalPriceList[globalPriceList?.length - 1]);
-
-    function handleQuantity(event:any){
-    const {name, value} = event.target;
-    if(name === 'to' || name === "amount"){
-        setCheckQuantity((prev:any) => ({...prev, [name]: value.toString()}))
-    }
-    else{
-        setCheckQuantity((prev:any) => ({...prev, [name]: +value}))
-    }
-    }
-
-    function handleSavePriceList(){
-        if(+checkQuantity.from >= +checkQuantity.to){}
-        else if(+checkQuantity.from === 0 && +checkQuantity.to === 0 && +checkQuantity.amount === 0){}
-        else if(+checkQuantity.from <= +globalPriceList[globalPriceList.length - 1]?.to){}     
-        else{
+        const [showPriceList, setShowPriceList] = useState<boolean>(false);
+        const {successMessage, setSuccessMessage} = useContext(State_data)
+        const {postDistancePriceData,
+            postDistancePriceError, 
+            postDistancePriceIsLoading,
+            postDistancePriceIsValidating,
+            postDistancePriceMutate} = usePostDistancePricing(globalPriceList[globalPriceList?.length - 1]);
+            
+            function handleQuantity(event:any){
+                const {name, value} = event.target;
+                if(name === 'to' || name === "amount"){
+                    setCheckQuantity((prev:any) => ({...prev, [name]: value.toString()}))
+                }
+                else{
+                    setCheckQuantity((prev:any) => ({...prev, [name]: +value}))
+                }
+            }
+            
+            function handleSavePriceList(){
+                if(+checkQuantity.from >= +checkQuantity.to){}
+                else if(+checkQuantity.from === 0 && +checkQuantity.to === 0 && +checkQuantity.amount === 0){}
+                else if(+checkQuantity.from <= +globalPriceList[globalPriceList.length - 1]?.to){}     
+                else{
         setGlobalPriceList((prev: number[]) => [...prev, {...checkQuantity}].sort((a:any, b:any) => a.from  - b.from));
-        setShowSuccessMessage(true)
-        }
+        setSuccessMessage((prev: any) => ({...prev, deliveryPrice: true}))
     }
+}
 
     const handleSetPriceList = () => {
         setShowPriceList(true)
     }
-
+    
     useEffect(() => {
         postDistancePriceMutate();
     }, [globalPriceList.length])
-
+    
     return(
         <>
             <head>
@@ -63,11 +64,11 @@ export default function AddItem({showCalculator, handleShowCalculator}: CALCULAT
             </head>
 
             <div>
-                { showSuccessMessage &&
+                { successMessage.deliveryPrice &&
                     <HandleSuccessMessage
-                    setSuccessMessage={setShowSuccessMessage}
-                    successMessage={showSuccessMessage}
                     code={postDistancePriceData?.code}
+                    name="deliveryPrice"
+                    title={successMessage.deliveryPrice}
                     failedmessage="Sorry, distance cannot be added to the list"
                     error={postDistancePriceError}
                     mutate={postDistancePriceMutate}

@@ -11,8 +11,20 @@ export const STAFFSWRKEYS = {
     countDispatcher: 'COUNT_DISPATCHER',
     countStaff: 'COUNT_STAFF',
     accountVerify: 'ACCOUNT_VERIFY', 
+    getBankAccount: 'GET_BANK_ACCOUNT',
     cardVerify: 'CARD_VERIFY',
     locations: 'LOCATIONS',
     fetchLocations: 'FETCH_LOCATIONS',
     postDistancePricing: 'POST_DISTANCE_PRICING',
+    getDistancePricing: 'GET_DISTANCE_PRICING',
+    deleteStaff: 'DELETE_STAFF', 
+    deleteDispatcher: 'DELETE_DISPATCHER',
+    deleteAccount: 'DELETE_ACCOUNT',
+    deleteMessages: 'DELETE_MESSAGES',
+    deleteDistancePricing: 'DELETE_DISTANCE_PRICING',
+    deleteLocations: 'DELETE_LOCATIONS',
+    deleteCustomer: 'DELETE_CUSTOMER',
+    deletePreference: 'DELETE_PREFERENCE',
+    deleteClassicPricing: 'DELETE_CLASSIC_PRICING'
+
 }

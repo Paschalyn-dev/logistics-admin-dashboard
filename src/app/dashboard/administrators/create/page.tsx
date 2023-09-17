@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Formik, Form } from 'formik';
 import SuccessMessage from "../../successmessage";
 import Hero from "../../preferences/hero";
@@ -15,12 +15,12 @@ import ConstantNav from "../../constantNav";
 import Section from "../../section";
 import { Password } from "../../formik/password";
 import { useCreateStaff } from "../../services/swr-functions/staff-swr";
-import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
 import Loader from "../../services/Loader/spinner";
+import { State_data } from "../../context/context";
 
  export const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 export default function FormPageAdministrators(){
-    const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+    const {successMessage, setSuccessMessage} = useContext(State_data);
     const [saveAndAddNewStaff, setSaveAndAddNewStaff] = useState<boolean>(false);
     const [passwordString, setPasswordString] = useState<boolean>(true)
     const [staffDetails, setStaffDetails] = useState<any>()
@@ -40,29 +40,29 @@ export default function FormPageAdministrators(){
         <Holder>
             <ConstantNav />
             <Section>
-                {showSuccessMessage && createStaffData?.code === 200 && 
+                {successMessage.createAdministrator && createStaffData?.code === 200 && 
                     <SuccessMessage 
                     messageTitle="Administrator has been successfully added to the list!" 
-                    successMessageShow={showSuccessMessage} 
-                    handleShowSuccessMessage={setShowSuccessMessage} 
+                    successMessageShow={successMessage.createAdministrator} 
+                    name="createAdministrator"
                     />
                 }
 
                 {
-                    createStaffError && showSuccessMessage &&
+                    createStaffError && successMessage.createAdministrator &&
                     <SuccessMessage
-                    successMessageShow={showSuccessMessage}
-                    handleShowSuccessMessage={setShowSuccessMessage}
+                    successMessageShow={successMessage.createAdministrator}
+                    name="createAdministrator"
                     id="failed"
                     messageTitle="Administrator cannot be added. Check network connection!"
                     />
                 }     
 
                 {
-                    createStaffData?.data !== 200 && showSuccessMessage &&
+                    createStaffData?.data !== 200 && successMessage.createAdministrator &&
                     <SuccessMessage
-                    successMessageShow={showSuccessMessage}
-                    handleShowSuccessMessage={setShowSuccessMessage}
+                    successMessageShow={successMessage.createAdministrator}
+                    name="createAdministrator"
                     id="failed"
                     messageTitle="Sorry, adminstrator cannot be added to the list!"
                     />
@@ -112,7 +112,7 @@ export default function FormPageAdministrators(){
                   })}
                   onSubmit={(values) => {
                     setTimeout(() => {
-                        setShowSuccessMessage(true);
+                        setSuccessMessage((prev: any) => ({...prev, createAdministrator: true}));
                         setStaffDetails(values);
                         createStaffMutate();
                     }, 1000);

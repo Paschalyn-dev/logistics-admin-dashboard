@@ -32,9 +32,11 @@ export const customerAPIUrl= {
     searchReviews: ({inputField, searchFields}: any) => `https://logapi.logistixng.com/api/b2c/reviews?search=${inputField.reviewsRange}&searchFields=${searchFields.reviewsRange}`,
     viewParcels: (id: number) => `https://logapi.logistixng.com/api/b2c/parcel/${id}`,
     editParcels: (id: number) => `https://logapi.logistixng.com/api/b2c/parcel/${id}`,
-    deleteParcels: (id: number) => `https://logapi.logistixng.com/api/b2c/parcel/${id}`,
     viewCustomer: (id: number) => `https://logapi.logistixng.com/api/b2c/user/${id}`,
     viewDispatcher: (id: number) => `https://logapi.logistixng.com/api/b2b/cakenus/rider/${id}`,
     viewStaff: (id: number) => `https://logapi.logistixng.com/api/b2b/cakenus/staff/${id}`,
-    deleteCustomers: (id: any) => `https://logapi.logistixng.com/api/b2b/${data}/subscriber/${id}`,
+    deleteParcels: (id: number) => `https://logapi.logistixng.com/api/b2c/parcel/${id}`,
+    deleteReviews: (id: any) => `https://logapi.logistixng.com/api/b2c/review/${id}`,
+    deleteBusiness: (id: any) => `https://logapi.logistixng.com/api/b2c/business/${id}`,
+    deleteUser: (id: any) => `https://logapi.logistixng.com/api/b2c/user/${id}`,
 }

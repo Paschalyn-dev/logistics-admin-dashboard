@@ -1,10 +1,9 @@
 'use client'
 import Holder from "../../holder";
-import Input from "../../input";
 import Section from "../../section";
 import PreferencesNav from "../preferencesnav";
 import States from "../../states";
-import { useContext, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useReducer } from "react";
 import { State_data } from "../../context/context";
 import AddItem from "./additembtn";
@@ -12,12 +11,10 @@ import OpenCalculator from "./opencalculator";
 import ToggleButton from "./toggleButton";
 import Hero from "../hero";
 import SubHeading from "../website/subheading";
-import Button from "../../button";
 import ButtonAndMessage from "./buttonandmessage";
-import { useBusiness } from "../../services/swr-functions/customer-swr";
+import { useBusiness, useGetBusiness } from "../../services/swr-functions/customer-swr";
 import { useFetchLocations, useLocations, usePostDistancePricing } from "../../services/swr-functions/staff-swr";
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
-import HandleSuccessMessage from "./handlesuccessmessage";
 
 type CURRENTSTATES = {
     showPriceRange: boolean,
@@ -27,16 +24,23 @@ type CURRENTSTATES = {
     PayOnDelivery: boolean;
     PayOnPickup: boolean;
 }
-
+export default function ShipmentPreferences(){   
+const {getBusinessData, getBusinessError, getBusinessIsLoading, getBusinessIsValidating, getBusinessMutate} = useGetBusiness();
+const payment = getBusinessData?.data?.paymentMethods;
 const initialState: CURRENTSTATES = {
     showPriceRange: true,
     showCalculator: false,
     showStates: false,
-    payInstantly: false,
-    PayOnDelivery: false,
-    PayOnPickup: false,
+    payInstantly: payment?.includes('PAY_NOW') ? true : false,
+    PayOnDelivery: payment?.includes('PAY_ON_DELIVERY') ? true : false,
+    PayOnPickup: payment?.includes('PAY_ON_PICKUP') ? true : false,
 }
+const [locationsSwap, setLocationsSwap] = useState<boolean>(false);
 
+useEffect(() => {
+    getBusinessMutate();
+    locationsMutate();
+}, [])
 
 const reducer = (state: any, action: any) => {
     switch(action.type){
@@ -62,13 +66,23 @@ const reducer = (state: any, action: any) => {
     }
 }
 
-export default function ShipmentPreferences(){
-    const {globaldata, globalPriceList, setGlobalPriceList, setGlobalData} = useContext<any | string>(State_data);
+    const {globaldata, globalPriceList, setGlobalPriceList, setGlobalData, setSuccessMessage, successMessage} = useContext<any | string>(State_data);
     const [state, dispatch] = useReducer(reducer, initialState);
     let paymentMethods: string[] = [];
     const {locationsData, locationsError, locationsIsLoading, locationsIsValidating, locationsMutate} = useLocations({locations: globaldata})
     const handleShowPriceRange = () => {
        dispatch({type: "SHOWPRICERANGE", payload: !initialState.showPriceRange})
+    }
+
+    // console.log("defghjk",locationsData, globaldata);
+
+    const handlePaymentOptions2 = () => {
+        setSuccessMessage((prev: any) => ({...prev, paymentOptions: true}))
+    }
+
+    const handleDeliveryLocations = () => {
+        setSuccessMessage((prev: any) => ({...prev, deliveryLocations: true}))
+        setLocationsSwap(false);
     }
 
     const handleShowStates = () => {
@@ -91,8 +105,6 @@ export default function ShipmentPreferences(){
         dispatch({type: "PAYONPICKUP", payload: !initialState.PayOnPickup})
     }
 
-    console.log(globalPriceList)
-
     if(state.payInstantly) paymentMethods.push('PAY_NOW');
     if(state.payOnDelivery) paymentMethods.push('PAY_ON_DELIVERY');
     if(state.payOnPickup) paymentMethods.push('PAY_ON_PICKUP');
@@ -106,6 +118,7 @@ export default function ShipmentPreferences(){
     useEffect(()=> {
       locationsMutate();
     }, [locationsData?.data])
+
 
     return(
         <Holder>
@@ -133,6 +146,9 @@ export default function ShipmentPreferences(){
                 <div>
                     <ButtonAndMessage
                     buttonName="Save"
+                    name="paymentOptions"
+                    title={successMessage.paymentOptions}
+                    handleClick={handlePaymentOptions2}
                     mutate={businessChangeMutate}
                     code={businessChangeData?.code}
                     error={businessChangeError}
@@ -154,8 +170,8 @@ export default function ShipmentPreferences(){
                         
                         <div className="mb-3 rounded-lg bg-gray-200 h-fit w-full p-5">
                             <div className="animate__animated animate__bounceInDown flex justify-start items-center gap-1 flex-wrap">
-                            {getLocationsData?.data && globaldata.length > 0 && globaldata?.map((data: string, i:number) => (
-                                    <div className="animate__animated animate__bounceInDown flex bg-gray-50 py-2 px-3 phone:text-xs laptop:text-sm w-fit my-2 rounded-full justify-center items-center gap-5">
+                            {locationsSwap && locationsData?.data && globaldata?.map((data: string, i:number) => (
+                                    <div className="flex bg-gray-50 py-2 px-3 phone:text-xs laptop:text-sm w-fit my-2 rounded-full justify-center items-center gap-5">
                                         <p>{data}</p>
                                         <span onClick={() => setGlobalData(globaldata.filter((item:string, index:number) => i !== index ))} 
                                         className="text-red-500 cursor-pointer font-extrabold">
@@ -164,23 +180,26 @@ export default function ShipmentPreferences(){
                                     </div>
                                 ))
                             }
-                            {/* {
-                                locationsData?.data && locationsData?.data?.map((location: string, i:number) => (
-                                    <div className="animate__animated animate__bounceInDown flex bg-gray-50 py-2 px-3 phone:text-xs laptop:text-sm w-fit my-2 rounded-full justify-center items-center gap-5">
+                            {
+                                !locationsSwap && locationsData?.data && locationsData?.data?.map((location: string, i:number) => (
+                                    <div className="animate__animated animate__fadeIn flex bg-gray-50 py-2 px-3 phone:text-xs laptop:text-sm w-fit my-2 rounded-full justify-center items-center gap-5">
                                         <p>{location}</p>
-                                        <span onClick={() => setGlobalData(globaldata.filter((item:string, index:number) => i !== index ))} 
+                                        <span onClick={() => setLocationsSwap(true)} 
                                         className="text-red-500 cursor-pointer font-extrabold">
                                             <i title="Delete" className="icon ion-md-close"></i>
                                         </span>
                                     </div>
                                 ))
-                            } */}
+                            }
                             </div>
                             <p className="relative text-xs text-right bottom-0 right-0">{locationsData?.data?.length} {locationsData?.data?.length > 1 ? "entries" : "entry"}</p>
                         </div>
                         <ButtonAndMessage 
                         error={locationsError}
-                        mutate={locationsMutate}
+                        mutate={locationsMutate}  
+                        title={successMessage.deliveryLocations}                  
+                        name="deliveryLocations"
+                        handleClick={handleDeliveryLocations}
                         successmessage="Your locations has been updated!" 
                         code={locationsData?.code}
                         failedmessage="Sorry, locations cannot be updated!"

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from "next/navigation";
-import { activeShipmentsCountFetcher, administratorsRangeFetcher, billingInvoiceFetcher, businessChangeFetcher, changePasswordFetcher, companyRevenueFetcher, countParcelsFetcher, createParcelFetcher, customerLoginFetcher, customerRangeFetcher, deleteCustomerFetcher, deleteParcel, dispatchersRangeFetcher, editParcelFetcher, fetchAllDispatchersFetcher, fetchAllParcelsFetcher, fetchAllReviews, fetchTransactionsFetcher, forgetPasswordFetcher, messagesRangeFetcher, parcelLateFetcher, parcelRangeFetcher, parcelsDeliveredFetcher, reviewsRangeFetcher, todayRevenueFetcher, transactionsRangeFetcher, viewCustomerFetcher, viewDispatcherFetcher, viewParcelFetcher, viewStaffFetcher } from "../customer-api/api";
+import { activeShipmentsCountFetcher, administratorsRangeFetcher, billingInvoiceFetcher, businessChangeFetcher, changePasswordFetcher, companyRevenueFetcher, countParcelsFetcher, createParcelFetcher, customerLoginFetcher, customerRangeFetcher, deleteBusinessFetcher, deleteParcel, deleteReviewFetcher, deleteUserFetcher, dispatchersRangeFetcher, editParcelFetcher, fetchAllDispatchersFetcher, fetchAllParcelsFetcher, fetchAllReviews, fetchTransactionsFetcher, forgetPasswordFetcher, getBusinessDetails, messagesRangeFetcher, parcelLateFetcher, parcelRangeFetcher, parcelsDeliveredFetcher, reviewsRangeFetcher, todayRevenueFetcher, transactionsRangeFetcher, viewCustomerFetcher, viewDispatcherFetcher, viewParcelFetcher, viewStaffFetcher } from "../customer-api/api";
 import { customerLogin } from "../libs/customer-auth";
 import { CUSTOMERSWRKEYS } from "../swr-keys/customer-keys";
 import useSWR from "swr";
@@ -358,18 +358,6 @@ export function useTodayRevenue(){
     }
 }
 
-export function useDeleteParcels(id: number){
-    const {data, error, mutate, isLoading, isValidating} = useSWR(CUSTOMERSWRKEYS.deleteParcels, 
-        () => deleteParcel(id));
-    return{
-        deleteParcelData: data,
-        deleteParcelError: error,
-        deleteParcelMutate: mutate,
-        deleteParcelIsLoading: isLoading,
-        deleteParcelIsValidating: isValidating 
-    }
-}
-
 export function useViewParcels(id: number){
     const {data, error, mutate, isLoading, isValidating} = useSWR(CUSTOMERSWRKEYS.viewParcels, 
         () => viewParcelFetcher(id));
@@ -430,17 +418,6 @@ export function useViewStaff(id: number){
     }
 }
 
-export function useDeleteCustomer(id: number){
-    const {data, error, mutate, isLoading, isValidating} = useSWR(CUSTOMERSWRKEYS.deleteCustomer, 
-        () => deleteCustomerFetcher(id));
-    return{
-        deleteCustomerData: data,
-        deleteCustomerError: error,
-        deleteCustomerMutate: mutate,
-        deleteCustomerIsLoading: isLoading,
-        deleteCustomerIsValidating: isValidating 
-    }
-}
 
 export function useBusiness(changeBearer: any){
     const {data, error, mutate, isLoading, isValidating} = useSWR(CUSTOMERSWRKEYS.business, 
@@ -451,5 +428,66 @@ export function useBusiness(changeBearer: any){
         businessChangeMutate: mutate,
         businessChangeIsLoading: isLoading,
         businessChangeIsValidating: isValidating 
+    }
+}
+
+export function useGetBusiness(){
+    const {data, error, mutate, isLoading, isValidating} = useSWR(CUSTOMERSWRKEYS.getBusinessDetails, 
+        () => getBusinessDetails());
+    return{
+        getBusinessData: data,
+        getBusinessError: error,
+        getBusinessMutate: mutate,
+        getBusinessIsLoading: isLoading,
+        getBusinessIsValidating: isValidating 
+    }
+}
+
+export function useDeleteParcels(id: number){
+    console.log(id, "parcel")
+    const {data, error, mutate, isLoading, isValidating} = useSWR(CUSTOMERSWRKEYS.deleteParcel, 
+        () => deleteParcel(id));
+    return{
+        deleteParcelData: data,
+        deleteParcelError: error,
+        deleteParcelMutate: mutate,
+        deleteParcelIsLoading: isLoading,
+        deleteParcelIsValidating: isValidating 
+    }
+}
+
+export function useDeleteUser(id: number){
+    const {data, error, mutate, isLoading, isValidating} = useSWR(CUSTOMERSWRKEYS.deleteUser, 
+        () => deleteUserFetcher(id));
+    return{
+        deleteUserData: data,
+        deleteUserError: error,
+        deleteUserMutate: mutate,
+        deleteUserIsLoading: isLoading,
+        deleteUserIsValidating: isValidating 
+    }
+}
+
+export function useDeleteBusiness(id: number){
+    const {data, error, mutate, isLoading, isValidating} = useSWR(CUSTOMERSWRKEYS.deleteBusiness, 
+        () => deleteBusinessFetcher(id));
+    return{
+        deleteBusinessData: data,
+        deleteBusinessError: error,
+        deleteBusinessMutate: mutate,
+        deleteBusinessIsLoading: isLoading,
+        deleteBusinessIsValidating: isValidating 
+    }
+}
+
+export function useDeleteReviews(id: number){
+    const {data, error, mutate, isLoading, isValidating} = useSWR(CUSTOMERSWRKEYS.deleteReview, 
+        () => deleteReviewFetcher(id));
+    return{
+        deleteReviewsData: data,
+        deleteReviewsError: error,
+        deleteReviewsMutate: mutate,
+        deleteReviewsIsLoading: isLoading,
+        deleteReviewsIsValidating: isValidating 
     }
 }

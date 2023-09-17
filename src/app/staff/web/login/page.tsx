@@ -35,7 +35,7 @@ export default function Staff(){
                         <h5 className="text-sm text-gray-800">CakenUs Services</h5>
                     </div>
                     {
-                        (staff?.id !== undefined && staff?.password !== undefined) && 
+                        (staff !== undefined && staff !== undefined) && 
                         <ErrorAndSucccessHandlers 
                         message={staff?.code} 
                         staffAndCustomer={staff}

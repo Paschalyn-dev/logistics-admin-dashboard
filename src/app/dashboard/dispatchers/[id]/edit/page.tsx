@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from "next/navigation";
@@ -18,9 +18,10 @@ import SubHeading from "@/app/dashboard/preferences/website/subheading";
 import UploadFile from "@/app/dashboard/formik/file";
 import ToggleButton from "@/app/dashboard/preferences/shipment/toggleButton";
 import Button from "@/app/dashboard/button";
+import { State_data } from "@/app/dashboard/context/context";
 
 export default function EditDispatchers({ params }: { params: {id: number}}){
-    const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+    const {successMessage, setSuccessMessage} = useContext(State_data);
     const [saveAndAddNewRider, setSaveAndAddNewRider] = useState<boolean>(false);
     const [passwordString, setPasswordString] = useState<boolean>(true)
     const [generatePassword, setGeneratePassword] = useState<boolean>(true);
@@ -125,7 +126,7 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                   })}
                   onSubmit={(values) => {
                     setTimeout(() => {
-                        setShowSuccessMessage(true);
+                        setSuccessMessage((prev: any) => ({...prev, editDispatcher: true}));
                         setDispatcherDetails(values);
                     }, 1000);
                   }}

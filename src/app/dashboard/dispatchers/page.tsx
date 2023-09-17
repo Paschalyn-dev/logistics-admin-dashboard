@@ -17,52 +17,43 @@ import { State_data } from "../context/context";
 import Popup from "../services/eventhandlers/popup";
 
 export default function Dispatcher(){
-    const [openUIBoxes, setOpenUIBoxes] = useState<UIBOXES>(
-        {
-            searchBox: false,
-            popup: false,
-            clearData: false,
-        }
-    )
     const [inputData, setInputData] = useState('');
-    const [id, setId] = useState<number>(0);
     const {dispatcherAllData, dispatcherAllError, dispatcherAllIsLoading, dispatcherAllIsValiddating, dispatcherAllMutate} = useAllDispatchersFetcher();
     const [menu, setMenu] = useState<string>('card');
-    const {dispatchersRange} = useContext<any | string>(State_data);
-    const [successmessage, setSuccessMessage] = useState<boolean>(true);
+    const {dispatchersRange, setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage} = useContext<any | string>(State_data);
     const {dispatchersRangeData, dispatchersRangeError, dispatchersRangeIsLoading, dispatchersRangeIsValidating, dispatchersRangeMutate} = useDispatcherSearchRange(dispatchersRange);
     const handleOpenSearch = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, searchBox: true, clearData: true}))
+        setOpenUIBoxes((prev: any) => ({...prev, dispatcherSearch: true, dispatcherClearData: true}))
     }
     const handleInputData = (e: any) => {
         setInputData(e.target.value)
     }
     const handleClearData = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, clearData: false}))
+        setOpenUIBoxes((prev: any) => ({...prev, dispatcherClearData: false}))
     }
 
     const handleCloseFill = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, popup: false}))
+        setOpenUIBoxes((prev: any) => ({...prev, dispatcherPopup: false}))
     }
     useEffect(() => {
         dispatcherAllMutate(dispatcherAllData);
         console.log(dispatcherAllData);
-    }, [openUIBoxes.clearData !== true]);
+    }, [openUIBoxes.dispatcherClearData !== true]);
     return(
         <Holder>
             {
-                (dispatcherAllIsLoading || dispatcherAllIsValiddating && !openUIBoxes.searchBox) &&
+                (dispatcherAllIsLoading || dispatcherAllIsValiddating && !openUIBoxes.dispatcherSearch) &&
                 <SkeletonLoading title="all dispatchers." />
             }
             {
-                ((dispatchersRangeIsLoading || dispatchersRangeIsValidating) && openUIBoxes.searchBox) &&
+                ((dispatchersRangeIsLoading || dispatchersRangeIsValidating) && openUIBoxes.dispatcherSearch) &&
                 <SkeletonLoading loadingSearching="Searching" title="dispatchers." />                
             }
             <ConstantNav />
             <Section>
                     <Heading heading="My Dispatchers" />
-                    {dispatcherAllData?.data?.length >= 0 && !openUIBoxes.clearData && dispatchersRangeData?.data !== 'undefined' && <p>You have <span className="font-bold">{dispatcherAllData?.data?.length || 0}</span> dispatcher{dispatcherAllData?.data?.length > 1 && "s"}.</p>}
-                    {dispatchersRangeData !== 'undefined' && openUIBoxes.clearData && <p><span className="font-bold">{dispatchersRangeData?.data?.length || 0}</span> dispatcher match(es) found.</p>}              
+                    {dispatcherAllData?.data?.length >= 0 && !openUIBoxes.dispatcherClearData && dispatchersRangeData?.data !== 'undefined' && <p>You have <span className="font-bold">{dispatcherAllData?.data?.length || 0}</span> dispatcher{dispatcherAllData?.data?.length > 1 && "s"}.</p>}
+                    {dispatchersRangeData !== 'undefined' && openUIBoxes.dispatcherClearData && <p><span className="font-bold">{dispatchersRangeData?.data?.length || 0}</span> dispatcher match(es) found.</p>}              
                     <Input 
                     link="/dashboard/dispatchers/create" 
                     placeholder="Search Dispatchers" 
@@ -73,29 +64,29 @@ export default function Dispatcher(){
                     handleChange={handleInputData}
                     searchInput={inputData}
                     />
-                    { openUIBoxes.clearData &&
+                    { openUIBoxes.dispatcherClearData &&
                         <button onClick={handleClearData} className="text-red-500 mt-3 gap-2 flex font-bold text-sm">
                             <span>
                                 <i className="icon ion-md-close"></i>
                             </span>Clear Filter</button>
                         }
-                    {openUIBoxes.searchBox && <SearchFilter inputData={inputData} closeFill={handleCloseFill} />}
-                    {openUIBoxes.popup && <Popup text="Rider" closeFill={handleCloseFill} popupShow={openUIBoxes.popup} id={id} />}
+                    {openUIBoxes.dispatcherSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
+                    {openUIBoxes.dispatcherPopup && <Popup text="Rider" name="dispatchers" closeFill={handleCloseFill} popupShow={openUIBoxes.dispatcherPopup} id={deleteWithId.dispatchers} />}
                     
                     {
-                        dispatcherAllError && successmessage &&
+                        dispatcherAllError && successMessage.dispatcher &&
                         <SuccessMessage
-                        successMessageShow={successmessage}
-                        handleShowSuccessMessage={setSuccessMessage}
+                        successMessageShow={successMessage.dispatcher}
+                        name="dispatcher"
                         id="failed"
                         messageTitle="Dispatchers cannot be fetched. Check network connection!"
                         />
                     }
                     {
-                        dispatchersRangeError && openUIBoxes.searchBox && successmessage &&
+                        dispatchersRangeError && openUIBoxes.dispatcherSearch && successMessage.dispatcher &&
                         <SuccessMessage
-                        successMessageShow={successmessage}
-                        handleShowSuccessMessage={setSuccessMessage}
+                        successMessageShow={successMessage.dispatcher}
+                        name="dispatcher"
                         id="failed"
                         messageTitle="Searching failed, check network connection!"
                         />
@@ -115,7 +106,7 @@ export default function Dispatcher(){
                 {menu === "card" &&
                 <>
                     <BoxesHolder>
-                    {dispatcherAllData?.data &&  !openUIBoxes.clearData &&
+                    {dispatcherAllData?.data &&  !openUIBoxes.dispatcherClearData &&
                     (dispatcherAllData.data.map((dispatcher: any) => {
                         return(
                             <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
@@ -135,8 +126,8 @@ export default function Dispatcher(){
                                         <i className="icon ion-md-create"></i>
                                     </Link>
                                     <span onClick={() => {
-                                        setOpenUIBoxes((prev: any) => ({...prev, popup: true}));
-                                        setId(dispatcher.id)
+                                        setOpenUIBoxes((prev: any) => ({...prev, dispatcherPopup: true}));
+                                        setDeleteWithId((prev: any) => ({...prev, dispatchers: dispatcher?.id}));
                                     }}  
                                     className="hover:text-red-400 text-red-500 cursor-pointer rounded-full bg-red-100 px-3 py-2">
                                     <i className="icon ion-md-trash"></i>
@@ -171,7 +162,7 @@ export default function Dispatcher(){
                     )}))}
                     </BoxesHolder>
                 { !dispatcherAllIsLoading && dispatcherAllData?.data?.length === 0 && (
-                    <div className={ !openUIBoxes.clearData ? "flex flex-col w-full justify-center items-center" : "hidden"}>
+                    <div className={ !openUIBoxes.dispatcherClearData ? "flex flex-col w-full justify-center items-center" : "hidden"}>
                     <span className="-mb-16">
                         <i id="bigger" className="icon ion-md-bicycle"></i>
                     </span>
@@ -180,10 +171,10 @@ export default function Dispatcher(){
                     {/* <p className="w-5/12 mt-1 text-sm text-center">You don't have any active Shipment.</p> */}
                 </div>
                 )}
-                {openUIBoxes.clearData && <SubHeading subheading="Search Results" />}
+                {openUIBoxes.dispatcherClearData && <SubHeading subheading="Search Results" />}
 
                 <BoxesHolder>
-                {dispatchersRangeData?.data && openUIBoxes.clearData &&
+                {dispatchersRangeData?.data && openUIBoxes.dispatcherClearData &&
                     (dispatchersRangeData.data.map((dispatcher: any) => {
                         return(
                         <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
@@ -203,8 +194,8 @@ export default function Dispatcher(){
                                         <i className="icon ion-md-create"></i>
                                     </Link>
                                     <span onClick={() => {
-                                        setOpenUIBoxes((prev: any) => ({...prev, popup: true}));
-                                        setId(dispatcher.id)
+                                        setOpenUIBoxes((prev: any) => ({...prev, dispatcherPopup: true}));
+                                        setDeleteWithId((prev: any) => ({...prev, dispatchers: dispatcher?.id}));
                                     }} 
                                     className="hover:text-red-400 text-red-500 cursor-pointer rounded-full bg-red-100 px-3 py-2">
                                     <i className="icon ion-md-trash"></i>
@@ -238,7 +229,7 @@ export default function Dispatcher(){
                         </div>
                     )}))}
                         </BoxesHolder>
-                    { (dispatchersRangeData?.data?.length === 0 || dispatchersRangeData?.data === 'undefined' || dispatchersRangeData?.code !== 200 && openUIBoxes.clearData) && (
+                    { (dispatchersRangeData?.data?.length === 0 || dispatchersRangeData?.data === 'undefined' || dispatchersRangeData?.code !== 200 && openUIBoxes.dispatcherClearData) && (
                         <div className="flex flex-col w-full justify-center items-center">
                         <span className="-mb-16">
                             <i id="bigger" className="icon ion-md-bicycle"></i>

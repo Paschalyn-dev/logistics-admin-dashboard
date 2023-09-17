@@ -1,10 +1,11 @@
 export type BUTTON = {
     buttonName?: string;
-    handleClick?: any;
     successmessage?: string;
     failedmessage?: string;
     errormessage?: string;
-    id?: string;
+    handleClick?: any;
+    title?: boolean;
+    name?: any;
     code?: number;
     mutate?: any;
     error?: any;
@@ -16,6 +17,9 @@ export type HANDLESUCCESSMESSAGETYPE = {
     errormessage?: string;
     id?: string;
     code?: number;
+    handleClick?: any;
+    title?: boolean;
+    name?: any;
     mutate?: any;
     error?: any;
     successMessage?: boolean;

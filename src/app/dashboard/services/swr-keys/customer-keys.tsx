@@ -25,14 +25,15 @@ export const CUSTOMERSWRKEYS = {
     searchReviews: 'SEARCH_REVIEWS',
     viewParcels: 'VIEW_PARCELS',
     editParcels: 'EDIT_PARCELS',
-    deleteParcels: 'DELETE_PARCELS',
     viewCustomers: 'VIEW_CUSTOMERS',
     viewDispatcher: 'VIEW_DISPATCHER',
     editDispatcher:'EDIT_DISPATCHER',
-    deleteDispatcher: 'DELETE_DISPATCHER',
-    deleteCustomer: 'DELETE_CUSTOMER',
+    deleteUser: 'DELETE_USER',
+    deleteBusiness: 'DELETE_BUSINESS',
+    deleteReview: 'DELETE_REVIEW',
+    deleteParcel: 'DELETE_PARCEL',
     viewStaff: 'VIEW_STAFF',
     editStaf: 'EDIT_STAFF',
-    deleteStaff: 'DELETE_STAFF', 
-    business: 'BUSINESS'
+    business: 'BUSINESS',
+    getBusinessDetails: 'GET_BUSINESS_DETAILS'
 }

@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Formik, Form } from 'formik';
 import SuccessMessage from "../../successmessage";
 import Hero from "../../preferences/hero";
@@ -18,9 +18,10 @@ import Section from "../../section";
 import { Password } from "../../formik/password";
 import { useCreateDispatcher } from "../../services/swr-functions/staff-swr";
 import Loader from "../../services/Loader/spinner";
+import { State_data } from "../../context/context";
 
 export default function FormPageDispatcher({handleOpenForm}: any){
-    const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+    const {successMessage, setSuccessMessage} = useContext(State_data);
     const [saveAndAddNewRider, setSaveAndAddNewRider] = useState<boolean>(false);
     const [passwordString, setPasswordString] = useState<boolean>(true)
     const [generatePassword, setGeneratePassword] = useState<boolean>(true);
@@ -41,29 +42,29 @@ export default function FormPageDispatcher({handleOpenForm}: any){
         <Holder>
             <ConstantNav />
             <Section>
-            {showSuccessMessage && createDispatcherData?.code === 200 && 
+            {successMessage.createDispatcher && createDispatcherData?.code === 200 && 
                     <SuccessMessage 
                     messageTitle="Dispatcher has been successfully added to the list!" 
-                    successMessageShow={showSuccessMessage} 
-                    handleShowSuccessMessage={setShowSuccessMessage} 
+                    successMessageShow={successMessage.createDispatcher} 
+                    name="createDispatcher"                    
                     />
                 }
 
                 {
-                    createDispatcherError && showSuccessMessage &&
+                    createDispatcherError && successMessage.createDispatcher &&
                     <SuccessMessage
-                    successMessageShow={showSuccessMessage}
-                    handleShowSuccessMessage={setShowSuccessMessage}
+                    successMessageShow={successMessage.createDispatcher}
+                    name="createDispatcher"                    
                     id="failed"
                     messageTitle="Dispatcher cannot be added. Check network connection!"
                     />
                 }     
 
                 {
-                    createDispatcherData?.data !== 200 && showSuccessMessage &&
+                    createDispatcherData?.data !== 200 && successMessage.createDispatcher &&
                     <SuccessMessage
-                    successMessageShow={showSuccessMessage}
-                    handleShowSuccessMessage={setShowSuccessMessage}
+                    successMessageShow={successMessage.createDispatcher}
+                    name="createDispatcher"                    
                     id="failed"
                     messageTitle="Sorry, Dispatcher cannot be added to the list!"
                     />
@@ -112,7 +113,7 @@ export default function FormPageDispatcher({handleOpenForm}: any){
                   onSubmit={(values) => {
                     setTimeout(() => {
                         console.log(createDispatcherData)
-                        setShowSuccessMessage(true);
+                        setSuccessMessage((prev: any) => ({...prev, createDispatcher: true}));
                         setDispatcherDetails(values);
                     }, 1000);
                   }}

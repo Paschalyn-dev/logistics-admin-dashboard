@@ -13,9 +13,11 @@ type Btn = {
     name?: string;
     message?: string;
     handleClick?: any;
+    justify?: string;
+    mt?: number;
 }
 
-export default function Input({phonetext, handleClick, laptoptext, placeholder, name, link, message, handleChange, searchInput}: Btn){
+export default function Input({phonetext, handleClick, mt, justify, laptoptext, placeholder, name, link, message, handleChange, searchInput}: Btn){
     const [windowWidth, setWindowWidth]= useState<number>(window.innerWidth);
     const [successMessage, setSuccessMessage] = useState<boolean>(false);
 
@@ -31,7 +33,7 @@ export default function Input({phonetext, handleClick, laptoptext, placeholder, 
         <>
         {successMessage && <SuccessMessage successMessageShow={successMessage} handleShowSuccessMessage={setSuccessMessage} messageTitle={message} />}
 
-        <div className="flex mt-5 justify-start w-full gap-2 items-center">
+        <div className={`flex mt-${mt === 0 ?  mt : 5} justify-${justify || 'start'} w-full gap-2 items-center`}>
         { (phonetext || laptoptext) && 
          <div className="font-bold w-fit laptop:text-base desktop:text-lg phone:text-sm text-gray-50 flex justify-start items-center">
               { link && <Link href={link} 
@@ -45,10 +47,12 @@ export default function Input({phonetext, handleClick, laptoptext, placeholder, 
             </div>
             }
 
-            <div className="flex items-center bg-gray-200 gap-3 rounded-xl w-fit justify-start p-3">
-                <i id="icon" className="icon ion-md-search"></i>
-                <input name={name} type="text" onClick={handleClick} onChange={handleChange} value={searchInput} className="text-green-700 bg-gray-200 outline-0 h-fit w-full" placeholder={placeholder} />
-            </div>
+            { name &&
+                <div className="flex items-center bg-gray-200 gap-3 rounded-xl w-fit justify-start p-3">
+                    <i id="icon" className="icon ion-md-search"></i>
+                    <input name={name} type="text" onClick={handleClick} onChange={handleChange} value={searchInput} className="text-green-700 bg-gray-200 outline-0 h-fit w-full" placeholder={placeholder} />
+                </div>
+            }
         </div>
         </>
     )

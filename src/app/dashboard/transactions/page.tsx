@@ -20,76 +20,56 @@ import Link from "next/link";
 
 export default function Transactions(){
     // const {companyRevenueData} = useCompanyRevenue();
-    const [openUIBoxes, setOpenUIBoxes] = useState<UIBOXES>(
-        {
-            searchBox: false,
-            popup: false,
-            clearData: false
-        }
-    )
     const [inputData, setInputData] = useState<string>('');
     const [id, setId] = useState<number>(0);
-    const [successmessage, setSuccessMessage] = useState<boolean>(true)
     const { fetchTransactionsData, fetchTransactionsError, fetchTransactionsIsLoading, fetchTransactionsIsValidating, fetchTransactionsMutate } = useAllFetchTransactions();
-    const {transactionsRange,setTransactionsRange} = useContext<any | string>(State_data);
+    const {transactionsRange,setTransactionsRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage} = useContext<any | string>(State_data);
     const {transactionsRangeData, transactionsRangeError, transactionsRangeIsLoading, transactionsRangeIsValidating, transactionsRangeMutate} = useTransactionsSearchRange(transactionsRange);
     const handleOpenSearch = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, searchBox: true, clearData: true}))
+        setOpenUIBoxes((prev: any) => ({...prev, transactionSearch: true, transactionClearData: true}))
     }
     const handleInputData = (e: any) => {
         setInputData(e.target.value)
     }
     const handleClearData = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, clearData: false}))
-    }
-    
-    const handleCloseFill = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, popup: false}))
+        setOpenUIBoxes((prev: any) => ({...prev, transactionClearData: false}))
     }
     
     useEffect(() => {
         fetchTransactionsMutate(fetchTransactionsData);
-    }, [openUIBoxes.clearData !== true]);
+    }, [openUIBoxes.transactionClearData !== true]);
 
     console.log("sdgyujikuhgfds",fetchTransactionsData)
     
     return(
         <Holder>
                {
-                   (fetchTransactionsIsLoading || fetchTransactionsIsValidating && !openUIBoxes.searchBox) &&
+                   (fetchTransactionsIsLoading || fetchTransactionsIsValidating && !openUIBoxes.transactionSearch) &&
                    <SkeletonLoading title="all transactions." />
                 }
                {
-                   (transactionsRangeIsLoading || transactionsRangeIsValidating && openUIBoxes.searchBox) &&
+                   (transactionsRangeIsLoading || transactionsRangeIsValidating && openUIBoxes.transactionSearch) &&
                    <SkeletonLoading loadingSearching="Searching" title="transactions." />                
                 }
             <ConstantNav />
             <Section>
               <Heading heading="Transactions" />  
-              {fetchTransactionsData?.data?.length >= 0 && !openUIBoxes.clearData && !transactionsRangeData?.data && <p>You have <span className="font-bold">{fetchTransactionsData?.data?.length || 0}</span> transaction{fetchTransactionsData?.data?.length > 1 && "s"}.</p>}
-               {transactionsRangeData !== 'undefined' && openUIBoxes.clearData && <p><span className="font-bold">{transactionsRangeData?.data?.length || 0}</span> transaction match(es) found.</p>}
-                { openUIBoxes.clearData &&
-                <button onClick={handleClearData} className="text-red-500 mt-3 gap-2 flex font-bold text-sm">
-                    <span>
-                        <i className="icon ion-md-close"></i>
-                    </span>Clear Filter</button>
-                }
-               {openUIBoxes.searchBox && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
-               {openUIBoxes.popup && <Popup text="Transaction" closeFill={handleCloseFill} popupShow={openUIBoxes.popup} id={id} />}
+              {fetchTransactionsData?.data?.length >= 0 && !openUIBoxes.transactionClearData && !transactionsRangeData?.data && <p>You have <span className="font-bold">{fetchTransactionsData?.data?.length || 0}</span> transaction{fetchTransactionsData?.data?.length > 1 && "s"}.</p>}
+               {transactionsRangeData !== 'undefined' && openUIBoxes.transactionClearData && <p><span className="font-bold">{transactionsRangeData?.data?.length || 0}</span> transaction match(es) found.</p>}
                {
-                   fetchTransactionsError && successmessage &&
+                   fetchTransactionsError && successMessage.transaction &&
                    <SuccessMessage
-                   successMessageShow={successmessage}
-                   handleShowSuccessMessage={setSuccessMessage}
+                   successMessageShow={successMessage.transaction}
+                   name="transaction"
                    id="failed"
                    messageTitle="Past transactions cannot be fetched. Check network connection!"
                    />
                 }
                {
-                   transactionsRangeError && !transactionsRangeData?.data && openUIBoxes.searchBox && successmessage &&
+                   transactionsRangeError && !transactionsRangeData?.data && openUIBoxes.transactionSearch && successMessage.transaction &&
                    <SuccessMessage
-                   successMessageShow={successmessage}
-                   handleShowSuccessMessage={setSuccessMessage}
+                   successMessageShow={successMessage.transaction}
+                   name="transaction"
                    id="failed"
                    messageTitle="Searching failed, check network connection!"
                    />
@@ -144,6 +124,13 @@ export default function Transactions(){
                  handleChange={handleInputData}
                  searchInput={inputData}
                  />
+                 { openUIBoxes.transactionClearData &&
+                 <button onClick={handleClearData} className="text-red-500 mt-3 gap-2 flex font-bold text-sm">
+                     <span>
+                         <i className="icon ion-md-close"></i>
+                     </span>Clear Filter</button>
+                 }
+                 {openUIBoxes.transactionSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
                <div className="px-5 mt-10">
                  <div className="font-bold grid grid-cols-6 gap-4">
                     <h3>#</h3>

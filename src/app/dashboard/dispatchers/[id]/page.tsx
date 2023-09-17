@@ -1,22 +1,22 @@
 'use client'
 import Holder from "../../holder"
-import OrdersNav from "../../orders"
 import Hero from "../../preferences/hero"
 import Section from "../../section"
 import Link from "next/link";
-import { useViewDispatcher, useViewParcels } from "../../services/swr-functions/customer-swr";
+import { useViewDispatcher } from "../../services/swr-functions/customer-swr";
 import MiniText from "../../minitext"
 import useDateHandler from "../../date"
 import EditHeading from "../../editHeading"
-import {useState } from "react";
 import Popup from "../../services/eventhandlers/popup"
-import { useEffect } from "react";
+import { useEffect, useState, useContext } from "react";
 import ConstantNav from "../../constantNav"
 import SubHeading from "../../preferences/website/subheading"
+import { State_data } from "../../context/context"
+
 export default function EditParcel({ params }: { params: {id: number}}){
-  const [openUIBoxes, setOpenUIBoxes] = useState(false);
+  const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
   const handleCloseFill = () => {
-    setOpenUIBoxes(false)
+    setOpenUIBoxes((prev: any) => ({...prev, dispatcherPopup: false}))
   }
   const {viewDispatcherData,
     viewDispatcherError,
@@ -27,8 +27,6 @@ export default function EditParcel({ params }: { params: {id: number}}){
       viewDispatcherMutate();
     }, []);
     const date = new Date (viewDispatcherData?.data?.createdAt.slice(0, 10));
-    console.log(date)
-  const [id, setId] = useState<number>(0);
     return(
       <Holder>
         <ConstantNav />
@@ -44,13 +42,13 @@ export default function EditParcel({ params }: { params: {id: number}}){
               <Link href={`/dashboard/dispatchers/${viewDispatcherData?.data?.id}/edit`} className="bg-blue-500 border-4 hover:bg-blue-600 tablet:py-2 phone:py-1 text-gray-50 phone:text-base phone:px-2 tablet:px-3 tablet:text-lg rounded-lg">Edit</Link>
               <button className="bg-red-500 border-4 hover:bg-red-600 py-2 text-gray-50 phone:py-1 phone:px-2 phone:text-base tablet:py-2 tablet:px-3 tablet:text-lg rounded-lg"
                   onClick={() => {
-                    setOpenUIBoxes(true);
-                    setId(viewDispatcherData?.data?.id)
-                }}>
+                    setOpenUIBoxes((prev: any) => ({...prev, dispatcherPopup: true}));
+                    setDeleteWithId((prev: any) => ({...prev, dispatchers: viewDispatcherData?.data?.id}));
+                  }}>
                 Delete
               </button>
             </div>
-            {openUIBoxes && <Popup text="Dispatcher" closeFill={handleCloseFill} popupShow={openUIBoxes} id={id} />}
+            {openUIBoxes.dispatcherPopup && <Popup text="Dispatcher" closeFill={handleCloseFill} name="dispatchers" popupShow={openUIBoxes.dispatcherPopup} id={deleteWithId.dispatchers} />}
 
             <EditHeading subheading="Email Address" />
             <MiniText minitext={viewDispatcherData?.data?.email || 'N/A'} />

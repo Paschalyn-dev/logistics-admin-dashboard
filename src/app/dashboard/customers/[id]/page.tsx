@@ -1,23 +1,19 @@
 'use client'
 'use client'
 import Holder from "../../holder"
-import OrdersNav from "../../orders"
 import Hero from "../../preferences/hero"
 import Section from "../../section"
 import Link from "next/link";
-import { useDeleteParcels, useViewCustomers, useViewParcels } from "../../services/swr-functions/customer-swr";
+import { useViewCustomers } from "../../services/swr-functions/customer-swr";
 import MiniText from "../../minitext"
-import useDateHandler from "../../date"
-import { NumberComma } from "../../numberComma"
 import EditHeading from "../../editHeading"
-import {useState } from "react";
 import Popup from "../../services/eventhandlers/popup"
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import ConstantNav from "../../constantNav"
+import { State_data } from "../../context/context"
 export default function EditParcel({ params }: { params: {id: number}}){
-  const [openUIBoxes, setOpenUIBoxes] = useState(false);
   const handleCloseFill = () => {
-    setOpenUIBoxes(false)
+    setOpenUIBoxes((prev: any) => ({...prev, customerPopup: false}))
   }
   useEffect(() => {
     viewCustomerMutate();
@@ -27,9 +23,9 @@ export default function EditParcel({ params }: { params: {id: number}}){
  viewCustomerIsLoading,
  viewCustomerIsValidating,
  viewCustomerMutate} = useViewCustomers(params.id);
-  const [id, setId] = useState<number>(0);
-  const {deleteParcelData} = useDeleteParcels(id);
-    return(
+ const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
+
+ return(
       <Holder>
         <ConstantNav />
         <Section>
@@ -43,13 +39,13 @@ export default function EditParcel({ params }: { params: {id: number}}){
             <div className="flex justify-center items-center w-full gap-2">
               <button className="bg-red-500 border-4 hover:bg-red-600 py-2 text-gray-50 phone:py-1 phone:px-2 phone:text-base tablet:py-2 tablet:px-3 tablet:text-lg rounded-lg"
                   onClick={() => {
-                    setOpenUIBoxes(true);
-                    setId(viewCustomerData?.data?.id)
-                }}>
+                    setOpenUIBoxes((prev: any) => ({...prev, customerPopup: true}));
+                    setDeleteWithId((prev: any) => ({...prev, customers: viewCustomerData?.data?.id}));
+                  }}>
                 Delete
               </button>
             </div>
-            {openUIBoxes && <Popup text="Customer" closeFill={handleCloseFill} popupShow={openUIBoxes} id={id} />}
+            {openUIBoxes.customerPopup && <Popup text="Customer" name="customers" closeFill={handleCloseFill} popupShow={openUIBoxes.customerPopup} id={deleteWithId.customers} />}
             <EditHeading subheading="Email Address" />
             <MiniText minitext={viewCustomerData?.data?.email || 'N/A'} />
 

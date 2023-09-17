@@ -9,14 +9,13 @@ import Holder from "../../holder";
 import Time from "@/app/time";
 import BoxesHolder from "../../boxesholder";
 import { useActiveShipmentsCount, useAllDispatchersFetcher, useCompanyRevenue, useCountParcel, useCustomerCount, useDeliveredParcels, useLateParcels, useTodayRevenue } from "../../services/swr-functions/customer-swr";
-import { customerStore, staffStore } from "../../services/store/store";
-import { useCountDispatcher, useCountStaff} from "../../services/swr-functions/staff-swr";
+import { useCountDispatcher, useCountStaff, useFetchLocations} from "../../services/swr-functions/staff-swr";
 import { NumberComma } from "../../numberComma";
 import { State_data } from "../../context/context";
-// import { authorizationKey } from "../../services/customer-api/api";
+import Input from "../../input";
+import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
 
 export const colors = ['red', 'amber', 'green', 'black', 'yellow', 'blue'];
-const authorizationKey = staffStore[staffStore.length - 1]?.authToken;
 
 export default function Overview(){
     const [location, setLocation] = useState('lagos');
@@ -29,16 +28,15 @@ export default function Overview(){
     const {countStaffData} = useCountStaff();
     const {countRidersData} = useCountDispatcher();
     const {todayRevenueData} = useTodayRevenue();
+    const {getLocationsData, getLocationsError, getLocationsIsLoading, getLocationsIsValidating} = useFetchLocations();
     const {globaldata} = useContext(State_data);
     const {dispatcherAllData} = useAllDispatchersFetcher();
     return(
-        <>
-            <head>
-                <link href="https://unpkg.com/ionicons@4.5.10-0/dist/css/ionicons.min.css" rel="stylesheet" />
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-            </head>  
-
             <Holder>
+                {
+                    getLocationsIsLoading || getLocationsIsValidating &&
+                    <SkeletonLoading title="locations..." loadingSearching="Loading" />  
+                }
                 <HomeNav />
                 <Section>
                     <div>
@@ -125,36 +123,54 @@ export default function Overview(){
                             <i className="icon ion-md-locate" title="Location"></i>
                             <h1 className="text-lg">Top Delivery Locations</h1>
                         </div>
+                    { getLocationsData?.data?.length ?
+                    <div> 
                         <div className="flex justify-start flex-wrap my-4 items-center gap-5 text-xs text-gray-500/50">
-                            {globaldata?.map((state: string) => (
+                            {getLocationsData?.data?.map((state: string) => (
                                 <h3 onClick={() => setLocation(state)} className={location === state ? "bg-amber-500/10 text-amber-500 p-2 text-base rounded-full cursor-pointer text-center" : "p-2 rounded-full text-base cursor-pointer text-center"}>{state}</h3>
                             ))}
                         </div>
 
-                        <div className="flex justify-between w-full scroll-width-3 overflow-x-auto items-start gap-3">
-    
-                            <SmallBoxes
-                            icon="icon ion-md-cash"
-                            title="Revenue"
-                            amount="₦0"
-                            name="Cash"
-                             />
+                            <div className="flex justify-between w-full scroll-width-3 overflow-x-auto items-start gap-3">
+        
+                                <SmallBoxes
+                                icon="icon ion-md-cash"
+                                title="Revenue"
+                                amount="₦0"
+                                name="Cash"
+                                />
 
-                            <SmallBoxes
-                            icon="icon ion-md-cube"
-                            title="Parcels"
-                            amount={0}
-                            name="Cube"
-                             />
+                                <SmallBoxes
+                                icon="icon ion-md-cube"
+                                title="Parcels"
+                                amount={0}
+                                name="Cube"
+                                />
 
-                            <SmallBoxes
-                            icon="icon ion-md-people"
-                            title="Customers"
-                            amount={0}
-                            name="Customers"
-                             />                           
-                        </div>
-                    </div>
+                                <SmallBoxes
+                                icon="icon ion-md-people"
+                                title="Customers"
+                                amount={0}
+                                name="Customers"
+                                />                           
+                            </div>
+                        </div> 
+                        : 
+                        <div className="flex py-16 justify-center items-center gap-2 flex-col">
+                            <i id="bigger" className="icon ion-md-pin"></i>
+                            { getLocationsError ? 
+                                <h1 className="text-lg text-red-500">Error occured!</h1> :
+                                <h1 className="text-lg">No Locations</h1>
+                            }
+                            {
+                                getLocationsError ? <p className="text-sm w-4/6 text-center text-red-500">Check network connection.</p> 
+                                : 
+                                <p className="text-sm w-4/6 text-center text-gray-500">Add locations your business ships to for us to have something to show.</p>
+                            }
+                            <Input mt={0} justify="center" link="/dashboard/preferences/shipment" phonetext="Add Locations" laptoptext="Add Locations" />
+                        </div> 
+                        }
+                    </div> 
 
                     {/* second box */}
 
@@ -201,6 +217,5 @@ export default function Overview(){
                   </div>
                 </Section>
             </Holder>
-        </>
     )
 }

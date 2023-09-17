@@ -14,14 +14,18 @@ import Holder from "../../../holder";
 import Section from "../../../section";
 import { useRouter } from "next/navigation";
 import OrdersNav from "../../../orders";
+import { useContext } from "react";
 import TextArea from "../../../formik/textarea";
-import { useCreateParcel } from "../../../services/swr-functions/customer-swr";
+import { useAllDispatchersFetcher, useCreateParcel } from "../../../services/swr-functions/customer-swr";
 import {company, data} from "./../../../services/api-url/customer-api-url";
 import { phoneRegExp } from "@/app/dashboard/administrators/create/page";
 import Loader from "@/app/dashboard/services/Loader/spinner";
+import { State_data } from "@/app/dashboard/context/context";
+import { useFetchCustomers } from "@/app/dashboard/services/swr-functions/staff-swr";
+import ShowCustomers from "@/app/dashboard/showCustomers";
 
 export default function FormPageShipments(){
-    const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+    const {successMessage, setSuccessMessage, id} = useContext(State_data);
     const [handleToggleParcelButtons, setHandleToggleParcelButtons] = useState<any>({
         saveAndAddNewRider: false,
         parcelFragility: false,
@@ -29,6 +33,13 @@ export default function FormPageShipments(){
         parcelDelivered: false,
         customerPaid: false
     });
+    const [showCustomer, setShowCustomer] = useState({
+        customer: false,
+        destination: false,
+        text: ""
+    })
+    const {fetchCustomersData} = useFetchCustomers();
+    const {dispatcherAllData} = useAllDispatchersFetcher();
     const router = useRouter();
     const [createParcel, setCreateParcel] = useState<any>()
     const {createParcelData, 
@@ -36,91 +47,94 @@ export default function FormPageShipments(){
         createParcelError, 
         createParcelIsLoading, 
         createParcelIsValidating} = useCreateParcel(createParcel);
-
-    function handleSaveAndAddNewRider() {
-        setHandleToggleParcelButtons((prev: any) => ({
-            ...prev, saveAndAddNewRider: !handleToggleParcelButtons.saveAndAddNewRider
-        }))
-    }
-
-    function handleParcelFragility() {
-        setHandleToggleParcelButtons((prev: any) => ({
-            ...prev, parcelFragility: !handleToggleParcelButtons.parcelFragility
-        }))
-    }
-
-    function handleParcelPicked() {
-        setHandleToggleParcelButtons((prev: any) => ({
+        
+        function handleSaveAndAddNewRider() {
+            setHandleToggleParcelButtons((prev: any) => ({
+                ...prev, saveAndAddNewRider: !handleToggleParcelButtons.saveAndAddNewRider
+            }))
+        }
+        
+        function handleParcelFragility() {
+            setHandleToggleParcelButtons((prev: any) => ({
+                ...prev, parcelFragility: !handleToggleParcelButtons.parcelFragility
+            }))
+        }
+        
+        function handleParcelPicked() {
+            setHandleToggleParcelButtons((prev: any) => ({
             ...prev, parcelPicked: !handleToggleParcelButtons.parcelPicked
         }))
     }
-
+    
     function handleDelivered() {
         setHandleToggleParcelButtons((prev: any) => ({
             ...prev, parcelDelivered: !handleToggleParcelButtons.parcelDelivered
         }))
     }
-
+    
     function handleCustomerPaid() {
         setHandleToggleParcelButtons((prev: any) => ({
             ...prev, customerPaid: !handleToggleParcelButtons.customerPaid
         }))
     }
 
-
+    const findCustomerIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.customer)
+    const findDestinationIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.destination)
+    console.log(fetchCustomersData?.data, findCustomerIndex, "wertyuioiuytre")
+    
     return(
         <Holder>
             <OrdersNav />
             <Section>
-            {showSuccessMessage && createParcelData.code === 200 &&
-           <SuccessMessage 
-           messageTitle="Shipment has been successfully added to the list." 
-            successMessageShow={showSuccessMessage} 
-            handleShowSuccessMessage={setShowSuccessMessage} 
-           />
-           }
+            {successMessage.createShipment && createParcelData.code === 200 &&
+            <SuccessMessage 
+            name="createShipment"
+            messageTitle="Shipment has been successfully added to the list." 
+            successMessageShow={successMessage.createShipment} 
+            />
+        }
           
-          {showSuccessMessage && createParcelData.code !== 200 &&
+          {successMessage.createShipment && createParcelData.code !== 200 &&
            <SuccessMessage 
            id="failed"
+           name="createShipment"
            messageTitle="Sorry! Shipment cannot be created!" 
-            successMessageShow={showSuccessMessage} 
-            handleShowSuccessMessage={setShowSuccessMessage} 
+           successMessageShow={successMessage.createShipment} 
            />
            }
 
-          {showSuccessMessage && createParcelError && 
+          {successMessage.createShipment && createParcelError && 
            <SuccessMessage 
-           messageTitle="Error occured! Check your network connection." 
-           id='failed'
-            successMessageShow={showSuccessMessage} 
-            handleShowSuccessMessage={setShowSuccessMessage} 
-           />
-           }
+            messageTitle="Error occured! Check your network connection." 
+            id='failed'
+            successMessageShow={successMessage.createShipment} 
+            name="createShipment"
+            />
+        }
 
            {
              (createParcelIsLoading || createParcelIsValidating) && 
              <Loader />
-           }
+            }
             <Link href="/dashboard/shipments/active" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                 <i className="icon ion-md-arrow-back"></i>
             </Link>
 
             <Formik
                   initialValues={{
-                    amount: "",
-                    card: {
-                        authorizationCode: "",
-                        email: ""
-                    },
-                    company: company,
-                    completed: handleToggleParcelButtons.parcelDelivered,
-                    description: "",
-                    destination:{
-                    address: "",
-                    email: "",
-                    name: "",
-                    phone: ""
+                      amount: "",
+                      card: {
+                          authorizationCode: "",
+                          email: ""
+                        },
+                        company: company,
+                        completed: handleToggleParcelButtons.parcelDelivered,
+                        description: "",
+                        destination:{
+                            address: fetchCustomersData?.data[findDestinationIndex]?.user?.address,
+                            email: fetchCustomersData?.data[findDestinationIndex]?.user?.email,
+                            name: fetchCustomersData?.data[findDestinationIndex]?.user?.name,
+                            phone: fetchCustomersData?.data[findDestinationIndex]?.user?.phone
                     },
                     fragile: handleToggleParcelButtons.parcelFragility,
                     meta: {
@@ -152,21 +166,21 @@ export default function FormPageShipments(){
                             value: null
                         },
                     },
-                        name: "",
-                        paid: handleToggleParcelButtons.customerPaid,
-                        paymentType: "",
-                        pickUp: {
-                            address: "",
-                            email: "",
-                            name: "",
-                            phone: "",
-                        },
-                        picked: handleToggleParcelButtons.parcelPicked,
-                        reference: "",
-                        rider: 2,
-                        user: null
-                  }}
-                  validationSchema={Yup.object({
+                    name: "",
+                    paid: handleToggleParcelButtons.customerPaid,
+                    paymentType: "",
+                    pickUp: {
+                        address: fetchCustomersData?.data[findCustomerIndex]?.user?.address,
+                        email: fetchCustomersData?.data[findCustomerIndex]?.user?.email,
+                        name: fetchCustomersData?.data[findCustomerIndex]?.user?.name,
+                        phone: fetchCustomersData?.data[findCustomerIndex]?.user?.phone,
+                    },
+                    picked: handleToggleParcelButtons.parcelPicked,
+                    reference: "",
+                    rider: "",
+                    user: null
+                }}
+                validationSchema={Yup.object({
                     pickUp: Yup.object({
                         name: Yup.string().required('This field is required!'),
                         phone: Yup.string()
@@ -198,27 +212,27 @@ export default function FormPageShipments(){
                     rider: Yup.string().required('This field is required!'),
                     amount: Yup.string().required('This field is required.'),
                     paymentType: Yup.string().notRequired()
-                  })}
-                  onSubmit={async (values) => {
-                        setShowSuccessMessage(true);
-                        setCreateParcel(values);
-                        createParcelMutate();
-                        console.log(createParcel, createParcelData)
-                        if(!handleToggleParcelButtons.saveAndAddNewCustomer && createParcelData?.code === 200){
-                            let timer = setTimeout(() => {
-                                router.replace('/dashboard/shipments/active')
-                            }, 6000);                        
-                        }
-                    }}
-                    >
+                })}
+                onSubmit={async (values) => {
+                    setSuccessMessage((prev: any) => ({...prev, createShipment: true}));
+                    setCreateParcel(values);
+                    createParcelMutate();
+                    console.log(createParcel, createParcelData)
+                    if(!handleToggleParcelButtons.saveAndAddNewCustomer && createParcelData?.code === 200){
+                        let timer = setTimeout(() => {
+                            router.replace('/dashboard/shipments/active')
+                        }, 6000);                        
+                    }
+                }}
+                enableReinitialize={true}
+                >
                     {
-                        ({ values, handleSubmit }) => (
+                        ({ values, getFieldProps, handleSubmit }) => (
                             <Hero 
                             formHeading={values.name} 
                             description={values.amount ? `₦${values.amount}` : `₦0`}
                             heading="Create A Shipment" 
                             icon="icon ion-md-cube">
-                            {console.log(values)}
                             <Form>
                                 <SubHeading subheading="Parcel" />
 
@@ -253,62 +267,65 @@ export default function FormPageShipments(){
                                 />
 
                                 <Select label="Dispatcher" name="rider">
-                                    <option value=""></option>
-                                    <option value=""></option>
+                                    {
+                                        dispatcherAllData?.data?.map((dispatcher: any) => (
+                                            <option value={dispatcher.fullName}>{dispatcher.fullName}</option>
+                                        ))
+                                    }
                                 </Select> 
 
                                 <SubHeading subheading="Pickup" />
-                                <div className="my-4 cursor-pointer text-green-500">Select Customer</div>
+                                <div onClick={() => setShowCustomer((prev: any) => ({...prev, customer: true, text: "customer"}))} className="my-4 cursor-pointer text-green-500">Select Customer</div>
 
                                 <TextInput
                                 label="Name"
-                                name="pickUp.name"
                                 type="text"
+                                {...getFieldProps('pickUp.name')}
                                 />
 
                                 <TextInput
                                 label="Email Address"
-                                name="pickUp.email"
                                 type="email"
+                                {...getFieldProps('pickUp.email')}
                                 /> 
 
                                 <TextInput
                                 label="Phone"
-                                name="pickUp.phone"
                                 type="tel"
+                                {...getFieldProps('pickUp.phone')}
                                 /> 
 
                                 <TextInput
                                 label="Address"
-                                name="pickUp.address"
                                 type="text"
+                                {...getFieldProps('pickUp.address')}
                                 /> 
 
                                 <SubHeading subheading="Destination" /> 
-                                {/* <div className="my-4 cursor-pointer text-green-500">Select Customer</div> */}
+                                <div onClick={() => setShowCustomer((prev: any) => ({...prev, destination: true, text: "destination"}))} className="my-4 cursor-pointer text-green-500">Select Customer</div>
 
                                 <TextInput
                                 label="Name"
-                                name="destination.name"
                                 type="text"
+                                {...getFieldProps('destination.name')}
                                 />
 
                                 <TextInput
                                 label="Email Address"
-                                name="destination.email"
                                 type="email"
+                                {...getFieldProps('destination.email')}
                                 /> 
 
                                 <TextInput
                                 label="Phone"
-                                name="destination.phone"
                                 type="tel"
+                                {...getFieldProps('destination.phone')}
                                 /> 
 
                                 <TextInput
                                 label="Address"
-                                name="destination.address"
                                 type="text"
+                                {...getFieldProps('destination.address')}
                                 /> 
 
                                 <SubHeading subheading="Route Estimate" />
@@ -363,6 +380,7 @@ export default function FormPageShipments(){
                         )
                     }
                 </Formik>
+                {(showCustomer.customer || showCustomer.destination) && <ShowCustomers setShow={setShowCustomer} show={showCustomer.text} />}
                 </Section>
         </Holder>
     )

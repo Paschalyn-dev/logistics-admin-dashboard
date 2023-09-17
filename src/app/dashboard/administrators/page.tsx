@@ -14,45 +14,35 @@ import BoxesHolder from "../boxesholder";
 import { State_data } from "../context/context";
 import { useAdministratorsSearchRange } from "../services/swr-functions/customer-swr";
 import Link from "next/link";
-import { UIBOXES } from "../shipments/active/page";
 import Popup from "../services/eventhandlers/popup";
 
 export default function Administrators(){
     const {fetchStaffData, fetchStaffError, fetchStaffIsLoading, fetchStaffIsValidating, fetchStaffMutate} = useFetchStaff();
     const [inputData, setInputData] = useState('')
-    const [successmessage, setSuccessMessage] = useState<boolean>(true);
-    const {administratorsRange} = useContext<any | string>(State_data);
+    const {setDeleteWithId, administratorsRange, deleteWithId, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage} = useContext(State_data);
     const {administratorsRangeData, administratorsRangeError, administratorsRangeIsLoading, administratorsRangeIsValidating, administratorsRangeMutate} = useAdministratorsSearchRange(administratorsRange);
-    const [openUIBoxes, setOpenUIBoxes] = useState<UIBOXES>(
-        {
-            searchBox: false,
-            popup: false,
-            clearData: false
-        }
-    )
-    const [id, setId] = useState<number>(0);
     const handleOpenSearch = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, searchBox: true, clearData: true}))
+        setOpenUIBoxes((prev: any) => ({...prev, administratorSearch: true, administratorClearData: true}))
     }
     const handleInputData = (e: any) => {
         setInputData(e.target.value)
     }    
 
     const handleClearData = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, clearData: false}))
+        setOpenUIBoxes((prev: any) => ({...prev, administratorClearData: false}))
     }
 
     const handleCloseFill = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, popup: false}))
+        setOpenUIBoxes((prev: any) => ({...prev, administratorPopup: false}))
     }
 
     useEffect(() => {
         fetchStaffMutate();
-    }, [openUIBoxes.clearData !== true]);
+    }, [openUIBoxes.administratorClearData !== true]);
 
     useEffect(() => {
         administratorsRangeMutate()
-    }, [openUIBoxes.searchBox === true]);
+    }, [openUIBoxes.administratorSearch === true]);
 
     return(
     <Holder>
@@ -61,14 +51,14 @@ export default function Administrators(){
             <SkeletonLoading title="all administrators." />
         }
         {
-            (administratorsRangeIsLoading || administratorsRangeIsValidating && openUIBoxes.searchBox) &&
+            (administratorsRangeIsLoading || administratorsRangeIsValidating && openUIBoxes.administratorSearch) &&
             <SkeletonLoading loadingSearching="Searching" title="administrators." />                
         }
         <ConstantNav />
         <Section>
             <Heading heading="My Administrators" />
-                {fetchStaffData?.data?.length >= 0 && !openUIBoxes.clearData && <p>You have <span className="font-bold">{fetchStaffData?.data?.length || 0}</span> administrator{fetchStaffData?.data?.length > 1 && "s"}.</p>}
-                {administratorsRangeData !== 'undefined' && openUIBoxes.clearData && <p><span className="font-bold">{administratorsRangeData?.data?.length || 0}</span> administrators match(es) found.</p>}
+                {fetchStaffData?.data?.length >= 0 && !openUIBoxes.administratorClearData && <p>You have <span className="font-bold">{fetchStaffData?.data?.length || 0}</span> administrator{fetchStaffData?.data?.length > 1 && "s"}.</p>}
+                {administratorsRangeData !== 'undefined' && openUIBoxes.administratorClearData && <p><span className="font-bold">{administratorsRangeData?.data?.length || 0}</span> administrators match(es) found.</p>}
                 <Input 
                 link="/dashboard/administrators/create"
                 placeholder="Search Staff" 
@@ -80,35 +70,36 @@ export default function Administrators(){
                 searchInput={inputData}
                 />
 
-                { openUIBoxes.clearData &&
+                { openUIBoxes.administratorClearData &&
                     <button onClick={handleClearData} className="text-red-500 mt-3 gap-2 flex font-bold text-sm">
                     <span>
                         <i className="icon ion-md-close"></i>
                     </span>Clear Filter</button>
                 }
-                {openUIBoxes.searchBox && <SearchFilter inputData={inputData} closeFill={handleCloseFill} /> }   
-                {openUIBoxes.popup && <Popup text="Administrator" closeFill={handleCloseFill} popupShow={openUIBoxes.popup} id={id} />}
+                
+                {openUIBoxes.administratorSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} /> }   
+                {openUIBoxes.administratorPopup && <Popup text="Administrator" closeFill={handleCloseFill} popupShow={openUIBoxes.administratorPopup} name="administrators" id={deleteWithId.administrators} />}
 
                 {
-                    fetchStaffError && successmessage &&
+                    fetchStaffError && successMessage.administrator &&
                     <SuccessMessage
-                    successMessageShow={successmessage}
-                    handleShowSuccessMessage={setSuccessMessage}
+                    successMessageShow={successMessage.administrator}
+                    name="administrator"
                     id="failed"
                     messageTitle="Dispatchers cannot be fetched. Check network connection!"
                     />
                 }
                 {
-                    administratorsRangeError && openUIBoxes.searchBox && successmessage &&
+                    administratorsRangeError && openUIBoxes.administratorSearch && successMessage.administrator &&
                     <SuccessMessage
-                    successMessageShow={successmessage}
-                    handleShowSuccessMessage={setSuccessMessage}
+                    successMessageShow={successMessage.administrator}
+                    name="administrator"
                     id="failed"
                     messageTitle="Searching failed, check network connection!"
                     />
                 }
                 <BoxesHolder>
-                {fetchStaffData?.data && !openUIBoxes.clearData && 
+                {fetchStaffData?.data && !openUIBoxes.administratorClearData && 
                 (fetchStaffData.data.map((staff: any) => {
                     return(
                     <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
@@ -151,9 +142,9 @@ export default function Administrators(){
                                     <i className="icon ion-md-create"></i>
                                 </Link>
                                 <span  onClick={() => {
-                                        setOpenUIBoxes((prev: any) => ({...prev, popup: true}));
-                                        setId(staff?.id)
-                                    }}  
+                                        setOpenUIBoxes((prev: any) => ({...prev, administratorPopup: true}));
+                                        setDeleteWithId((prev: any) => ({...prev, administrators: staff?.id}));
+                                }}  
                                  className="hover:text-red-400 text-red-500 cursor-pointer rounded-full bg-red-100 px-3 py-2">
                                 <i className="icon ion-md-trash"></i>
                                 </span>
@@ -162,7 +153,7 @@ export default function Administrators(){
                 )}))}
                 </BoxesHolder>        
                         
-                { !fetchStaffIsLoading && fetchStaffData?.data?.length === 0 && !openUIBoxes.clearData && (
+                { !fetchStaffIsLoading && fetchStaffData?.data?.length === 0 && !openUIBoxes.administratorClearData && (
                     <div className="flex flex-col w-full justify-center items-center">
                         <span className="-mb-16">
                             <i id="bigger" className="icon ion-md-person"></i>
@@ -173,10 +164,10 @@ export default function Administrators(){
                     </div>
                 )}
 
-                {openUIBoxes.clearData && <SubHeading subheading="Search Results" />}
+                {openUIBoxes.administratorClearData && <SubHeading subheading="Search Results" />}
 
                 <BoxesHolder>    
-                    {  administratorsRangeData?.data && openUIBoxes.clearData &&
+                    {  administratorsRangeData?.data && openUIBoxes.administratorClearData &&
                             (administratorsRangeData.data.map((staff: any) => {
                                 return(
                                 <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
@@ -213,10 +204,15 @@ export default function Administrators(){
                                     <Link href={`/dashboard/administrators/${staff?.id}`} className="hover:text-gray-600 cursor-pointer rounded-full bg-gray-200 p-2">
                                         <i className="icon ion-md-open"></i>
                                     </Link>
-                                    <span className="hover:text-gray-600 mx-3 cursor-pointer rounded-full bg-gray-200 p-2">
+                                    <Link href={`/dashboard/administrators/${staff?.id}/edit`} 
+                                    className="hover:text-gray-600 mx-3 cursor-pointer rounded-full bg-gray-200 p-2">
                                         <i className="icon ion-md-create"></i>
-                                    </span>
-                                    <span className="hover:text-red-400 text-red-500 cursor-pointer rounded-full bg-red-100 p-2">
+                                    </Link>
+                                    <span onClick={() => {
+                                        setOpenUIBoxes((prev: any) => ({...prev, administratorPopup: true}));
+                                        setDeleteWithId((prev: any) => ({...prev, administrators: staff?.id}));
+                                    }}                                       
+                                    className="hover:text-red-400 text-red-500 cursor-pointer rounded-full bg-red-100 p-2">
                                     <i className="icon ion-md-trash"></i>
                                     </span>
                                 </div>
@@ -224,7 +220,7 @@ export default function Administrators(){
                     )}))}
                     </BoxesHolder>        
     
-                    { (administratorsRangeData?.data?.length === 0 || administratorsRangeData?.data === 'undefined' || administratorsRangeData?.code !== 200 && openUIBoxes.clearData) && (
+                    { (administratorsRangeData?.data?.length === 0 || administratorsRangeData?.data === 'undefined' || administratorsRangeData?.code !== 200 && openUIBoxes.administratorClearData) && (
                         <div className="flex flex-col w-full justify-center items-center">
                             <span className="-mb-16">
                                 <i id="bigger" className="icon ion-md-person"></i>

@@ -17,52 +17,43 @@ import Popup from "../services/eventhandlers/popup";
 import Input from "../input";
 
 export default function Message(){
-    const [openUIBoxes, setOpenUIBoxes] = useState<UIBOXES>(
-        {
-            searchBox: false,
-            popup: false,
-            clearData: false
-        }
-    )
     const [inputData, setInputData] = useState<string>('');
-    const [id, setId] = useState<number>(0);
-    const {messagesRange} = useContext<any | string>(State_data);
+    const {setDeleteWithId, openUIBoxes, setOpenUIBoxes, messagesRange, deleteWithId, successMessage, setSuccessMessage} = useContext(State_data);
     const {messagesRangeData, messagesRangeError, messagesRangeIsLoading, messagesRangeIsValidating, messagesRangeMutate} = useMessagesSearchRange(messagesRange)
     const {fetchMessagesData, fetchMessagesError, fetchMessagesIsLoading, fetchMessagesIsValidating, fetchMessagesMutate} = useFetchMessages();
-    const [successmessage,setSuccessMessage] = useState<boolean>(true);  
     const handleOpenSearch = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, searchBox: true, clearData: true}))
+        setOpenUIBoxes((prev: any) => ({...prev, messageSearch: true, messageClearData: true}))
     }
     const handleInputData = (e: any) => {
         setInputData(e.target.value)
     }
     const handleClearData = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, clearData: false}))
+        setOpenUIBoxes((prev: any) => ({...prev, messageClearData: false}))
     }
 
     const handleCloseFill = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, popup: false}))
+        setOpenUIBoxes((prev: any) => ({...prev, messagePopup: false}))
     }
 
     useEffect(() => {
         fetchMessagesMutate(fetchMessagesData);
-    }, [openUIBoxes.clearData !== true]);  
+    }, [openUIBoxes.messageClearData !== true]);  
     
     return(
         <Holder>
                {
-               (fetchMessagesIsLoading || fetchMessagesIsValidating && !openUIBoxes.searchBox) &&
+               (fetchMessagesIsLoading || fetchMessagesIsValidating && !openUIBoxes.messageSearch) &&
                <SkeletonLoading title="all messages." />
                }
                {
-               (messagesRangeIsLoading || messagesRangeIsValidating && openUIBoxes.searchBox) &&
+               (messagesRangeIsLoading || messagesRangeIsValidating && openUIBoxes.messageSearch) &&
                <SkeletonLoading loadingSearching="Searching" title="messages." />                
                }
             <ConstantNav />
             <Section>
                 <Heading heading="Messages" />
-                {fetchMessagesData?.data?.length >= 0 && !openUIBoxes.clearData && <p>You have <span className="font-bold">{fetchMessagesData?.data?.length || 0}</span> message {fetchMessagesData?.data?.length > 1 && "s"}.</p>}
-               {messagesRangeData !== 'undefined' && openUIBoxes.clearData && <p><span className="font-bold">{messagesRangeData?.data?.length || 0}</span> message match(es) found.</p>}
+                {fetchMessagesData?.data?.length >= 0 && !openUIBoxes.messageClearData && <p>You have <span className="font-bold">{fetchMessagesData?.data?.length || 0}</span> message {fetchMessagesData?.data?.length > 1 && "s"}.</p>}
+               {messagesRangeData !== 'undefined' && openUIBoxes.messageClearData && <p><span className="font-bold">{messagesRangeData?.data?.length || 0}</span> message match(es) found.</p>}
                <Input
                name="messages"
                 handleClick={handleOpenSearch}
@@ -70,35 +61,35 @@ export default function Message(){
                 handleChange={handleInputData}
                 searchInput={inputData}
                 />
-                { openUIBoxes.clearData &&
+                { openUIBoxes.messageClearData &&
                 <button onClick={handleClearData} className="text-red-500 mt-3 gap-2 flex font-bold text-sm">
                     <span>
                         <i className="icon ion-md-close"></i>
                     </span>Clear Filter</button>
                 }
-               {openUIBoxes.searchBox && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
-               {openUIBoxes.popup && <Popup text="Message" closeFill={handleCloseFill} popupShow={openUIBoxes.popup} id={id} />}
+               {openUIBoxes.messageSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
+               {openUIBoxes.messagePopup && <Popup text="Message" closeFill={handleCloseFill} name="messages" popupShow={openUIBoxes.messagePopup} id={deleteWithId.messages} />}
                {
-                fetchMessagesError && successmessage &&
+                fetchMessagesError && successMessage.messages &&
                 <SuccessMessage
-                successMessageShow={successmessage}
-                handleShowSuccessMessage={setSuccessMessage}
+                name="messages"
+                successMessageShow={successMessage.messages}
                 id="failed"
                 messageTitle="Messages cannot be fetched. Check network connection!"
                 />
             }
                {
-                   messagesRangeError && openUIBoxes.searchBox && successmessage &&
+                   messagesRangeError && openUIBoxes.messageSearch && successMessage.messages &&
                    <SuccessMessage
-                   successMessageShow={successmessage}
-                   handleShowSuccessMessage={setSuccessMessage}
+                   successMessageShow={successMessage.messages}
+                   name="messages"
                    id="failed"
                    messageTitle="Searching failed, check network connection!"
                    />
                 }
 
                 <div className="h-full flex flex-wrap tablet:justify-start phone:justify-start m-auto items-start tablet:gap-5 phone:gap-3 mt-5 w-full p-1">
-                    {fetchMessagesData?.data && !openUIBoxes.clearData &&
+                    {fetchMessagesData?.data && !openUIBoxes.messageClearData &&
                     fetchMessagesData?.data?.map((message: any) => {
                         const mydate = new Date(message?.updatedAt?.slice(0, 10));
                         return(
@@ -119,8 +110,8 @@ export default function Message(){
                                     </a>
                                     <button 
                                         onClick={() => {
-                                            setOpenUIBoxes((prev: any) => ({...prev, popup: true}));
-                                            setId(message.id)
+                                            setOpenUIBoxes((prev: any) => ({...prev, messagePopup: true}));
+                                            setDeleteWithId((prev: any) => ({...prev, messages: message?.id}));
                                         }}  
                                      className="text-red-500 flex gap-1 justify-start items-center">
                                         Delete
@@ -135,7 +126,7 @@ export default function Message(){
                         )
                     })
                     }
-                    { !fetchMessagesIsLoading && fetchMessagesData?.data?.length === 0 && !openUIBoxes.clearData && (
+                    { !fetchMessagesIsLoading && fetchMessagesData?.data?.length === 0 && !openUIBoxes.messageClearData && (
                         <div className="flex flex-col w-full justify-center items-center">
                         <span className="-mb-16">
                             <i id="bigger" className="icon ion-md-chat"></i>
@@ -146,7 +137,7 @@ export default function Message(){
                     </div>
                     )}
 
-                    {  messagesRangeData?.data && openUIBoxes.clearData &&
+                    {  messagesRangeData?.data && openUIBoxes.messageClearData &&
                        messagesRangeData?.data?.map((message: any) => {
                         const mydate = new Date(message?.updatedAt?.slice(0, 10));
                         return(
@@ -165,7 +156,12 @@ export default function Message(){
                                             <i title="Reply" className="icon ion-md-redo"></i>
                                         </span>
                                     </a>
-                                    <button className="text-red-500 flex gap-1 justify-start items-center">
+                                    <button 
+                                    onClick={() => {
+                                        setOpenUIBoxes((prev: any) => ({...prev, messagePopup: true}));
+                                        setDeleteWithId((prev: any) => ({...prev, messages: message?.id}));
+                                    }}  
+                                     className="text-red-500 flex gap-1 justify-start items-center">
                                         Delete
                                         <span>
                                             <i title="Delete" className="icon ion-md-trash"></i>
@@ -178,7 +174,7 @@ export default function Message(){
                         )
                     })
                     }
-                    { (messagesRangeData?.data?.length === 0 || messagesRangeData?.data === 'undefined' || messagesRangeData?.code !== 200 && openUIBoxes.clearData) && (
+                    { (messagesRangeData?.data?.length === 0 || messagesRangeData?.data === 'undefined' || messagesRangeData?.code !== 200 && openUIBoxes.messageClearData) && (
                         <div className="flex flex-col w-full justify-center items-center">
                         <span className="-mb-16">
                             <i id="bigger" className="icon ion-md-chatboxes"></i>

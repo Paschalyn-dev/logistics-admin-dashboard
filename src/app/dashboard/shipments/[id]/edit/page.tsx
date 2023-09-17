@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Formik, Form } from 'formik';
 import SuccessMessage from "../../../successmessage";
 import Hero from "../../../preferences/hero";
@@ -19,11 +19,11 @@ import { useAllParcelsFetcher, useEditParcels, useViewParcels } from "../../../s
 import { phoneRegExp } from "@/app/dashboard/administrators/create/page";
 import Loader from "@/app/dashboard/services/Loader/spinner";
 import SkeletonLoading from "@/app/dashboard/services/eventhandlers/skeleton-loading";
-import { fetchAllParcelsFetcher } from "@/app/dashboard/services/customer-api/api";
+import { State_data } from "@/app/dashboard/context/context";
 
 export default function FormPageShipments({ params }: { params: {id: number}}){
     const {viewParcelData, viewParcelIsLoading, viewParcelIsValidating} = useViewParcels(params.id);
-    const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+    const {successMessage, setSuccessMessage} = useContext(State_data);
     const [handleToggleParcelButtons, setHandleToggleParcelButtons] = useState<any>({
         saveAndAddNewRider: false,
         parcelFragility: viewParcelData?.data?.fragile,
@@ -79,30 +79,30 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
             }
             <OrdersNav />
             <Section>
-            {showSuccessMessage && editParcelData.code === 200 &&
+            {successMessage.editShipment && editParcelData.code === 200 &&
            <SuccessMessage 
+           name="editShipment"
            messageTitle="Shipment details has been successfully updated!" 
-            successMessageShow={showSuccessMessage} 
-            handleShowSuccessMessage={setShowSuccessMessage} 
+            successMessageShow={successMessage.editShipment} 
            />
            }
           
-          {showSuccessMessage && editParcelData.code !== 200 &&
+          {successMessage.editShipment && editParcelData.code !== 200 &&
            <SuccessMessage 
-           id="failed"
-           messageTitle="Sorry, Shipment details cannot be updated!" 
-            successMessageShow={showSuccessMessage} 
-            handleShowSuccessMessage={setShowSuccessMessage} 
-           />
+            id="failed"
+            messageTitle="Sorry, Shipment details cannot be updated!" 
+            successMessageShow={successMessage.editShipment} 
+            name="editShipment"
+            />
            }
 
-          {showSuccessMessage && editParcelError && 
+          {successMessage.editShipment && editParcelError && 
            <SuccessMessage 
-           messageTitle="Error occured, Check your network connection!" 
-           id='failed'
-            successMessageShow={showSuccessMessage} 
-            handleShowSuccessMessage={setShowSuccessMessage} 
-           />
+            messageTitle="Error occured, Check your network connection!" 
+            id='failed'
+            successMessageShow={successMessage.editShipment} 
+            name="editShipment"
+            />
            }
 
            {
@@ -180,7 +180,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                         name: Yup.string().required('This field is required!'),
                         phone: Yup.string()
                         .matches(phoneRegExp, 'Phone number is not valid')
-                        .min(15, 'Must be 15 characters or more.')
+                        .min(1, 'Must be 1 character or more.')
                         .required('This field is required.'),                        
                         email: Yup.string().email('This email seems invalid!').required('This field is required!'),
                         address: Yup.string().required('This feild is required!'),
@@ -189,7 +189,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                         name: Yup.string().required('This field is required!'),
                         phone: Yup.string()
                         .matches(phoneRegExp, 'Phone number is not valid')
-                        .min(15, 'Must be 15 characters or more.')
+                        .min(1, 'Must be 1 character or more.')
                         .required('This field is required.'),                        
                         email: Yup.string().email('This email seems invalid!').required('This field is required!'),
                         address: Yup.string().required('This feild is required!'),
@@ -204,12 +204,12 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                     .min(5, 'Name must be five characters or more.')
                     .required('This field is required.'),
                     description: Yup.string().notRequired(),
-                    rider: Yup.string().required('This field is required!'),
+                    rider: Yup.string().notRequired(),
                     amount: Yup.string().required('This field is required.'),
                     paymentType: Yup.string().notRequired()
                   })}
                   onSubmit={async (values) => {
-                        setShowSuccessMessage(true);
+                        setSuccessMessage((prev:any) => ({...prev, editShipment: true}));
                         parcelAllMutate();
                         setEditParcelDetails(values);
                         if(!handleToggleParcelButtons.saveAndAddNewCustomer && editParcelData?.code === 200){

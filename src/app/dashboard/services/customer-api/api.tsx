@@ -264,16 +264,6 @@ export const todayRevenueFetcher = async() => {
     return data;
 }
 
-export const deleteParcel = async(id: number) => {
-    const response = await fetch(customerAPIUrl.deleteParcels(id), {
-        method: 'DELETE',
-        headers: {
-            'Authorization': authorizationKey
-        }
-    });
-    const data = await response.json();
-    return data;
-}
 
 export const viewParcelFetcher = async(id: number) => {
     const response = await fetch(customerAPIUrl.viewParcels(id), {
@@ -332,9 +322,30 @@ export const viewStaffFetcher = async(id: number) =>{
     return data;
 }
 
-export const deleteCustomerFetcher = async(id: number) =>{
-    const response = await fetch(customerAPIUrl.deleteCustomers(id), {
+export const businessChangeFetcher = async(changeBearer: any) =>{
+    const response = await fetch(customerAPIUrl.business, {
+        method: 'PUT',
+        body: JSON.stringify(changeBearer),
+        headers: {
+            "Content-Type": "application/json",
+            'Authorization': authorizationKey
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+
+export const getBusinessDetails = async() => {
+    const response = await fetch(customerAPIUrl.business, {
         method: 'GET',
+    });
+    const data = await response.json();
+    return data;
+}
+
+export const deleteParcel = async(id: number) => {
+    const response = await fetch(customerAPIUrl.deleteParcels(id), {
+        method: 'DELETE',
         headers: {
             'Authorization': authorizationKey
         }
@@ -343,12 +354,32 @@ export const deleteCustomerFetcher = async(id: number) =>{
     return data;
 }
 
-export const businessChangeFetcher = async(changeBearer: any) =>{
-    const response = await fetch(customerAPIUrl.business, {
-        method: 'PUT',
-        body: JSON.stringify(changeBearer),
+export const deleteUserFetcher = async(id: number) =>{
+    const response = await fetch(customerAPIUrl.deleteUser(id), {
+        method: 'DELETE',
         headers: {
-            "Content-Type": "application/json",
+            'Authorization': authorizationKey
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+
+export const deleteBusinessFetcher = async(id: number) =>{
+    const response = await fetch(customerAPIUrl.deleteBusiness(id), {
+        method: 'DELETE',
+        headers: {
+            'Authorization': authorizationKey
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+
+export const deleteReviewFetcher = async(id: number) =>{
+    const response = await fetch(customerAPIUrl.deleteReviews(id), {
+        method: 'DELETE',
+        headers: {
             'Authorization': authorizationKey
         }
     });

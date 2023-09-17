@@ -1,5 +1,5 @@
 'use client'
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { State_data } from "././context/context"
 import { useState } from "react";
 import DarkFill from "./darkfill";
@@ -17,10 +17,10 @@ export default function States({handleShow, show}: States){
 "Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa","Niger","Ogun","Ondo",
 "Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara"
 ];
-
 const {setGlobalData, globaldata} = useContext<any | string>(State_data);
 const [search, setSearch] = useState<string>('');
 const [searched, setSearched] = useState<string[]>([]);
+const {locationsData, locationsMutate} = useLocations(globaldata)
 const [check, setCheck] = useState<string[]>([]);
 function handleCheckAll(event:any){
     if(event.target.checked){
@@ -48,8 +48,17 @@ function handleSearch(event: any){
 }
 
 const handleDone = () => {
-    setGlobalData((prev: string[]) => [...prev, ...check].filter((val,id,array) => array.indexOf(val) == id));
+    if(locationsData?.data?.length === 0){
+        setGlobalData((prev: string[]) => [...prev, ...check].filter((val,id,array) => array.indexOf(val) == id));
+    }
+    if(locationsData?.data?.length > 0){
+        setGlobalData(() => [ ...locationsData?.data, ...check].filter((val,id,array) => array.indexOf(val) == id));
+    }
 }
+
+useEffect(() => {
+    locationsMutate();
+}, [globaldata])
 
     return(
         <>

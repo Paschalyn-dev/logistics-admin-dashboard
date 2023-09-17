@@ -1,7 +1,6 @@
 'use client'
 import useSWR from "swr";
-import { useState, useEffect } from "react";
-import { accountFetcher, cardFetcher, countRidersFetcher, countStaffFetcher, createCustomerFetcher, createDispatcher, createStaffFetcher, fetchCustomersFetcher, fetchMessagesFetcher, fetchStaffFetcher, forgetPasswordFetcher, getLocationsFetcher, locationsFetcher, postDistancePricing, staffLoginFetcher } from "../staff-api/api";
+import { accountFetcher, cardFetcher, countRidersFetcher, countStaffFetcher, createCustomerFetcher, createDispatcher, createStaffFetcher, deleteBankAccountFetcher, deleteClassicPricing, deleteCustomerFetcher, deleteDispatcherFetcher, deleteDistancePricing, deleteLocationsFetcher, deleteMessagesFetcher, deletePreferenceFetcher, deleteStaffFetcher, fetchCustomersFetcher, fetchMessagesFetcher, fetchStaffFetcher, forgetPasswordFetcher, getBankAccount, getDistancePricing, getLocationsFetcher, locationsFetcher, postDistancePricing, staffLoginFetcher } from "../staff-api/api";
 import { STAFFSWRKEYS } from "../swr-keys/staff-keys";
 import { changeStaffPasswordFetcher } from "../staff-api/api";
 import { login } from "../libs/staff-auth";
@@ -23,7 +22,7 @@ export function useStaffLogin(creds: any){
                     console.log(staffStore)
                     let timer = setTimeout(() => {
                         router.replace('/dashboard/welcome');
-                    }, 6000);
+                    }, 5000);
                     () => clearTimeout(timer);
                 }
                 if(data.code === 200 && data.data.isDefaultPassword === true){
@@ -275,5 +274,144 @@ export function usePostDistancePricing(distancePrice: any){
         postDistancePriceIsValidating: isValidating,
         postDistancePriceIsLoading: isLoading,
         postDistancePriceMutate: mutate
+    }
+}
+
+
+export function useGetDistancePricing(){
+    const {data, mutate, isLoading, isValidating, error} = useSWR(STAFFSWRKEYS.getDistancePricing, 
+        () => getDistancePricing());
+
+        return{        
+            getDistancePriceData: data,
+            getDistancePriceError: error,
+            getDistancePriceIsValidating: isValidating,
+            getDistancePriceIsLoading: isLoading,
+            getDistancePriceMutate: mutate 
+        }
+}
+
+
+export function useGetBankAccount(){
+    const {data, mutate, isLoading, isValidating, error} = useSWR(STAFFSWRKEYS.getBankAccount, 
+        () => getBankAccount());
+
+        return{        
+            getBankAccountData: data,
+            getBankAccountError: error,
+            getBankAccountIsValidating: isValidating,
+            getBankAccountIsIsLoading: isLoading,
+            getBankAccountIsMutate: mutate 
+        }
+}
+
+
+export function useDeleteCustomer(id: number){
+    const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.deleteCustomer, 
+        () => deleteCustomerFetcher(id));
+    return{
+        deleteCustomerData: data,
+        deleteCustomerError: error,
+        deleteCustomerMutate: mutate,
+        deleteCustomerIsLoading: isLoading,
+        deleteCustomerIsValidating: isValidating 
+    }
+}
+
+export function useDeleteStaff(id: number){
+    const router = useRouter();
+    const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.deleteStaff, 
+        () => deleteStaffFetcher(id));
+    return{
+        deleteStaffData: data,
+        deleteStaffError: error,
+        deleteStaffMutate: mutate,
+        deleteStaffIsLoading: isLoading,
+        deleteStaffIsValidating: isValidating 
+    }
+}
+
+export function useDeleteDispatcher(id: number){
+    const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.deleteDispatcher, 
+        () => deleteDispatcherFetcher(id));
+    return{
+        deleteDispatcherData: data,
+        deleteDispatcherError: error,
+        deleteDispatcherMutate: mutate,
+        deleteDispatcherIsLoading: isLoading,
+        deleteDispatcherIsValidating: isValidating 
+    }
+}
+
+
+export function useDeleteBankAccount(id: number){
+    const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.deleteAccount, 
+        () => deleteBankAccountFetcher(id));
+    return{
+        deleteBankAccountData: data,
+        deleteBankAccountError: error,
+        deleteBankAccountMutate: mutate,
+        deleteBankAccountIsLoading: isLoading,
+        deleteBankAccountIsValidating: isValidating 
+    }
+}
+
+export function useDeleteMessages(id: number){
+    const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.deleteMessages, 
+        () => deleteMessagesFetcher(id));
+    return{
+        deleteMessagesData: data,
+        deleteMessagesError: error,
+        deleteMessagesMutate: mutate,
+        deleteMessagesIsLoading: isLoading,
+        deleteMessagesIsValidating: isValidating 
+    }
+}
+
+export function useDeleteDistancePricing(id: number){
+    const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.deleteDistancePricing, 
+        () => deleteDistancePricing(id));
+    return{
+        deleteDistancePricingData: data,
+        deleteDistancePricingError: error,
+        deleteDistancePricingMutate: mutate,
+        deleteDistancePricingIsLoading: isLoading,
+        deleteDistancePricingIsValidating: isValidating 
+    }
+}
+
+export function useDeleteLocations(id: number){
+    const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.deleteLocations, 
+        () => deleteLocationsFetcher(id));
+    return{
+        deleteLocationsFetcherData: data,
+        deleteLocationsFetcherError: error,
+        deleteLocationsFetcherMutate: mutate,
+        deleteLocationsFetcherIsLoading: isLoading,
+        deleteLocationsFetcherIsValidating: isValidating 
+    }
+}
+
+export function useDeletePreference(id: number){
+    const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.deletePreference, 
+        () => deletePreferenceFetcher(id));
+    return{
+        deletePreferenceData: data,
+        deletePreferenceError: error,
+        deletePreferenceMutate: mutate,
+        deletePreferenceIsLoading: isLoading,
+        deletePreferenceIsValidating: isValidating 
+    }
+}
+
+export function useClassicPricing(id: number){
+    const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.deleteClassicPricing, 
+        () => deleteClassicPricing(id));
+    return{
+        deleteClassicPricingData: data,
+        deleteClassicPricingError: error,
+        deleteClassicPricingMutate: mutate,
+        deleteClassicPricingIsLoading: isLoading,
+        deleteClassicPricingIsValidating: isValidating 
     }
 }

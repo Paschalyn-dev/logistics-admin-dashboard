@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react";
+import { useContext } from "react";
 import Heading from "../../heading";
 import Holder from "../../holder";
 import OrdersNav from "../../orders";
@@ -7,34 +7,21 @@ import SubHeading from "../../preferences/website/subheading";
 import Section from "../../section";
 import { useDeliveredParcels } from "../../services/swr-functions/customer-swr";
 import SuccessMessage from "../../successmessage";
-import Loader from "../../services/Loader/spinner";
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
-import { parcelsDeliveredFetcher } from "../../services/customer-api/api";
 import BoxesHolder from "../../boxesholder";
 import Popup from "../../services/eventhandlers/popup";
-import {useRouter} from "next/navigation"
-// import { handleEditParcel, handleViewParcel } from "../../functions";
+import { State_data } from "../../context/context";
+import Link from "next/link";
+
 export default function Delivered(){
-    const [id, setId] = useState<number>(0);
-    const [openUIBoxes, setOpenUIBoxes] = useState(false);
-    const [successmessage, setSuccessMessage] = useState<boolean>(true);
-    const router =  useRouter();
+    const {setDeleteWithId, deleteWithId, openUIBoxes, successMessage, setSuccessMessage, setOpenUIBoxes} = useContext(State_data);
     const {deliveredParcelsData, 
         deliveredParcelsError, 
         deliveredParcelsIsLoading, 
         deliveredParcelsIsValiddating, 
         deliveredParcelsMutate} = useDeliveredParcels();
     const handleCloseFill = () => {
-        setOpenUIBoxes(false)
-    }
-    const handleViewParcel = (id: any) => {
-        console.log('dfghjk')
-        router.replace(`/dashboard/shipments/${id}`);
-    }
-
-    const handleEditParcel = (id: any) => {
-        console.log('dfghjk')
-        router.replace(`/dashboard/shipments/${id}/edit`);
+        setOpenUIBoxes((prev: any) => ({...prev, shipmentPopup: false}))
     }
     return(
         <Holder>
@@ -46,18 +33,18 @@ export default function Delivered(){
             <Section>
                <Heading heading="Delivered Parcels" />
                <p>You have <span className="font-bold">{deliveredParcelsData?.data?.length || 0}</span> delivered shipment{deliveredParcelsData?.data?.length > 1 && "s"}.</p>
-               <BoxesHolder>
                {
-                deliveredParcelsError && successmessage &&
+                deliveredParcelsError && successMessage.delieveredShipment &&
                 <SuccessMessage
-                successMessageShow={successmessage}
-                handleShowSuccessMessage={setSuccessMessage}
+                successMessageShow={successMessage.delieveredShipment}
+                name="deliveredShipment"
                 id="failed"
-                messageTitle="Delivered shipments cannot be fetched. Check network connection!"
+                messageTitle="Error occured! Check network connection!"
                 />
                }
-               {openUIBoxes && <Popup closeFill={handleCloseFill} popupShow={openUIBoxes} id={id} />}
+               {openUIBoxes.shipmentPopup && <Popup closeFill={handleCloseFill} text="Shipment" name="parcels" popupShow={openUIBoxes.shipmentPopup} id={deleteWithId.parcels} />}
 
+            <BoxesHolder>
                {deliveredParcelsData?.data && 
                     (deliveredParcelsData.data.map((parcel: any) => {
                         return(
@@ -71,18 +58,16 @@ export default function Delivered(){
                                 </div>
 
                                 <div>
-                                    <span onClick={() => handleViewParcel(parcel.id)} className="hover:text-gray-600 cursor-pointer rounded-full bg-gray-200 p-2">
+                                    <Link href={`/dashboard/shipments/${parcel.id}`} 
+                                     className="hover:text-gray-600 mx-3 cursor-pointer rounded-full bg-gray-200 px-3 py-2">
                                        <i className="icon ion-md-open"></i>
-                                    </span>
-                                    <span onClick={() => handleEditParcel(parcel.id)} className="hover:text-gray-600 mx-1 cursor-pointer rounded-full bg-gray-200 p-2">
-                                        <i className="icon ion-md-create"></i>
-                                    </span>
+                                    </Link>
                                     <span 
                                     onClick={() => {
-                                        setOpenUIBoxes(true);
-                                        setId(parcel.id)
+                                        setOpenUIBoxes((prev: any) => ({...prev, shipmentPopup: true}));
+                                        setDeleteWithId((prev: any) => ({...prev, parcels: parcel.id}));
                                     }}
-                                    className="hover:text-red-400 text-red-500 cursor-pointer rounded-full bg-red-100 p-2">
+                                    className="hover:text-red-400 text-red-500 cursor-pointer rounded-full bg-red-100 px-3 py-2">
                                        <i className="icon ion-md-trash"></i>
                                     </span>
                                 </div>

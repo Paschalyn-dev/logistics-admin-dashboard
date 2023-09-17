@@ -126,8 +126,8 @@ export default function Sidebar() {
           <Link href="/dashboard/preferences/developer" 
           className="m-auto mt-6 mb-4">{`</> Developer`}</Link>
           <div className="flex justify-between items-center gap-3">
-          <div className="bg-red-400 rounded-full px-6 py-2 font-bold"> <SignOut /> </div>
-           <a target="_blank" href="https://help.logistix.africa/?business=cakenus">🛈 Help</a>
+              <div className="bg-red-400 rounded-full px-6 py-2 font-bold"> <SignOut /> </div>
+              <a target="_blank" href="https://help.logistix.africa/?business=cakenus">🛈 Help</a>
           </div>
          </div>
          </aside>

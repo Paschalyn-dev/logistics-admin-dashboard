@@ -6,74 +6,65 @@ import OrdersNav from "../../orders";
 import Section from "../../section";
 import { useState, useEffect, useContext } from "react";
 import SearchFilter from "./search";
-import { useAllParcelsFetcher, useSearchParcelRange } from "../../services/swr-functions/customer-swr";
+import { useAllParcelsFetcher, useDeleteParcels, useSearchParcelRange } from "../../services/swr-functions/customer-swr";
 import SubHeading from "../../preferences/website/subheading";
 import SuccessMessage from "../../successmessage";
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
 import BoxesHolder from "../../boxesholder";
 import useDateHandler from "../../date";
 import { State_data } from "../../context/context";
-import { useRouter } from "next/navigation"
 import Popup from "../../services/eventhandlers/popup";
 import Link from "next/link";
 
 export type UIBOXES = {
-    searchBox: boolean;
-    popup: boolean;
-    clearData?: boolean;
+    shipmentSearch: boolean;
+    shipmentPopup: boolean;
+    shipmentClearData?: boolean;
 }
 
 export default function Shipments(){
-    const [openUIBoxes, setOpenUIBoxes] = useState<UIBOXES>(
-        {
-            searchBox: false,
-            popup: false,
-            clearData: false
-        }
-    )
+    const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
     const [inputData, setInputData] = useState<string>('');
-    const [id, setId] = useState<number>(0);
     const [successmessage, setSuccessMessage] = useState<boolean>(true)
     const {parcelAllData, parcelAllError, parcelAllIsLoading, parcelAllIsValiddating, parcelAllMutate} = useAllParcelsFetcher();
     const {parcelRange} = useContext<any | string>(State_data);
     const {parcelRangeData, parcelRangeIsLoading, parcelRangeError, parcelRangeIsValidating} = useSearchParcelRange(parcelRange);
 
     const handleOpenSearch = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, searchBox: true, clearData: true}))
+        setOpenUIBoxes((prev: any) => ({...prev, shipmentSearch: true, shipmentClearData: true}))
     }
     const handleInputData = (e: any) => {
         setInputData(e.target.value)
     }
     const handleClearData = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, clearData: false}))
+        setOpenUIBoxes((prev: any) => ({...prev, shipmentClearData: false}))
     }
 
     const handleCloseFill = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, popup: false}))
+        setOpenUIBoxes((prev: any) => ({...prev, shipmentPopup: false}))
     }
 
     const lengthActive = parcelRangeData?.data?.filter((parcel: any) => !parcel.completed && !parcel.paid && !parcel.picked )
 
     useEffect(() => {
         parcelAllMutate(parcelAllData);
-        console.log(parcelAllData);
-    }, [openUIBoxes.clearData !== true]);
+    }, [openUIBoxes.shipmentClearData !== true]);
 
     return(
         <Holder>
                {
-               (parcelAllIsLoading || parcelAllIsValiddating && !openUIBoxes.searchBox) &&
+               (parcelAllIsLoading || parcelAllIsValiddating && !openUIBoxes.shipmentSearch) &&
                <SkeletonLoading title="all active shipments." />
                }
                {
-               (parcelRangeIsLoading || parcelRangeIsValidating && openUIBoxes.searchBox) &&
+               (parcelRangeIsLoading || parcelRangeIsValidating && openUIBoxes.shipmentSearch) &&
                <SkeletonLoading loadingSearching="Searching" title="parcels." />                
                }
             <OrdersNav />
             <Section>
                <Heading heading="Active Orders" />
-               {parcelAllData?.data?.length >= 0 && !openUIBoxes.clearData && <p>You have <span className="font-bold">{parcelAllData?.data?.length || 0}</span> active shipment{parcelAllData?.data?.length > 1 && "s"}.</p>}
-               {parcelRangeData !== 'undefined' && openUIBoxes.clearData && <p><span className="font-bold">{lengthActive?.length || 0}</span> active parcel match(es) found.</p>}
+               {parcelAllData?.data?.length >= 0 && !openUIBoxes.shipmentClearData && <p>You have <span className="font-bold">{parcelAllData?.data?.length || 0}</span> active shipment{parcelAllData?.data?.length > 1 && "s"}.</p>}
+               {parcelRangeData !== 'undefined' && openUIBoxes.shipmentClearData && <p><span className="font-bold">{lengthActive?.length || 0}</span> active parcel match(es) found.</p>}
                 <Input 
                 link="/dashboard/shipments/active/create"
                 phonetext="Add" 
@@ -84,28 +75,28 @@ export default function Shipments(){
                 handleChange={handleInputData}
                 searchInput={inputData}
                 />
-                { openUIBoxes.clearData &&
+                { openUIBoxes.shipmentClearData &&
                 <button onClick={handleClearData} className="text-red-500 mt-3 gap-2 flex font-bold text-sm">
                     <span>
                         <i className="icon ion-md-close"></i>
                     </span>Clear Filter</button>
                 }
-               {openUIBoxes.searchBox && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
-               {openUIBoxes.popup && <Popup text="Shipment" closeFill={handleCloseFill} popupShow={openUIBoxes.popup} id={id} />}
+               {openUIBoxes.shipmentSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
+               {openUIBoxes.shipmentPopup && <Popup text="Shipment" closeFill={handleCloseFill} name='parcels' popupShow={openUIBoxes.shipmentPopup} id={deleteWithId.parcels} />}
                {
                    parcelAllError && successmessage &&
                    <SuccessMessage
-                successMessageShow={successmessage}
-                handleShowSuccessMessage={setSuccessMessage}
-                id="failed"
-                messageTitle="Active shipments cannot be fetched. Check network connection!"
-                />
-            }
+                   successMessageShow={successmessage}
+                   name="activeShipment"
+                   id="failed"
+                   messageTitle="Active shipments cannot be fetched. Check network connection!"
+                   />
+                }
             {
-                parcelRangeError && openUIBoxes.searchBox && successmessage &&
+                parcelRangeError && openUIBoxes.shipmentSearch && successmessage &&
                 <SuccessMessage
                 successMessageShow={successmessage}
-                handleShowSuccessMessage={setSuccessMessage}
+                name="activeShipment"
                 id="failed"
                 messageTitle="Searching failed, check network connection!"
                 />
@@ -115,7 +106,7 @@ export default function Shipments(){
                 (parcelAllData.data.map((parcel: any) => {
                     let date  = new Date(parcel?.updatedAt?.slice(0, 10))
                     return(
-                        <div className={!openUIBoxes.clearData ? "bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5" : "hidden"}>
+                        <div className={!openUIBoxes.shipmentClearData ? "bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5" : "hidden"}>
                         <div className="flex justify-between">
                             <div>
                                 <p className="text-red-600 text-xs">NOT PICKED</p>
@@ -134,8 +125,9 @@ export default function Shipments(){
                                     <i className="icon ion-md-create"></i>
                                 </Link>
                                 <span onClick={() => {
-                                    setOpenUIBoxes((prev: any) => ({...prev, popup: true}));
-                                    setId(parcel.id)
+                                    console.log(parcel.id, "New parcel");
+                                    setOpenUIBoxes((prev: any) => ({...prev, shipmentPopup: true}));
+                                    setDeleteWithId((prev: any) => ({...prev, parcels: parcel.id}));
                                 }}
                                 className="hover:text-red-400 text-red-500 cursor-pointer rounded-full bg-red-100 px-3 py-2">
                                 <i className="icon ion-md-trash"></i>
@@ -173,7 +165,7 @@ export default function Shipments(){
                 )}))} 
             </BoxesHolder>
             { !parcelAllIsLoading && parcelAllData?.data?.length === 0 && (
-                <div className={ !openUIBoxes.clearData ? "flex flex-col w-full justify-center items-center" : "hidden"}>
+                <div className={ !openUIBoxes.shipmentClearData ? "flex flex-col w-full justify-center items-center" : "hidden"}>
                 <span className="-mb-16">
                     <i id="bigger" className="icon ion-md-cube"></i>
                 </span>
@@ -183,14 +175,14 @@ export default function Shipments(){
             </div>
             )}
                 
-            {openUIBoxes.clearData && <SubHeading subheading="Search Results" />}
-            {parcelRangeData !== 'undefined' && openUIBoxes.clearData && <p><span className="font-bold">{parcelRangeData?.data?.length || 0}</span> parcel match(es) in total.</p>}
+            {openUIBoxes.shipmentClearData && <SubHeading subheading="Search Results" />}
+            {parcelRangeData !== 'undefined' && openUIBoxes.shipmentClearData && <p><span className="font-bold">{parcelRangeData?.data?.length || 0}</span> parcel match(es) in total.</p>}
             <BoxesHolder>
             {  parcelRangeData?.data &&
                 (parcelRangeData?.data?.map((parcelRange: any) => {
                     let date  = new Date(parcelRange?.updatedAt?.slice(0, 10))
                     return(
-                        <div className={openUIBoxes.clearData  ? "bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5": "hidden"}>
+                        <div className={openUIBoxes.shipmentClearData  ? "bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5": "hidden"}>
                         <div className="flex justify-between">
                             <div>
                             <p className={parcelRange.completed || parcelRange.paid || parcelRange.picked ? "text-green-600 text-xs" :"text-red-600 text-xs"}>{parcelRange.completed && parcelRange.paid && parcelRange.picked ? 'DELIVERED' : parcelRange.completed || parcelRange.picked || parcelRange.paid ? 'NOT PICKED' : "NOT PICKED"}</p>
@@ -209,8 +201,8 @@ export default function Shipments(){
                                     <i className="icon ion-md-create"></i>
                                 </Link>
                                 <span onClick={() => {
-                                    setOpenUIBoxes((prev: any) => ({...prev, popup: true}));
-                                    setId(parcelRange.id)
+                                    setOpenUIBoxes((prev: any) => ({...prev, shipmentPopup: true}));
+                                    setDeleteWithId((prev: any) => ({...prev, parcels: parcelRange.id}));
                                 }}
                                 className="hover:text-red-400 text-red-500 cursor-pointer rounded-full bg-red-100 px-3 py-2">
                                 <i className="icon ion-md-trash"></i>
@@ -248,8 +240,8 @@ export default function Shipments(){
                         )}))}
                     </BoxesHolder>
                         
-                    { (parcelRangeData?.data?.length === 0 || parcelRangeData?.data === 'undefined' || parcelRangeData?.code !== 200 && openUIBoxes.clearData) && (
-                            <div className={openUIBoxes.clearData ? "flex flex-col w-full justify-center items-center" : "hidden"}>
+                    { (parcelRangeData?.data?.length === 0 || parcelRangeData?.data === 'undefined' || parcelRangeData?.code !== 200 && openUIBoxes.shipmentClearData) && (
+                            <div className={openUIBoxes.shipmentClearData ? "flex flex-col w-full justify-center items-center" : "hidden"}>
                             <span className="-mb-16">
                                 <i id="bigger" className="icon ion-md-cube"></i>
                             </span>
