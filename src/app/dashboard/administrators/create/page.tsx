@@ -16,9 +16,8 @@ import Section from "../../section";
 import { Password } from "../../formik/password";
 import { useCreateStaff } from "../../services/swr-functions/staff-swr";
 import Loader from "../../services/Loader/spinner";
-import { State_data } from "../../context/context";
+import { State_data, phoneRegExp } from "../../context/context";
 
- export const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 export default function FormPageAdministrators(){
     const {successMessage, setSuccessMessage} = useContext(State_data);
     const [saveAndAddNewStaff, setSaveAndAddNewStaff] = useState<boolean>(false);

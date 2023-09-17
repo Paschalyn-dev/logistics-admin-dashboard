@@ -18,9 +18,8 @@ import { useContext } from "react";
 import TextArea from "../../../formik/textarea";
 import { useAllDispatchersFetcher, useCreateParcel } from "../../../services/swr-functions/customer-swr";
 import {company, data} from "./../../../services/api-url/customer-api-url";
-import { phoneRegExp } from "@/app/dashboard/administrators/create/page";
 import Loader from "@/app/dashboard/services/Loader/spinner";
-import { State_data } from "@/app/dashboard/context/context";
+import { State_data, phoneRegExp } from "@/app/dashboard/context/context";
 import { useFetchCustomers } from "@/app/dashboard/services/swr-functions/staff-swr";
 import ShowCustomers from "@/app/dashboard/showCustomers";
 
