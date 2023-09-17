@@ -16,10 +16,9 @@ import { useRouter } from "next/navigation";
 import OrdersNav from "../../../orders";
 import TextArea from "../../../formik/textarea";
 import { useAllParcelsFetcher, useEditParcels, useViewParcels } from "../../../services/swr-functions/customer-swr";
-import { phoneRegExp } from "@/app/dashboard/administrators/create/page";
 import Loader from "@/app/dashboard/services/Loader/spinner";
 import SkeletonLoading from "@/app/dashboard/services/eventhandlers/skeleton-loading";
-import { State_data } from "@/app/dashboard/context/context";
+import { State_data, phoneRegExp } from "@/app/dashboard/context/context";
 
 export default function FormPageShipments({ params }: { params: {id: number}}){
     const {viewParcelData, viewParcelIsLoading, viewParcelIsValidating} = useViewParcels(params.id);
