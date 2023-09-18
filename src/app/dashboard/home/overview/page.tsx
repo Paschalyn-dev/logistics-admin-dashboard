@@ -15,8 +15,6 @@ import { State_data } from "../../context/context";
 import Input from "../../input";
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
 
-export const colors = ['red', 'amber', 'green', 'black', 'yellow', 'blue'];
-
 export default function Overview(){
     const [location, setLocation] = useState('lagos');
     const {countParcelData} = useCountParcel()
@@ -29,7 +27,6 @@ export default function Overview(){
     const {countRidersData} = useCountDispatcher();
     const {todayRevenueData} = useTodayRevenue();
     const {getLocationsData, getLocationsError, getLocationsIsLoading, getLocationsIsValidating} = useFetchLocations();
-    const {globaldata} = useContext(State_data);
     const {dispatcherAllData} = useAllDispatchersFetcher();
     return(
             <Holder>
