@@ -1,7 +1,8 @@
 'use client'
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import SuccessMessage from "./successmessage";
 import Link from "next/link";
+import { State_data } from "./context/context";
 
 type Btn = {
     phonetext?: string;
@@ -19,7 +20,7 @@ type Btn = {
 
 export default function Input({phonetext, handleClick, mt, justify, laptoptext, placeholder, name, link, message, handleChange, searchInput}: Btn){
     const [windowWidth, setWindowWidth]= useState<number>(window.innerWidth);
-    const [successMessage, setSuccessMessage] = useState<boolean>(false);
+    const {successMessage, setSuccessMessage} = useContext(State_data);
 
     useEffect(function onFirstMount() {
         function checkWidth(){
@@ -31,7 +32,7 @@ export default function Input({phonetext, handleClick, mt, justify, laptoptext, 
 
     return(
         <>
-        {successMessage && <SuccessMessage successMessageShow={successMessage} handleShowSuccessMessage={setSuccessMessage} messageTitle={message} />}
+        {successMessage.input && <SuccessMessage successMessageShow={successMessage.input} name="input" messageTitle={message} />}
 
         <div className={`flex mt-${mt === 0 ?  mt : 5} justify-${justify || 'start'} w-full gap-2 items-center`}>
         { (phonetext || laptoptext) && 
