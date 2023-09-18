@@ -1,6 +1,7 @@
 'use client'
-import { useState } from "react";
+import { useState, useContext } from "react";
 import SuccessMessage from "../../successmessage";
+import { State_data } from "../../context/context";
 
 type Btn = {
     value?: any;
@@ -9,12 +10,12 @@ type Btn = {
 }
 
 export default function DoneStatesBtn({value, text, message}: Btn){
-    const [successMessage, setSuccessMessage] = useState<boolean>(false);
+    const {successMessage, setSuccessMessage} = useContext(State_data);
 
 
     return(
         <>
-        {successMessage && <SuccessMessage successMessageShow={successMessage} handleShowSuccessMessage={setSuccessMessage} messageTitle={message} />}
+        {successMessage.saveLocations && <SuccessMessage name="saveLocations" successMessageShow={successMessage.saveLocations} messageTitle={message} />}
 
         <div className="flex mt-2 justify-start w-full items-center">
        <div className="font-bold w-full laptop:text-base desktop:text-lg phone:text-sm text-gray-50 w-fit flex justify-start items-center">

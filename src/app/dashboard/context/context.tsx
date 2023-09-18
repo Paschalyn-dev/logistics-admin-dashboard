@@ -97,6 +97,7 @@ export default function Context({children}: any){
 
     const [successMessage, setSuccessMessage] = useState({
         input: false,
+        saveLocations: false,
         activeShipment: true,
         deliveredShipment: true,
         customer: true,
