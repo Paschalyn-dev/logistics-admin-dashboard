@@ -121,6 +121,7 @@ export default function Context({children}: any){
         messages: true,
         websiteError: true,
         deliveryPrice: false,
+        changePassword: false,
         staffAndCustomerLogin: false,
         staffAndCustomerForgotPassword: false,
     })

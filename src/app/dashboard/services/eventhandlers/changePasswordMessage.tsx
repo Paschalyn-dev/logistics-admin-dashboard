@@ -1,10 +1,11 @@
 'use client'
 import Loader from "@/app/dashboard/services/Loader/spinner";
 import SuccessMessage from "@/app/dashboard/successmessage";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { State_data } from "../../context/context";
 
 export default function ChangePasswordMessage({changePasswordFormDetails, changePasswordLoading, changePasswordValidating, changePasswordError, changePasswordData, message}: any){
-    const [successMessage, setSuccessMessage] = useState<boolean>(false);
+    const {successMessage, setSuccessMessage} = useContext(State_data);
 
     useEffect(() => {
         setSuccessMessage(true);
@@ -14,37 +15,37 @@ export default function ChangePasswordMessage({changePasswordFormDetails, change
     return(
         <>
             {(changePasswordLoading || changePasswordValidating) && <Loader />}
-                {(changePasswordError && changePasswordFormDetails && !changePasswordData && successMessage) &&
+                {(changePasswordError && changePasswordFormDetails && !changePasswordData && successMessage.changePassword) &&
                     (
                     <>
                             <SuccessMessage 
                             messageTitle="Error occured! Check your network connection."
                             id="failed"
-                            handleShowSuccessMessage={setSuccessMessage}
-                            successMessageShow={successMessage}
+                            name="changePassword"
+                            successMessageShow={successMessage.changePassword}
                             />
                         </>
                     )
                 }
                 {
-                    (changePasswordFormDetails && changePasswordData?.code && changePasswordData?.code === 200 && successMessage) &&
+                    (changePasswordFormDetails && changePasswordData?.code && changePasswordData?.code === 200 && successMessage.changePassword) &&
                     <>
                         <SuccessMessage 
                         messageTitle="You have successfully changed your password!"
-                        handleShowSuccessMessage={setSuccessMessage}
-                        successMessageShow={successMessage}
+                        name="changePassword"
+                        successMessageShow={successMessage.changePassword}
                         />
                     </> 
                 }
 
                 {
-                    (changePasswordFormDetails && changePasswordData?.code && changePasswordData?.code !== 200 && successMessage) &&
+                    (changePasswordFormDetails && changePasswordData?.code && changePasswordData?.code !== 200 && successMessage.changePassword) &&
                         <>
                             <SuccessMessage 
                             messageTitle="Sorry password cannot be changed!"
                             id="failed"
-                            handleShowSuccessMessage={setSuccessMessage}
-                            successMessageShow={successMessage}
+                            name="changePassword"
+                            successMessageShow={successMessage.changePassword}
                             />
                         </>
                 }
