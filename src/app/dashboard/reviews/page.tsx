@@ -19,7 +19,7 @@ export default function Reviews(){
     const {reviewsRange, openUIBoxes, setOpenUIBoxes} = useContext<any | string>(State_data);
     const {reviewsRangeData, reviewsRangeError, reviewsRangeIsLoading, reviewsRangeIsValidating, reviewsRangeMutate} = useReviewsSearchRange(reviewsRange);
     const {fetchAllReviewsData, fetchAllReviewsError, fetchAllReviewsIsLoading, fetchAllReviewsIsValiddating, fetchAllReviewsMutate} = useAllFetchReviews();
-    const [successmessage, setSuccessMessage] = useState<boolean>(true);
+    const {successMessage, setSuccessMessage} = useContext(State_data);
     const excellentRatings = fetchAllReviewsData?.data?.filter((data: any) => data.rating === "EXCELLENT").length;
     const goodRatings = fetchAllReviewsData?.data?.filter((data: any) => data.rating === "GOOD").length;
     const poorRatings = fetchAllReviewsData?.data?.filter((data: any) => data.rating === "POOR").length;
@@ -71,20 +71,20 @@ export default function Reviews(){
                 }
                {openUIBoxes.reviewSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
                {
-                   fetchAllReviewsError && successmessage &&
+                   fetchAllReviewsError && successMessage.reviews &&
                    <SuccessMessage
-                successMessageShow={successmessage}
-                handleShowSuccessMessage={setSuccessMessage}
+                successMessageShow={successMessage.reviews}
+                name="reviews"
                 id="failed"
                 messageTitle="Reviews cannot be fetched. Check network connection!"
                 />
             }
                {
-                   reviewsRangeError && openUIBoxes.reviewSearch && successmessage &&
+                   reviewsRangeError && openUIBoxes.reviewSearch && successMessage.reviews &&
                    <SuccessMessage
-                   successMessageShow={successmessage}
-                   handleShowSuccessMessage={setSuccessMessage}
+                   successMessageShow={successMessage.reviews}
                    id="failed"
+                   name="reviews"
                    messageTitle="Searching failed, check network connection!"
                    />
                 }

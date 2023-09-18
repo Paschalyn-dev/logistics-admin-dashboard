@@ -101,6 +101,7 @@ export default function Context({children}: any){
         activeShipment: true,
         deliveredShipment: true,
         customer: true,
+        reviews: true,
         lateShipment: true,
         transaction: true,
         administrator: true,
