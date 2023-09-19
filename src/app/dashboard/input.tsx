@@ -19,7 +19,7 @@ type Btn = {
 }
 
 export default function Input({phonetext, handleClick, mt, justify, laptoptext, placeholder, name, link, message, handleChange, searchInput}: Btn){
-    const [windowWidth, setWindowWidth]= useState<number>(window.innerWidth);
+    const [windowWidth, setWindowWidth]= useState<number>(0);
     const {successMessage, setSuccessMessage} = useContext(State_data);
 
     useEffect(function onFirstMount() {
@@ -28,7 +28,7 @@ export default function Input({phonetext, handleClick, mt, justify, laptoptext, 
         }
         window.addEventListener("resize", checkWidth);
         return () => window.removeEventListener('resize', checkWidth);
-    }, [windowWidth]);
+    }, []);
 
     return(
         <>

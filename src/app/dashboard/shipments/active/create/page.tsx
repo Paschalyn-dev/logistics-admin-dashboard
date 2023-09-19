@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Formik, Form } from 'formik';
 import SuccessMessage from "../../../successmessage";
 import Hero from "../../../preferences/hero";
@@ -25,6 +25,7 @@ import ShowCustomers from "@/app/dashboard/showCustomers";
 
 export default function FormPageShipments(){
     const {successMessage, setSuccessMessage, id} = useContext(State_data);
+    const [windowDetails, setWindowDetails] = useState<any>('')
     const [handleToggleParcelButtons, setHandleToggleParcelButtons] = useState<any>({
         saveAndAddNewRider: false,
         parcelFragility: false,
@@ -79,8 +80,11 @@ export default function FormPageShipments(){
 
     const findCustomerIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.customer)
     const findDestinationIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.destination)
-    console.log(fetchCustomersData?.data, findCustomerIndex, "wertyuioiuytre")
     
+    useEffect(() => {
+        setWindowDetails(window)
+    }, [])
+
     return(
         <Holder>
             <OrdersNav />
@@ -146,15 +150,15 @@ export default function FormPageShipments(){
                         },
                         device:{
                             appBuild: null,
-                            appId: navigator.appCodeName,
-                            appName: navigator.appName,
-                            appVersion: navigator.appVersion,
+                            appId: windowDetails?.navigator?.appCodeName || "",
+                            appName: windowDetails?.navigator?.appName || "",
+                            appVersion: windowDetails?.navigator?.appVersion || "",
                             isVirtual: false,
-                            manufacturer: navigator.vendor,
-                            model: navigator.appName,
+                            manufacturer: windowDetails?.navigator?.vendor || "",
+                            model: windowDetails?.navigator?.appName || "",
                             name: "CakenUs Services",
-                            operatingSystem: navigator.platform,
-                            platform: navigator.userAgent
+                            operatingSystem: windowDetails?.navigator?.platform || "",
+                            platform: windowDetails?.navigator?.userAgent || ""
                         },
                         estimatedDistance: {
                             text: "",

@@ -9,7 +9,7 @@ import * as React from "react";
 
 export default function HomeNav(){
     const [clickIt, setClickIt] = useState<string>('');
-    const [windowWidth, setWindowWidth]= useState<number>(window.innerWidth);
+    const [windowWidth, setWindowWidth]= useState<number>(0);
 
     useEffect(function onFirstMount() {
         function checkWidth() {
@@ -17,7 +17,7 @@ export default function HomeNav(){
         }
         window.addEventListener("resize", checkWidth);
         return () => window.removeEventListener('resize', checkWidth);
-    }, [windowWidth]);
+    }, []);
 
     useEffect(() => {
         const homepage = localStorage.getItem('homepage');

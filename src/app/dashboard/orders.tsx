@@ -5,7 +5,7 @@ import Sidebar from "./sidebar";
 import InsideNav from "./home/insidenav";
 
 export default function OrdersNav(){
-    const [windowWidth, setWindowWidth]= useState<number>(window.innerWidth);
+    const [windowWidth, setWindowWidth]= useState<number>(0);
     const [clickIt, setClickIt] = useState<string>('');
 
     useEffect(() => {
@@ -14,7 +14,7 @@ export default function OrdersNav(){
         }
         window.addEventListener("resize", checkWidth);
         return () => window.removeEventListener('resize', checkWidth);
-    }, [windowWidth]);
+    }, []);
   
 
     return(

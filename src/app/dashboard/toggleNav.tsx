@@ -4,14 +4,14 @@ import Sidebar from "./sidebar";
 
 export default function ToggleNav(){
     const [showNav, setShowNav] = useState<boolean>(false);
-    const [windowWidth, setWindowWidth]= useState<number>(window.innerWidth);
+    const [windowWidth, setWindowWidth]= useState<number>(0);
     useEffect(function onFirstMount() {
         function checkWidth(){
           setWindowWidth(window.innerWidth);
         }
         window.addEventListener("resize", checkWidth);
         return () => window.removeEventListener('resize', checkWidth);
-    }, [windowWidth]);
+    }, []);
 
     
     return(
