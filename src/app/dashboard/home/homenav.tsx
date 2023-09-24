@@ -8,27 +8,33 @@ import * as React from "react";
 
 
 export default function HomeNav(){
-    const [clickIt, setClickIt] = useState<string>('');
-    const [windowWidth, setWindowWidth]= useState<number>(0);
+  let myWidth = 0;
+  const [clickIt, setClickIt] = useState<string>('');
+  
+  if(typeof window !== "undefined"){
+    myWidth = window.innerWidth;
+  }
 
-    useEffect(function onFirstMount() {
-        function checkWidth() {
-          setWindowWidth(window.innerWidth);
-        }
-        window.addEventListener("resize", checkWidth);
-        return () => window.removeEventListener('resize', checkWidth);
-    }, []);
+  const [windowWidth, setWindowWidth]= useState<number>(myWidth);
 
+  useEffect(function onFirstMount() {
+      function checkWidth() {
+        setWindowWidth(window.innerWidth);
+      }
+      window.addEventListener("resize", checkWidth);
+      return () => window.removeEventListener('resize', checkWidth);
+  });
+
+  useEffect(() => {
+      const homepage = localStorage.getItem('homepage');
+      if(homepage) {
+        setClickIt(JSON.parse(homepage))
+      }
+    }, [])
+  
     useEffect(() => {
-        const homepage = localStorage.getItem('homepage');
-        if(homepage) {
-          setClickIt(JSON.parse(homepage))
-        }
-      }, [])
-    
-      useEffect(() => {
-        localStorage.setItem('homepage', JSON.stringify(clickIt))
-      }, [clickIt])
+      localStorage.setItem('homepage', JSON.stringify(clickIt))
+    }, [clickIt])
 
     return(
         <div className= "flex z-10 dark:bg-red-500 bg-blue-700 top-0 phone:w-full laptop:w-10/12 overflow-x-auto bg-gray-100 phone:pr-10 laptop:pr-24 fixed justify-between items-center shadow-sm">            

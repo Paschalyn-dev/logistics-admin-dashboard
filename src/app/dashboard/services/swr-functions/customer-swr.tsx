@@ -1,108 +1,12 @@
 'use client'
 
 import { useRouter } from "next/navigation";
-import { activeShipmentsCountFetcher, administratorsRangeFetcher, billingInvoiceFetcher, businessChangeFetcher, changePasswordFetcher, companyRevenueFetcher, countParcelsFetcher, createParcelFetcher, customerLoginFetcher, customerRangeFetcher, deleteBusinessFetcher, deleteParcel, deleteReviewFetcher, deleteUserFetcher, dispatchersRangeFetcher, editParcelFetcher, fetchAllDispatchersFetcher, fetchAllParcelsFetcher, fetchAllReviews, fetchTransactionsFetcher, forgetPasswordFetcher, getBusinessDetails, messagesRangeFetcher, parcelLateFetcher, parcelRangeFetcher, parcelsDeliveredFetcher, reviewsRangeFetcher, todayRevenueFetcher, transactionsRangeFetcher, viewCustomerFetcher, viewDispatcherFetcher, viewParcelFetcher, viewStaffFetcher } from "../customer-api/api";
-import { customerLogin } from "../libs/customer-auth";
+import { activeShipmentsCountFetcher, administratorsRangeFetcher, billingInvoiceFetcher, businessChangeFetcher, companyRevenueFetcher, countParcelsFetcher, createParcelFetcher, customerRangeFetcher, deleteBusinessFetcher, deleteParcel, deleteReviewFetcher, deleteUserFetcher, dispatchersRangeFetcher, editParcelFetcher, fetchAllDispatchersFetcher, fetchAllParcelsFetcher, fetchAllReviews, fetchTransactionsFetcher, getBusinessDetails, messagesRangeFetcher, parcelLateFetcher, parcelRangeFetcher, parcelsDeliveredFetcher, reviewsRangeFetcher, todayRevenueFetcher, transactionsRangeFetcher, viewCustomerFetcher, viewDispatcherFetcher, viewParcelFetcher, viewStaffFetcher } from "../customer-api/api";
 import { CUSTOMERSWRKEYS } from "../swr-keys/customer-keys";
 import useSWR from "swr";
-import { customerStore } from "../store/store";
 import { countCustomersFetcher } from "../staff-api/api";
 
-export function useCustomerLogin(creds: any){
-    const router = useRouter();
-    const {data, mutate, error } = useSWR(CUSTOMERSWRKEYS.customerKey, 
-        () => customerLoginFetcher(creds), {
-            onSuccess: (data) => {
-                const customer = data.data;
-                if (data.code === 200 && data.data.isDefaultPassword === false) {
-                    customerLogin(customer.authToken);
-                    customerStore.push(customer);
-                    let timer = setTimeout(() => {
-                        router.replace('/dashboard/welcome');
-                    }, 6000);
-                    () => clearTimeout(timer);
-                }
 
-                if(data.code === 200 && data.data.isDefaultPassword === true){
-                    customerStore.push(customer);
-                    console.log(customerStore);
-                    customerLogin(customer.authToken);
-                    router.replace('/customer/web/changepassword')
-                }
-            }
-        });
-    const loading = !data && !error;
-    const loggedOut = error && error.status === 403;
-    return{
-        loading,
-        error,
-        loggedOut,
-        customerData: data,
-        mutate
-    };
-}
-
-
-export function useForgetPassword(credentials: any){
-    const router = useRouter();
-    const {
-        data,
-        error,
-        isLoading, 
-        mutate,
-        isValidating
-    } = useSWR(
-        CUSTOMERSWRKEYS.forgotPassword,
-        () => forgetPasswordFetcher(credentials), {
-            onSuccess: (data) => {
-                if(data.code === 200){
-                    let timer = setTimeout(() => {
-                        router.replace('/customer/web/login');
-                    }, 6000);
-                    () => clearTimeout(timer);
-                }
-            }
-        });
-        const loggedOut = error && error.status === 403;      
-        return{
-            isLoading,
-            forgotCustomerPasswordError: error,
-            forgotCustomerPasswordData: data,
-            forgotCustomerPasswordValidating: isValidating,
-            mutate
-        };
-}
-
-
-export function useCustomerChangePassword(passwordDetails: any){
-    const router = useRouter();
-    const {
-        data,
-        error,
-        isLoading,
-        isValidating, 
-        mutate
-    } = useSWR(
-        CUSTOMERSWRKEYS.changePassword,
-        () => changePasswordFetcher(passwordDetails), {
-            onSuccess: (data) => {
-                if (data.code === 200) {
-                    let timer = setTimeout(() => {
-                        router.replace('/dashboard/welcome');
-                    }, 6000);
-                    () => clearTimeout(timer);
-                }
-            }
-        }
-    );
-    return{
-        customerChangePasswordData: data,
-        customerChangePasswordError: error,
-        customerChangePasswordIsLoading: isLoading,
-        customerChangePasswordMutate: mutate,
-        customerChangePasswordIsValidating: isValidating,
-    }
-}
 
 
 export function useCreateParcel(parcelDetails: any){

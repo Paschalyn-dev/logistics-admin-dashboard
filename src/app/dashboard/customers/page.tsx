@@ -20,7 +20,7 @@ export default function Customers(){
     const [inputData, setInputData] = useState<string>('');
     const {fetchCustomersData, fetchCustomersError, fetchCustomersIsLoading, fetchCustomersIsValidating, fetchCustomersMutate} = useFetchCustomers();
     const {customersRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage} = useContext<any | string>(State_data);
-    const {customerRangeData, customerRangeError, customerRangeIsLoading, customerRangeMutate, customerRangeIsValidating} = useCustomerSearchRange(customersRange);
+    const {customerRangeData, customerRangeIsLoading, customerRangeMutate, customerRangeIsValidating} = useCustomerSearchRange(customersRange);
     const handleOpenSearch = () => {
         setOpenUIBoxes((prev: any) => ({...prev, customerSearch: true, customerClearData: true}))
     }
@@ -35,12 +35,11 @@ export default function Customers(){
 
     useEffect(() => {
         fetchCustomersMutate();
-        console.log(customerRangeData);
     }, [openUIBoxes.customerClearData !== true]);
 
     useEffect(() => {
         customerRangeMutate()
-    }, [openUIBoxes.customerSearch === true || customerRangeMutate()]);
+    }, [openUIBoxes.customerSearch === true]);
 
     return(
         <Holder>
@@ -101,7 +100,7 @@ export default function Customers(){
                                 <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                                     <p className="text-xs">{useDateHandler(date)}</p>
                                     <h3 className="text-lg">{customer?.user?.name}</h3>
-                                    <p>{customer?.id || 0} parcels shipped</p>
+                                    <p>{customer?.user?.parcels || 0} parcels shipped</p>
                                     <hr className="my-2" />
 
                                     <div className="flex text-gray-500 justify-start gap-3 items-center">
@@ -154,7 +153,7 @@ export default function Customers(){
                             <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                                 <p className="text-xs">{useDateHandler(date)}</p>
                                 <h3 className="text-lg">{customer?.user?.name}</h3>
-                                <p>{customer?.id || 0} parcels shipped</p>
+                                <p>{customer?.user?.parcels || 0} parcels shipped</p>
                                 <hr className="my-2" />
 
                                 <div className="flex text-gray-500 justify-start gap-3 items-center">

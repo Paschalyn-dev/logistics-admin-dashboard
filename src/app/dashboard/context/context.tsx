@@ -122,8 +122,10 @@ export default function Context({children}: any){
         websiteError: true,
         deliveryPrice: false,
         changePassword: false,
-        staffAndCustomerLogin: false,
         staffAndCustomerForgotPassword: false,
+        staffAndCustomerChangePassword: false,
+        staffAndCustomerLogin: false,
+        signOut: false,
     })
 
     return(

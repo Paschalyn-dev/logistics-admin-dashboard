@@ -7,14 +7,21 @@ import * as React from "react";
 
 
 export default function ConstantNav(){
-    const [windowWidth, setWindowWidth]= useState<number>(0);
-    useEffect(() => {
-        function checkWidth(){
+    let myWidth = 0;
+    
+    if(typeof window !== "undefined"){
+        myWidth = window.innerWidth;
+    }  
+
+    const [windowWidth, setWindowWidth]= useState<number>(myWidth);
+    
+    useEffect(function onFirstMount() {
+        function checkWidth() {
           setWindowWidth(window.innerWidth);
         }
         window.addEventListener("resize", checkWidth);
         return () => window.removeEventListener('resize', checkWidth);
-    }, []);
+    });
 
     return(
         <div className= "flex z-10 h-16 bg-blue-700 top-0 phone:w-full laptop:w-10/12 overflow-x-auto bg-gray-100 phone:pr-10 laptop:pr-24 fixed justify-between items-center shadow-sm">            
@@ -31,6 +38,5 @@ export default function ConstantNav(){
             </div>
             </div>
         </div>
-
     )
 }

@@ -5,48 +5,47 @@ import { useContext, useEffect } from "react";
 import { State_data } from "../../context/context";
 
 
-export default function ErrorAndSucccessHandlers({staffAndCustomer, error, loading, data,  message}: any){
-    const {successMessage, setSuccessMessage} = useContext(State_data);
+export default function ErrorAndSucccessHandlers({staffAndCustomer, successmessage, failedmessage, error, successName, name, loading, data, code, message}: any){
+    const {setSuccessMessage} = useContext(State_data);
 
     useEffect(() => {
-        setSuccessMessage((prev: any) => ({...prev, staffAndCustomerlogin: true}));
-    }, [message])
-
+        setSuccessMessage((prev: any) => ({...prev, [name]: true}));
+    }, [code])
 
     return(
         <>
             {(loading) && <Loader />}
-                {(error && staffAndCustomer && !data && successMessage) &&
+                {(error && staffAndCustomer && !data && successName) &&
                     (
                     <>
                             <SuccessMessage 
                             messageTitle="Error occured! Check your network connection."
                             id="failed"
-                            name="staffAndCustomerlogin"
-                            successMessageShow={successMessage.staffAndCustomerlogin}
+                            name={name}
+                            successMessageShow={successName}
                             />
                         </>
                     )
                 }
                 {
-                    (staffAndCustomer && data?.code && data?.code === 200 && successMessage.staffAndCustomerlogin) &&
+                    (staffAndCustomer && data?.code && data?.code === 200 && successName) &&
                     <>
                         <SuccessMessage 
-                        messageTitle="You are logged in successfully!"
-                        name="staffAndCustomerlogin"
-                        successMessageShow={successMessage.staffAndCustomerlogin}
+                        messageTitle={successmessage}
+                        name={name}
+                        successMessageShow={successName}
                         />
                     </> 
                 }
 
                 {
-                    (staffAndCustomer && data?.code && data?.code !== 200 && successMessage.staffAndCustomerlogin) &&
+                    (staffAndCustomer && data?.code && data?.data && data?.code !== 200 && successName) &&
                         <>
                             <SuccessMessage 
-                            messageTitle="Your login parameters are incorrect!"
+                            messageTitle={failedmessage}
                             id="failed"
-                            name="staffAndCustomerlogin"
-                            successMessageShow={successMessage.staffAndCustomerlogin}
+                            name={name}
+                            successMessageShow={successName}
                             />
                         </>
                 }

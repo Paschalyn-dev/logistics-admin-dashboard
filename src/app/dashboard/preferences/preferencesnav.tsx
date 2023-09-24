@@ -7,8 +7,14 @@ import InsideNav from "../home/insidenav";
 
 
 export default function PreferencesNav(){
-    const [windowWidth, setWindowWidth]= useState<number>(0);
+    let myWidth = 0;
     const [clicked, setClicked]= useState<string>('website');
+    
+    if(typeof window !== 'undefined'){
+        myWidth = window.innerWidth;
+    }
+
+    const [windowWidth, setWindowWidth]= useState<number>(myWidth);
 
     useEffect(() => {
         function checkWidth(){
@@ -16,17 +22,17 @@ export default function PreferencesNav(){
         }
         window.addEventListener("resize", checkWidth);
         return () => window.removeEventListener('resize', checkWidth);
-    }, []);
-    // const minipage = localStorage.getItem('minipage');
-    // useEffect(() => {
-    //     if(minipage) {
-    //       setClicked(JSON.parse(minipage))
-    //     }
-    //   }, [])
+    });
+    const minipage = localStorage.getItem('minipage');
+    useEffect(() => {
+        if(minipage) {
+          setClicked(JSON.parse(minipage))
+        }
+      }, [])
     
-      // useEffect(() => {
-      //   localStorage.setItem('minipage', JSON.stringify(clicked))
-      // }, [clicked])
+      useEffect(() => {
+        localStorage.setItem('minipage', JSON.stringify(clicked))
+      }, [clicked])
 
     return(
         <div className= "flex gap-5 z-10 h-fit bg-blue-700 top-0 phone:w-full laptop:w-10/12 bg-gray-100 phone:pr-10 laptop:pr-24 fixed justify-between items-center shadow-sm">            

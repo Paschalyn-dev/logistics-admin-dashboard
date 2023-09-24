@@ -1,31 +1,36 @@
 'use client';
 
 import { useRouter } from "next/navigation";
+import { useContext } from "react";
 import { logout } from "../services/libs/staff-auth";
 import { customerLogout } from "../services/libs/customer-auth";
-import { useStaffLogin } from "../services/swr-functions/staff-swr";
-import Loader from "../services/Loader/spinner";
-import { useCustomerLogin } from "../services/swr-functions/customer-swr";
+import { State_data } from "../context/context";
+import SuccessMessage from "../successmessage";
 
-export default function SignOut({staffLogin, customerLogin}: any){
-    const {mutate, loading, loggedOut} = useStaffLogin(staffLogin || '');
-    const {mutate: m, loading: l, loggedOut: lO} = useCustomerLogin(customerLogin || '');
+export default function SignOut(){
     const router = useRouter();
-
-    if(loggedOut || lO){
-        console.log('router')
-        router.replace('/');
+    const {successMessage, setSuccessMessage} = useContext(State_data);
+    function handleSignOut(){
+        logout();
+        customerLogout();
+        setSuccessMessage((prev: any) => ({...prev, signOut: true}));
+        let timer = setTimeout(() => {router.replace('/')}, 2000);
+        () => clearTimeout(timer);
     }
-    // if(loggedOut) return <Loader />
-    if(loading || l) return <Loader />
     return(
-        <button 
-        onClick={() => {
-            logout();
-            customerLogout();
-            mutate(null);
-            m(null);
-        }}
-        >Sign Out</button>
+        <div>
+            {
+                successMessage.signOut &&
+                <SuccessMessage
+                messageTitle="Sign out successful!"
+                name="signOut"
+                successMessageShow={successMessage.signOut}
+                 />
+            }
+            <button 
+            onClick={handleSignOut}>
+                Sign Out
+            </button>
+        </div>
     )
 }

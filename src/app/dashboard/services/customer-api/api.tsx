@@ -1,48 +1,10 @@
 import { customerAPIUrl } from "../api-url/customer-api-url";
-import { staffAPIURL } from "../api-url/staff-api-url";
-import { customerStore } from "../store/store";
-import { staffStore } from "../store/store";
+
 
 
 // const authorizationKey = staffStore[staffStore.length - 1]?.authToken;
-const authorizationKey = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTExODgzNDZ9.73G4_gAI_mexLVUYQOkaJN7XCaIj0iHqj5b2g9yYIa8"
-export const customerLoginFetcher = async(val: any) => {
-        const response = await fetch(customerAPIUrl.fetchCustomer, {
-        method: "POST",
-        body: JSON.stringify(val),
-        headers: {
-            "Content-Type": "application/json",
-        },
-    })
-    const data = await response.json();
-    return data;
-}
+export const authorizationKey = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTExODgzNDZ9.73G4_gAI_mexLVUYQOkaJN7XCaIj0iHqj5b2g9yYIa8";
 
-
-export const forgetPasswordFetcher = async(val: any) => {
-    const response = await fetch(customerAPIUrl.forgotCustomerPassword,{
-        method: 'PUT',
-        body: JSON.stringify(val),
-        headers: {
-            "Content-Type": "application/json",
-        },
-    })
-    const data = await response.json();
-    return data;
-}
-
-export const changePasswordFetcher = async(passwordDetails: string) => {
-    const response = await fetch(customerAPIUrl.changePassword,{
-        method: 'PUT',
-        body: JSON.stringify(passwordDetails),
-        headers:{
-            "Content-Type": "application/json",
-            'Authorization': authorizationKey
-        },
-    })
-    const data = await response.json();
-    return data;
-}
 
 export const createParcelFetcher = async(parcelDetails: any) => {
     const response = await fetch(customerAPIUrl.createParcel, {

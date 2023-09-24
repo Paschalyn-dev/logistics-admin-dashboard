@@ -2,25 +2,56 @@
 import image from "../../../wallpaperflare.com_wallpaper.jpg"
 import Image from "next/image";
 import logo from '../../../logo-icon.svg';
-import Link from "next/link";
 import { Form, Formik } from "formik";
 import * as Yup from 'yup';
+import { useRouter } from "next/navigation";
 import TextInput from "@/app/dashboard/formik/inputtypes";
 import Button from "@/app/dashboard/button";
-import { useState } from "react";
-import { useCustomerChangePassword } from "@/app/dashboard/services/swr-functions/customer-swr";
+import { useState, useEffect, useContext } from "react";
 import { Password } from "@/app/dashboard/formik/password";
-import ChangePasswordMessage from "@/app/dashboard/services/eventhandlers/changePasswordMessage";
+import { State_data } from "@/app/dashboard/context/context";
+import { customerAPIUrl } from "@/app/dashboard/services/api-url/customer-api-url";
+import { authorizationKey } from "@/app/dashboard/services/customer-api/api";
+import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
 
 export default function     CustomerChangePassword(){
     const [passwordString, setPasswordString] = useState<boolean>(true);
-    const [changePassword, setChangePassword] = useState<any>();
-    const {customerChangePasswordError,
-        customerChangePasswordData,
-        customerChangePasswordIsLoading,
-        customerChangePasswordIsValidating,
-        customerChangePasswordMutate
-    } = useCustomerChangePassword(changePassword);
+    const [changePassword, setChangePassword] = useState<any>({
+        info: "",
+        result: ""
+    });
+    const router =   useRouter();
+    const {successMessage} = useContext(State_data)
+
+    async function handleChangePassword(passwordDetails: any){
+        const response = await fetch(customerAPIUrl.changePassword,{
+            method: 'PUT',
+            body: JSON.stringify(passwordDetails),
+            headers:{
+                "Content-Type": "application/json",
+                'Authorization': authorizationKey
+            },
+        })
+        const data = await response.json();
+        setChangePassword((prev: any) => ({...prev, result: data}));
+    }
+
+    useEffect(() => {
+        if(changePassword?.result !== ""){
+           if(changePassword?.result?.code === 200){
+                let timer = setTimeout(() => {
+                    router.replace('/dashboard/welcome');
+                }, 6000);
+                () => clearTimeout(timer);
+            }
+        }
+   }, [changePassword?.result])
+
+     useEffect(() => {
+        if(changePassword?.info !== ""){
+            handleChangePassword(changePassword?.info)
+        }
+    }, [changePassword?.info])
 
     return(
         <div className="w-screen relative h-screen overflow-x-hidden">
@@ -36,17 +67,21 @@ export default function     CustomerChangePassword(){
                     <Image className="w-10 mb-2" src={logo} alt="logo" />
                     <h5 className="text-sm text-gray-800">CakenUs Services</h5>
                 </div>
-                {(
-                    changePassword?.oldpassword !== undefined && changePassword?.newpassword !== undefined) && (
-                    <ChangePasswordMessage
-                    changePasswordFormDetails={changePassword} 
-                    changePasswordData={customerChangePasswordData} 
-                    changePasswordError={customerChangePasswordError} 
-                    changePasswordLoading={customerChangePasswordIsLoading}
-                    changePasswordValidating={customerChangePasswordIsValidating}
-                    message={changePassword?.code}
+                {
+                    changePassword.result !== "" && changePassword.info !== "" && 
+                    <ErrorAndSucccessHandlers
+                    name="staffAndCustomerChangePassword"
+                    successName={successMessage.staffAndCustomerChangePassword}
+                    message={changePassword?.result?.code} 
+                    code={changePassword?.info?.code}
+                    successmessage="Password change was successful!"
+                    failedmessage="Sorry, password cannot be changed!"
+                    staffAndCustomer={changePassword?.result}
+                    error={changePassword?.result?.code !== 200}
+                    loading={changePassword?.result === "undefined" && changePassword?.info !== ""}
+                    data={changePassword?.result}
                     />
-                )}
+                }
                 <div className="mt-5 justify-center font-bold text-2xl flex gap-2 "> Change Password</div>
                 <p className="text-center text-gray-500">Please enter your old(default password) and new passwords to change password.</p>
                 <div className="flex flex-col w-full mt-10">
@@ -66,13 +101,13 @@ export default function     CustomerChangePassword(){
                             .matches(/[a-zaA-z0-9]/, 'Password can only contain letters and numbers.')        
                         })}
                         onSubmit={async (values) => {
-                            setChangePassword(null)
-                            setChangePassword({
-                                code: Password(),
-                                ...values
-                            })
-                            console.log(customerChangePasswordData, customerChangePasswordError, changePassword)
-                            customerChangePasswordMutate()
+                            setChangePassword((prev: any) => ({
+                                ...prev, 
+                                info: {
+                                    code: Password(),
+                                    ...values
+                                }
+                            }))
                         }}  
                     >
                         {({handleSubmit}) => (

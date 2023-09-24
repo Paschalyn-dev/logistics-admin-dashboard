@@ -3,31 +3,52 @@ import image from "../../../wallpaperflare.com_wallpaper.jpg"
 import Image from "next/image";
 import logo from '../../../logo-icon.svg';
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useContext, useState } from "react";
 import { Form, Formik } from "formik";
 import * as Yup from 'yup';
 import TextInput from "@/app/dashboard/formik/inputtypes";
 import Button from "@/app/dashboard/button";
 import { Password } from "@/app/dashboard/formik/password";
-import { useForgetPassword } from "@/app/dashboard/services/swr-functions/staff-swr";
 import { useRouter } from "next/navigation";
-import ForgotPasswordMessage from "@/app/dashboard/services/eventhandlers/forgotPasswordMessage";
+import { State_data } from "@/app/dashboard/context/context";
+import { staffAPIURL } from "@/app/dashboard/services/api-url/staff-api-url";
+import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
 
 export default function RecoverPassword(){
-     const [forgotPassword, setForgotPassword] = useState<any>();
-     const {forgotPasswordData, mutate, forgetPasswordLoggedout, forgotPasswordError, isLoading, forgotPasswordValidating
-           } = useForgetPassword(forgotPassword);
+     const [forgotPassword, setForgotPassword] = useState<any>({
+        info: "",
+        result: ""
+     });
      const router = useRouter();
+     const {successMessage} = useContext(State_data)
+     async function handleRecoverPassword(val: any){
+        const response = await fetch(staffAPIURL.forgetStaffPassword,{
+            method: 'PUT',
+            body: JSON.stringify(val),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        const data = await response.json();
+        setForgotPassword((prev: any) => ({...prev, result: data}));
+     }
 
      useEffect(() => {
-        if (forgotPasswordData && !forgetPasswordLoggedout && forgotPasswordData.code === 200){
-            var timer = setTimeout(() => {
-                router.replace('/staff/web/login');
-            }, 6000);
-        }
-        return () => clearTimeout(timer);
-     }, [forgotPasswordData, forgetPasswordLoggedout]);
+        if(forgotPassword?.result !== ""){
+           if(forgotPassword?.result?.code === 200){
+               let timer = setTimeout(() => {
+                   router.replace('/staff/web/login');
+               }, 6000);
+               () => clearTimeout(timer);
+           }
+       }
+   }, [forgotPassword?.result])
 
+     useEffect(() => {
+        if(forgotPassword?.info !== ""){
+            handleRecoverPassword(forgotPassword?.info)
+        }
+    }, [forgotPassword?.info])
 
     return(
         <div className="w-screen relative h-screen overflow-x-hidden">
@@ -44,14 +65,18 @@ export default function RecoverPassword(){
                         <h5 className="text-sm text-gray-800">CakenUs Services</h5>
                     </div>
                     {
-                        forgotPassword?.email !== undefined && 
-                        <ForgotPasswordMessage
-                        forgotPassword={forgotPassword} 
-                        message={forgotPassword.code} 
-                        isLoading={isLoading}
-                        forgotPasswordData={forgotPasswordData}
-                        forgotPasswordError={forgotPasswordError}
-                        forgotPasswordValidating={forgotPasswordValidating}
+                        forgotPassword.result !== "" && forgotPassword.info !== "" && 
+                        <ErrorAndSucccessHandlers
+                        name="staffAndCustomerForgotPassword"
+                        successName={successMessage.staffAndCustomerForgotPassword}
+                        staffAndCustomer={forgotPassword?.result} 
+                        error={forgotPassword?.result?.code !== 200}
+                        loading={forgotPassword?.result === "undefined" && forgotPassword?.info !== ""}
+                        data={forgotPassword?.result}
+                        code={forgotPassword?.info?.code}
+                        failedmessage ="This email is not registered."
+                        successmessage="Check your email, an email has been sent to you."
+                        message={forgotPassword?.result?.code} 
                         />
                     }
                     <div className="mt-5 justify-center font-bold text-2xl flex gap-2 "> Recover Password</div>
@@ -66,13 +91,12 @@ export default function RecoverPassword(){
                                 .required('Email Address is required.')           
                             })}
                             onSubmit={async (values) => {
-                                setForgotPassword(null)
-                                setForgotPassword({
-                                    code: Password(),
-                                    ...values
-                                })
-                                console.log(forgotPassword, forgotPasswordData)
-                                mutate();
+                                setForgotPassword((prev: any) => ({...prev,
+                                    info: {
+                                        code: Password(),
+                                        ...values
+                                    }
+                                }))
                             }}  
                         >
                             {({handleSubmit}) => (

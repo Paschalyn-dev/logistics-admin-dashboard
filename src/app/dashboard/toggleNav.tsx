@@ -15,11 +15,6 @@ export default function ToggleNav(){
 
     
     return(
-      <>   
-      <head>
-        <link href="https://unpkg.com/ionicons@4.5.10-0/dist/css/ionicons.min.css" rel="stylesheet" />
-      </head>   
-
       <>
         {
             windowWidth  >= 1025 || showNav && <Sidebar />
@@ -44,6 +39,5 @@ export default function ToggleNav(){
         </div>
         }
        </>
-      </>
     )
 }

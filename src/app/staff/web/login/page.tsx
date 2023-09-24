@@ -4,23 +4,65 @@ import Image from "next/image";
 import logo from '../../../logo-icon.svg';
 import Time from "@/app/time";
 import Link from "next/link";
-import {useState} from "react";
+import {useEffect, useContext, useState} from "react";
 import { Form, Formik } from "formik";
 import * as Yup from 'yup';
-import { useStaffLogin } from "@/app/dashboard/services/swr-functions/staff-swr";
+import { useRouter } from "next/navigation";
 import TextInput from "@/app/dashboard/formik/inputtypes";
 import Button from "@/app/dashboard/button";
 import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
 import { Password } from "@/app/dashboard/formik/password";
+import { login } from "@/app/dashboard/services/libs/staff-auth";
+import { staffAPIURL } from "@/app/dashboard/services/api-url/staff-api-url";
+import { State_data } from "@/app/dashboard/context/context";
 
 
 export default function Staff(){
-     const [passwordString, setPasswordString] = useState<boolean>(true)
-     const [staff, setStaff] = useState<any>();
-     const { staffData, loading, mutate, error, loggedOut } = useStaffLogin(staff);
+    const router = useRouter();
+    const [passwordString, setPasswordString] = useState<boolean>(true)
+    const [staff, setStaff] = useState<any>({
+        info: '',
+        result: ''
+    });
+    const {successMessage} = useContext(State_data)
 
+    async function handleLogin(val: any){
+        const response = await fetch(staffAPIURL.stafflogin, {
+            method: "POST",
+            body: JSON.stringify(val),
+            headers: {
+            "Content-Type": "application/json",
+        },
+    })
+    const data = await response.json();
+    setStaff((prev: any) => ({...prev, result: data}));
+    }
 
-     return(
+useEffect(() => {
+    if(staff?.result !== ""){
+    const user = staff?.result?.data;
+    if(staff?.result?.code === 200 && staff?.result?.data?.isDefaultPassword === false) {
+        login(user.authToken)
+        // staffStore.push(user);
+        let timer = setTimeout(() => {
+            router.replace('/dashboard/welcome');
+        }, 5000);
+        () => clearTimeout(timer);
+    }
+    if(staff?.result?.code === 200 && staff?.result?.data?.isDefaultPassword === true){
+        router.replace('/staff/web/changepassword')
+        // staffStore.push(user);
+    }  
+}
+},[staff?.result])
+
+useEffect(() => {
+    if(staff?.info !== ""){
+        handleLogin(staff.info);
+    }
+}, [staff?.info?.code])
+
+return(
         <div className="w-screen relative h-screen overflow-x-hidden">
             <Image  
             alt="background" 
@@ -35,13 +77,18 @@ export default function Staff(){
                         <h5 className="text-sm text-gray-800">CakenUs Services</h5>
                     </div>
                     {
-                        (staff !== undefined && staff !== undefined) && 
+                        staff.result !== "" && staff.info !== "" && 
                         <ErrorAndSucccessHandlers 
-                        message={staff?.code} 
-                        staffAndCustomer={staff}
-                        error={error}
-                        loading={loading}
-                        data={staffData}
+                        name="staffAndCustomerLogin"
+                        successName={successMessage.staffAndCustomerLogin}
+                        message={staff?.result?.code} 
+                        code={staff?.info?.code}
+                        successmessage="Login successful!"
+                        failedmessage="Login parameters are incorrect"
+                        staffAndCustomer={staff?.result}
+                        error={staff?.result?.code !== 200}
+                        loading={staff?.result === "undefined" && staff?.info !== ""}
+                        data={staff?.result}
                         />
                     }
                     <div className="mt-5 justify-center font-bold text-2xl flex gap-2 "><Time /> Staff</div>
@@ -65,13 +112,7 @@ export default function Staff(){
                                 .matches(/[a-zaA-z0-9]/, 'Password can only contain letters and numbers.')                    
                             })}
                             onSubmit={async (values) => {
-                                setStaff(null)
-                                setStaff({
-                                    ...values,
-                                    code: Password()
-                                });
-                                console.log(error, staffData, loading)
-                                mutate();
+                                setStaff((prev: any) => ({...prev, result: "", info: {...values, code: Password()}}));
                             }}   
                         >
                             {({handleSubmit}) => (

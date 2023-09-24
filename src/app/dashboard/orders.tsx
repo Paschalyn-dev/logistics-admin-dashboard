@@ -5,16 +5,23 @@ import Sidebar from "./sidebar";
 import InsideNav from "./home/insidenav";
 
 export default function OrdersNav(){
-    const [windowWidth, setWindowWidth]= useState<number>(0);
+    let myWidth = 0;
+    
     const [clickIt, setClickIt] = useState<string>('');
-
+    
+    if(typeof window !== "undefined"){
+        myWidth = window.innerWidth;
+    }  
+    
+    const [windowWidth, setWindowWidth]= useState<number>(myWidth);
+    
     useEffect(() => {
         function checkWidth(){
           setWindowWidth(window.innerWidth);
         }
         window.addEventListener("resize", checkWidth);
         return () => window.removeEventListener('resize', checkWidth);
-    }, []);
+    });
   
 
     return(

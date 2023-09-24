@@ -4,19 +4,62 @@ import Image from "next/image";
 import logo from '../../../logo-icon.svg';
 import Time from "@/app/time";
 import Link from "next/link";
-import {useState} from "react";
+import {useState, useContext, useEffect} from "react";
+import { useRouter } from "next/navigation";
 import { Form, Formik } from "formik";
 import * as Yup from 'yup';
 import TextInput from "@/app/dashboard/formik/inputtypes";
 import Button from "@/app/dashboard/button";
 import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
-import { useCustomerLogin } from "@/app/dashboard/services/swr-functions/customer-swr";
 import { Password } from "@/app/dashboard/formik/password";
+import { customerAPIUrl } from "@/app/dashboard/services/api-url/customer-api-url";
+import { login } from "@/app/dashboard/services/libs/staff-auth";
+import { customerLogin } from "@/app/dashboard/services/libs/customer-auth";
+import { State_data } from "@/app/dashboard/context/context";
 
 export default function Customer(){
-     const [passwordString, setPasswordString] = useState<boolean>(true)
-     const [customer, setCustomer] = useState<any>();
-     const { customerData, loading, mutate, error } = useCustomerLogin(customer);
+    const [passwordString, setPasswordString] = useState<boolean>(true)
+    const router = useRouter();
+    const [customer, setCustomer] = useState<any>({
+        info: "",
+        result: ""
+    });
+    const {successMessage} = useContext(State_data)
+    async function handleLogin(val: any){
+        const response = await fetch(customerAPIUrl.fetchCustomer, {
+            method: "POST",
+            body: JSON.stringify(val),
+            headers: {
+            "Content-Type": "application/json",
+        },
+    })
+    const data = await response.json();
+    setCustomer((prev: any) => ({...prev, result: data}));
+    }
+
+    useEffect(() => {
+        if(customer?.result !== ""){
+        const user = customer?.result?.data;
+        if(customer?.result?.code === 200 && customer?.result?.data?.isDefaultPassword === false) {
+            customerLogin(user.authToken)
+            // staffStore.push(user);
+            let timer = setTimeout(() => {
+                router.replace('/dashboard/welcome');
+            }, 5000);
+            () => clearTimeout(timer);
+        }
+        if(customer?.result?.code === 200 && customer?.result?.data?.isDefaultPassword === true){
+            router.replace('/customer/web/changepassword')
+            // staffStore.push(user);
+        }  
+    }
+    },[customer?.result])
+    
+    useEffect(() => {
+        if(customer?.info !== ""){
+            handleLogin(customer.info);
+        }
+    }, [customer?.info?.code])
      
     return(
         <div className="w-screen relative h-screen overflow-x-hidden">
@@ -33,13 +76,18 @@ export default function Customer(){
                         <h5 className="text-sm text-gray-800">CakenUs Services</h5>
                     </div>
                     {
-                        (customer?.id !== undefined && customer?.password !== undefined) &&
+                        customer.result !== "" && customer.info !== "" && 
                         <ErrorAndSucccessHandlers 
-                        message={customer?.code} 
-                        staffAndCustomer={customer}
-                        error={error}
-                        loading={loading}
-                        data={customerData}
+                        name="staffAndCustomerLogin"
+                        successName={successMessage.staffAndCustomerLogin}
+                        message={customer?.result?.code} 
+                        code={customer?.info?.code}
+                        successmessage="Login successful!"
+                        failedmessage="Login parameters are incorrect"
+                        staffAndCustomer={customer?.result}
+                        error={customer?.result?.code !== 200}
+                        loading={customer?.result === "undefined" && customer?.info !== ""}
+                        data={customer?.result}
                         />
                     }
                     <div className="mt-5 justify-center font-bold text-2xl flex gap-2 "><Time /> Customer</div>
@@ -63,13 +111,7 @@ export default function Customer(){
                             .matches(/[a-zaA-z0-9]/, 'Password can only contain letters and numbers.')                    
                         })}
                             onSubmit={async (values) => {
-                                setCustomer(null)
-                                setCustomer({
-                                    ...values,
-                                    code: Password()
-                                });
-                                console.log(error, customerData, loading)
-                                mutate();
+                                setCustomer((prev: any) => ({...prev, result: "", info: {...values, code: Password()}}));
                             }}    
                         >
                     {      ({handleSubmit}) => ( 

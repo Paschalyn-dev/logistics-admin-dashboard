@@ -1,9 +1,10 @@
 'use client'
-import { useState } from "react";
-import DarkFill from "../../darkfill";
-import { useDeleteParcels, useDeleteReviews, useSearchParcelRange } from "../../services/swr-functions/customer-swr";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useDeleteCustomer, useDeleteDispatcher, useDeleteMessages, useDeleteStaff } from "../swr-functions/staff-swr";
+import DarkFill from "../../darkfill";
+import { customerAPIUrl } from "../api-url/customer-api-url";
+import { authorizationKey } from "../customer-api/api";
+import { staffAPIURL } from "../api-url/staff-api-url";
 type POPUP_TYPE = {
     closeFill: any;
     popupShow: boolean;
@@ -13,97 +14,167 @@ type POPUP_TYPE = {
 }
 
 export default function Popup({closeFill, name, popupShow, id, text}: POPUP_TYPE){
-    console.log(id, "Parcel id ")
-    const router = useRouter();
     const [details, setDetails] = useState({
         text: "",
         isShow: false,
-    })
+    });
+
     const [haveClicked, setHaveClicked] = useState<any>({
         parcels: false,
         customers: false,
         dispatchers: false, 
         administrators: false,
-        transactions: false,
-        reviews: false,
         messages: false
     });
+
     const [servicesId, setServicesId] = useState<any>({
         parcelsId: 0,
+        parcelsResult: "",
         customersId: 0,
+        customersResult: "",
         dispatchersId: 0, 
+        dispatchersResult: "",
         administratorsId: 0,
-        transactionsId: 0,
-        reviewsId: 0,
-        messagesId: 0
-    })
+        administratorsResult: "",
+        messagesId: 0,
+        messagesResult: "",
+    });
+
+    const router = useRouter();
     
     const handleDelete = (serviceName: any) => {
-        console.log(serviceName)
         setHaveClicked((prev: any) => ({...prev, [serviceName]: true}));
-        
-        console.log(serviceName, "edfghj")
-        if(haveClicked.parcels === true){
-            console.log(servicesId, "services id")
-            setServicesId((prev: any) => ({...prev, parcelsId: id}))
-
-            if(deleteParcelData?.code === 200) {
-                setDetails((prev: any) => ({...prev, text: "Shipment", isShow: true}))
-                // router.replace('/dashboard/shipments/active')
-            }
-        }
-        else if(haveClicked.dispatchers === true){
-            setServicesId((prev: any) => ({...prev, dispatchersId: id}))
-            if(deleteDispatcherData?.code === 200) {
-                setDetails((prev: any) => ({...prev, text: "Dispatcher", isShow: true}))
-                // router.replace('/dashboard/dispatchers')
-            }
-        }
-        else if(haveClicked.customers === true){
-            setServicesId((prev: any) => ({...prev, customersId: id}))
-            if(deleteCustomerData?.code === 200) {
-                setDetails((prev: any) => ({...prev, text: "Customer", isShow: true}))
-                // router.replace('/dashboard/customers')
-            }
-        }
-        else if(haveClicked.administrators === true){
-            setServicesId((prev: any) => ({...prev, administratorsId: id}))
-            if(deleteStaffData?.code === 200) {
-                setDetails((prev: any) => ({...prev, text: "Adminstrator", isShow: true}))
-                // router.replace('/dashboard/administrators')
-            }
-        }
-        else if(haveClicked.transactions === true){
-            setServicesId((prev: any) => ({...prev, transactionsId: id}))
-            // router.replace('/dashboard/transactions')
-        }
-        else if(haveClicked.reviews === true){
-            setServicesId((prev: any) => ({...prev, reviewsId: id}))
-            if(deleteReviewsData?.code === 200){
-                // router.replace('/dashboard/reviews')
-            }
-        }
-        else if(haveClicked.messages === true){
-            setServicesId((prev: any) => ({...prev, messagesId: id}))
-            if(deleteMessagesData?.code === 200) {
-                setDetails((prev: any) => ({...prev, text: "Message", isShow: true}))
-                // router.replace('/dashboard/messages')
-            }
-        }
-        else{}
     }   
-    // console.log(haveClicked, servicesId);
+    
     const handleClose = () => {
         setDetails((prev: any) => ({...prev, isShow: false}));
         closeFill();
     }
     
-    const {deleteStaffData} = useDeleteStaff(servicesId.administratorsId)
-    const {deleteMessagesData} = useDeleteMessages(servicesId.messagesId);
-    const {deleteReviewsData} = useDeleteReviews(servicesId.reviewsId)
-    const {deleteDispatcherData} = useDeleteDispatcher(servicesId.dispatchersId)
-    const {deleteParcelData} = useDeleteParcels(servicesId.parcelsId);
-    const {deleteCustomerData} = useDeleteCustomer(servicesId.customersId)
+    async function handleDeleteParcel(parcel: any){
+        const response = await fetch(customerAPIUrl.deleteParcels(parcel), {
+            method: 'DELETE',
+            headers: {
+                'Authorization': authorizationKey
+            }
+        });
+        const data = await response.json();
+        setServicesId((prev: any) => ({...prev, parcelsResult: data}));
+    }
+
+    async function handleDeleteCustomers(customer: any){
+        const response = await fetch(staffAPIURL.deleteCustomer(customer), {
+            method: 'DELETE',
+            headers: {
+                'Authorization': authorizationKey
+            }
+        });
+        const data = await response.json();
+        setServicesId((prev: any) => ({...prev, customersResult: data}));
+    }
+
+    async function handleDeleteAdministrators(admin: any){
+        const response = await fetch(staffAPIURL.deleteStaff(admin), {
+            method: 'DELETE',
+            headers: {
+                'Authorization': authorizationKey
+            }
+        });
+        const data = await response.json();
+        setServicesId((prev: any) => ({...prev, administratorsResult: data}));
+    }
+    
+    async function handleDeleteDispatchers(dispatcher: any) {
+        const response = await fetch(staffAPIURL.deleteDispatcher(dispatcher), {
+            method: 'DELETE',
+            headers: {
+                'Authorization': authorizationKey
+            }
+        });
+        const data = await response.json();
+        setServicesId((prev: any) => ({...prev, dispatchersResult: data}));
+    }
+
+    async function handleDeleteMessages(message: any){
+        const response = await fetch(staffAPIURL.deleteMessages(message), {
+            method: 'DELETE',
+            headers: {
+                'Authorization': authorizationKey
+            }
+        });
+        const data = await response.json();
+        setServicesId((prev: any) => ({...prev, messagesResult: data}));
+    }
+
+    useEffect(() => {
+        setServicesId((prev: any) => ({...prev, parcelsId: id}));
+        handleDeleteParcel(servicesId.parcelsId);
+    }, [haveClicked.parcels === true]);
+    
+    useEffect(() => {
+        setServicesId((prev: any) => ({...prev, customersId: id}));
+        console.log('asdfghjfdsa')
+        handleDeleteCustomers(servicesId.customersId);
+        // router.replace('/dashboard/customers')
+    }, [haveClicked.customers === true]);
+    
+    useEffect(() => {
+        setServicesId((prev: any) => ({...prev, dispatchersId: id}));
+        handleDeleteDispatchers(servicesId.dispatchersId);
+    }, [haveClicked.dispatchers === true]);
+    
+    useEffect(() => {
+        setServicesId((prev: any) => ({...prev, administratorsId: id}));
+        handleDeleteAdministrators(servicesId.administratorsId);
+    }, [haveClicked.administrators === true]);
+
+    useEffect(() => {
+        setServicesId((prev: any) => ({...prev, messagesId: id}));
+        handleDeleteMessages(servicesId.messagesId)
+    }, [haveClicked.messages === true]);
+
+    useEffect(() => {
+        if(servicesId.parcelsResult !== ""){
+            if(servicesId?.parcelsResult?.code === 200) {
+                setDetails((prev: any) => ({...prev, text: "Shipment", isShow: true}))
+            }
+        }
+    }, [servicesId.parcelsResult]);
+    
+    // Share your business' website address(https://cakenus.logistix.africa) on Social Media to get Customers to visit your website and Ship their parcels.
+    useEffect(() => {
+        if(servicesId.customersResult !== ""){
+            if(servicesId?.customerResult?.code === 200) {
+                setDetails((prev: any) => ({...prev, text: "Customer", isShow: true}))
+            }
+        }
+    }, [servicesId.customersResult]);
+
+
+    useEffect(() => {
+        if(servicesId.dispatchersResult !== ""){
+            if(servicesId?.dispatchersResult?.code === 200) {
+                setDetails((prev: any) => ({...prev, text: "Dispatcher", isShow: true}))
+            }
+        }
+    }, [servicesId.dispatchersResult]);
+
+
+    useEffect(() => {
+        if(servicesId.administratorsResult !== ""){
+            if(servicesId?.administratorsResult?.code === 200) {
+                setDetails((prev: any) => ({...prev, text: "Administrator", isShow: true}));          
+            }
+        }
+    }, [servicesId.administratorsResult]);
+
+    useEffect(() => {
+        if(servicesId.messagesResult !== ""){
+            if(servicesId?.messagesResult?.code === 200) {
+                setDetails((prev: any) => ({...prev, text: "Message", isShow: true}));
+            }
+        }
+    }, [servicesId.messagesResult]);
     
     return (
             <div>

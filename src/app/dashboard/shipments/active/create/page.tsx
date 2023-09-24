@@ -17,11 +17,14 @@ import OrdersNav from "../../../orders";
 import { useContext } from "react";
 import TextArea from "../../../formik/textarea";
 import { useAllDispatchersFetcher, useCreateParcel } from "../../../services/swr-functions/customer-swr";
-import {company, data} from "./../../../services/api-url/customer-api-url";
+import {company, customerAPIUrl, data} from "./../../../services/api-url/customer-api-url";
 import Loader from "@/app/dashboard/services/Loader/spinner";
 import { State_data, phoneRegExp } from "@/app/dashboard/context/context";
 import { useFetchCustomers } from "@/app/dashboard/services/swr-functions/staff-swr";
 import ShowCustomers from "@/app/dashboard/showCustomers";
+import { authorizationKey } from "@/app/dashboard/services/customer-api/api";
+import { Password } from "@/app/dashboard/formik/password";
+import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
 
 export default function FormPageShipments(){
     const {successMessage, setSuccessMessage, id} = useContext(State_data);
@@ -41,26 +44,44 @@ export default function FormPageShipments(){
     const {fetchCustomersData} = useFetchCustomers();
     const {dispatcherAllData} = useAllDispatchersFetcher();
     const router = useRouter();
-    const [createParcel, setCreateParcel] = useState<any>()
-    const {createParcelData, 
-        createParcelMutate, 
-        createParcelError, 
-        createParcelIsLoading, 
-        createParcelIsValidating} = useCreateParcel(createParcel);
-        
-        function handleSaveAndAddNewRider() {
-            setHandleToggleParcelButtons((prev: any) => ({
-                ...prev, saveAndAddNewRider: !handleToggleParcelButtons.saveAndAddNewRider
-            }))
+    const [createParcel, setCreateParcel] = useState<any>({
+        info: "",
+        result: ""
+    })
+    
+    async function handleCreate(details: any){
+        const response = await fetch(customerAPIUrl.createParcel, {
+            method: 'POST',
+            body: JSON.stringify(details),
+            headers: {
+                "Content-Type": "application/json",
+                'Authorization': authorizationKey
+            },
+        })
+        const data = await response.json();
+        setCreateParcel((prev: any) => ({...prev, result: data}));
+    }
+
+    useEffect(() => {
+        if(createParcel?.info !== ""){
+          handleCreate(createParcel?.info);
         }
+        console.log(createParcel, handleCreate(createParcel?.info))
+      }, [createParcel?.info?.code]);
+
+    function handleSaveAndAddNewRider() {
+        setHandleToggleParcelButtons((prev: any) => ({
+            ...prev, saveAndAddNewRider: !handleToggleParcelButtons.saveAndAddNewRider
+        }))
+    }
+    
+    function handleParcelFragility() {
+        setHandleToggleParcelButtons((prev: any) => ({
+            ...prev, parcelFragility: !handleToggleParcelButtons.parcelFragility
+        }))
+    }
         
-        function handleParcelFragility() {
-            setHandleToggleParcelButtons((prev: any) => ({
-                ...prev, parcelFragility: !handleToggleParcelButtons.parcelFragility
-            }))
-        }
-        
-        function handleParcelPicked() {
+    function handleParcelPicked() {
             setHandleToggleParcelButtons((prev: any) => ({
             ...prev, parcelPicked: !handleToggleParcelButtons.parcelPicked
         }))
@@ -89,36 +110,22 @@ export default function FormPageShipments(){
         <Holder>
             <OrdersNav />
             <Section>
-            {successMessage.createShipment && createParcelData.code === 200 &&
-            <SuccessMessage 
-            name="createShipment"
-            messageTitle="Shipment has been successfully added to the list." 
-            successMessageShow={successMessage.createShipment} 
-            />
-        }
-          
-          {successMessage.createShipment && createParcelData.code !== 200 &&
-           <SuccessMessage 
-           id="failed"
-           name="createShipment"
-           messageTitle="Sorry! Shipment cannot be created!" 
-           successMessageShow={successMessage.createShipment} 
-           />
-           }
 
-          {successMessage.createShipment && createParcelError && 
-           <SuccessMessage 
-            messageTitle="Error occured! Check your network connection." 
-            id='failed'
-            successMessageShow={successMessage.createShipment} 
+            {
+            createParcel.result !== "" && createParcel.info !== "" && 
+            <ErrorAndSucccessHandlers
             name="createShipment"
+            successName={successMessage.createShipment}
+            message={createParcel?.result?.code} 
+            code={createParcel?.info?.code}
+            successmessage="Shipment successfully added to the list!"
+            failedmessage="Sorry, shipment cannot be added to the list!"
+            staffAndCustomer={createParcel?.result}
+            error={createParcel?.result?.code !== 200}
+            loading={createParcel?.result === "undefined" && createParcel?.info !== ""}
+            data={createParcel?.result}
             />
-        }
-
-           {
-             (createParcelIsLoading || createParcelIsValidating) && 
-             <Loader />
-            }
+          }
             <Link href="/dashboard/shipments/active" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                 <i className="icon ion-md-arrow-back"></i>
             </Link>
@@ -185,22 +192,22 @@ export default function FormPageShipments(){
                 }}
                 validationSchema={Yup.object({
                     pickUp: Yup.object({
-                        name: Yup.string().required('This field is required!'),
+                        name: Yup.string().notRequired(),
                         phone: Yup.string()
                         .matches(phoneRegExp, 'Phone number is not valid')
                         .min(1, 'Must be 1 character or more.')
-                        .required('This field is required.'),                        
-                        email: Yup.string().email('This email seems invalid!').required('This field is required!'),
-                        address: Yup.string().required('This feild is required!'),
+                        .notRequired(),                        
+                        email: Yup.string().email('This email seems invalid!').notRequired(),
+                        address: Yup.string().notRequired(),
                     }),
                     destination: Yup.object({
-                        name: Yup.string().required('This field is required!'),
+                        name: Yup.string().notRequired(),
                         phone: Yup.string()
                         .matches(phoneRegExp, 'Phone number is not valid')
                         .min(15, 'Must be 15 characters or more.')
-                        .required('This field is required.'),                        
-                        email: Yup.string().email('This email seems invalid!').required('This field is required!'),
-                        address: Yup.string().required('This feild is required!'),
+                        .notRequired(),
+                        email: Yup.string().email('This email seems invalid!').notRequired(),
+                        address: Yup.string().notRequired(),
                     }),
                     estimatedDistance: Yup.object({
                         text: Yup.string().notRequired(),
@@ -210,19 +217,17 @@ export default function FormPageShipments(){
                     }),
                     name: Yup.string()
                     .min(5, 'Name must be five characters or more.')
-                    .required('This field is required.'),
+                    .notRequired(),
                     description: Yup.string().notRequired(),
-                    rider: Yup.string().required('This field is required!'),
-                    amount: Yup.string().required('This field is required.'),
+                    rider: Yup.string().notRequired(),
+                    amount: Yup.string().notRequired(),
                     paymentType: Yup.string().notRequired()
                 })}
                 onSubmit={async (values) => {
                     setSuccessMessage((prev: any) => ({...prev, createShipment: true}));
-                    setCreateParcel(values);
-                    createParcelMutate();
-                    console.log(createParcel, createParcelData)
-                    if(!handleToggleParcelButtons.saveAndAddNewCustomer && createParcelData?.code === 200){
-                        let timer = setTimeout(() => {
+                    setCreateParcel((prev: any) => ({...prev, result: "", info: {...values, code: Password()}}));
+                    if(!handleToggleParcelButtons.saveAndAddNewCustomer && createParcel?.result?.code === 200){
+                        setTimeout(() => {
                             router.replace('/dashboard/shipments/active')
                         }, 6000);                        
                     }

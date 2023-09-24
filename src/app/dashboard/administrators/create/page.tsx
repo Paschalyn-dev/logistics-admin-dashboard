@@ -1,5 +1,5 @@
 'use client'
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Formik, Form } from 'formik';
 import SuccessMessage from "../../successmessage";
 import Hero from "../../preferences/hero";
@@ -14,17 +14,20 @@ import { useRouter } from "next/navigation";
 import ConstantNav from "../../constantNav";
 import Section from "../../section";
 import { Password } from "../../formik/password";
-import { useCreateStaff } from "../../services/swr-functions/staff-swr";
 import Loader from "../../services/Loader/spinner";
 import { State_data, phoneRegExp } from "../../context/context";
+import { staffAPIURL } from "../../services/api-url/staff-api-url";
+import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
 
 export default function FormPageAdministrators(){
     const {successMessage, setSuccessMessage} = useContext(State_data);
     const [saveAndAddNewStaff, setSaveAndAddNewStaff] = useState<boolean>(false);
     const [passwordString, setPasswordString] = useState<boolean>(true)
-    const [staffDetails, setStaffDetails] = useState<any>()
+    const [staffDetails, setStaffDetails] = useState<any>({
+        info: "",
+        result: ""
+    })
     const [generatePassword, setGeneratePassword] = useState<boolean>(true)
-    const {createStaffData, createStaffMutate, createStaffError, createStaffIsLoading, createStaffIsValidating} = useCreateStaff(staffDetails);
     const router = useRouter()
 
     const handleSaveAndAddNewStaff = (e: any) => {
@@ -32,48 +35,51 @@ export default function FormPageAdministrators(){
         setSaveAndAddNewStaff(!saveAndAddNewStaff)
     }
 
+    async function handleCreate(details: any){
+        const response = await fetch(staffAPIURL.createStaff, {
+            method: 'POST',
+            body: JSON.stringify(details),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTExODgzNDZ9.73G4_gAI_mexLVUYQOkaJN7XCaIj0iHqj5b2g9yYIa8"
+            }
+        });
+        const data = await response.json();
+        setStaffDetails((prev: any) => ({...prev, result: data}));
+    }
+
+    useEffect(() => {
+        if(staffDetails?.info !== ""){
+            handleCreate(staffDetails?.info)
+        }
+    }, [staffDetails?.info?.code])
+
     const handleDispatcherPage = () => {
         router.replace('/dashboard/dispatchers/create')
     }
     return(
         <Holder>
             <ConstantNav />
-            <Section>
-                {successMessage.createAdministrator && createStaffData?.code === 200 && 
-                    <SuccessMessage 
-                    messageTitle="Administrator has been successfully added to the list!" 
-                    successMessageShow={successMessage.createAdministrator} 
-                    name="createAdministrator"
-                    />
-                }
-
-                {
-                    createStaffError && successMessage.createAdministrator &&
-                    <SuccessMessage
-                    successMessageShow={successMessage.createAdministrator}
-                    name="createAdministrator"
-                    id="failed"
-                    messageTitle="Administrator cannot be added. Check network connection!"
-                    />
-                }     
-
-                {
-                    createStaffData?.data !== 200 && successMessage.createAdministrator &&
-                    <SuccessMessage
-                    successMessageShow={successMessage.createAdministrator}
-                    name="createAdministrator"
-                    id="failed"
-                    messageTitle="Sorry, adminstrator cannot be added to the list!"
-                    />
-                }     
-                
-                {
-                    (createStaffIsLoading || createStaffIsValidating) &&
-                    <Loader />
-                }     
+            <Section>  
             <Link href="/dashboard/administrators" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                     <i className="icon ion-md-arrow-back"></i>
             </Link>
+
+            {
+            staffDetails.result !== "" && staffDetails.info !== "" && 
+            <ErrorAndSucccessHandlers
+            name="createCsutomer"
+            successName={successMessage.createCsutomer}
+            message={staffDetails?.result?.code} 
+            code={staffDetails?.info?.code}
+            successmessage="Administrator successfully added to the list!"
+            failedmessage="Sorry, administrator cannot be added to the list!"
+            staffAndCustomer={staffDetails?.result}
+            error={staffDetails?.result?.code !== 200}
+            loading={staffDetails?.result === "undefined" && staffDetails?.info !== ""}
+            data={staffDetails?.result}
+            />
+          }
 
             <Formik
                   initialValues={{
@@ -109,12 +115,9 @@ export default function FormPageAdministrators(){
                     .min(8, 'Password is too short. It should be 8 characters or more')
                     .matches(/[a-zaA-z0-9]/, 'Password can only contain letters and numbers.'),
                   })}
-                  onSubmit={(values) => {
-                    setTimeout(() => {
+                  onSubmit={async (values) => {
                         setSuccessMessage((prev: any) => ({...prev, createAdministrator: true}));
-                        setStaffDetails(values);
-                        createStaffMutate();
-                    }, 1000);
+                        setStaffDetails((prev: any) => ({...prev, result: "", info: {...values, code: Password()}}));
                   }}
                 >
                     {

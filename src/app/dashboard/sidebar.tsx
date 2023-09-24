@@ -1,23 +1,34 @@
 'use client';
 import Link from "next/link";
-import SignOut from "./signout/page";
 import '../globals.css';
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { logout } from "./services/libs/staff-auth";
+import { customerLogout } from "./services/libs/customer-auth";
+import { State_data } from "./context/context";
+import { useRouter } from "next/navigation";
+// import SuccessMessage from "./successmessage";
 
 
 export default function Sidebar() {
-  const [windowWidth, setWindowWidth]= useState<number>(window.innerWidth);
+  let myWidth = 0;
   const [clicked, setClicked] = useState<string>('welcome');
-
-
+  if(typeof window !== 'undefined'){
+    myWidth = window.innerWidth;
+  }
+  const [windowWidth, setWindowWidth]= useState<number>(myWidth);
+  const router = useRouter();
+  function handleSignOut(){
+    logout();
+    customerLogout();
+    router.replace('/');
+}
   useEffect(function onFirstMount() {
     function checkWidth(){
       setWindowWidth(window.innerWidth);
     }
     window.addEventListener("resize", checkWidth);
     return () => window.removeEventListener('resize', checkWidth);
-}, [windowWidth]);
+});
 
   useEffect(() => {
     const page = localStorage.getItem('page');
@@ -31,7 +42,7 @@ export default function Sidebar() {
   }, [clicked])
 
     return(
-      <aside className={ windowWidth <= 1025 ? "animate__animated animate__slideInLeft fixed flex flex-col justify-start items-center z-20 top-0 bottom-0 left-0 text-white w-fit h-full bg-stone-900 text-center shadow-lg" : "fixed flex flex-col justify-start items-center z-20 top-0 bottom-0 left-0 text-white w-fit h-full bg-stone-900 text-center shadow-lg"}>
+      <div className={ windowWidth <= 1025 ? "animate__animated animate__slideInLeft fixed flex flex-col justify-start items-center z-20 top-0 bottom-0 left-0 text-white w-fit h-full bg-stone-900 text-center shadow-lg" : "fixed flex flex-col justify-start items-center z-20 top-0 bottom-0 left-0 text-white w-fit h-full bg-stone-900 text-center shadow-lg"}>
         <div className="z-20 sticky h-fit w-fit bg-stone-900 py-8 px-12 shadow">
           <img src="https://cakenus.logistix.africa/logo-icon.svg" alt="logo" className="w-12 m-auto mb-3" />
           <h4 className="font-bold mb-1">CakenUs Services</h4>
@@ -122,14 +133,23 @@ export default function Sidebar() {
               <h1 className={clicked === "reviews" ? " " : "text-gray-100/70"}>Reviews</h1>
             </Link>
           </div>
+
+          {/* {
+              successMessage.signOut &&
+              <SuccessMessage
+              messageTitle="Sign out successful!"
+              name="signOut"
+              successMessageShow={successMessage.signOut}
+                />
+          } */}
           
           <Link href="/dashboard/preferences/developer" 
           className="m-auto mt-6 mb-4">{`</> Developer`}</Link>
           <div className="flex justify-between items-center gap-3">
-              <div className="bg-red-400 rounded-full px-6 py-2 font-bold"> <SignOut /> </div>
+              <button onClick={handleSignOut} className="bg-red-400 rounded-full px-6 py-2 font-bold">SignOut</button>
               <a target="_blank" href="https://help.logistix.africa/?business=cakenus">🛈 Help</a>
           </div>
          </div>
-         </aside>
+         </div>
     )
   }

@@ -1,9 +1,7 @@
 'use client'
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Formik, Form } from 'formik';
-import SuccessMessage from "../../successmessage";
 import Hero from "../../preferences/hero";
-import SubHeading from "../../preferences/website/subheading";
 import * as Yup from 'yup';
 import TextInput from "../../formik/inputtypes";
 import Button from "../../button";
@@ -12,56 +10,65 @@ import Link from "next/link";
 import Holder from "@/app/dashboard/holder";
 import ConstantNav from "@/app/dashboard/constantNav";
 import Section from "@/app/dashboard/section";
-import { useCreateCustomer } from "../../services/swr-functions/staff-swr";
-import { staffStore } from "../../services/store/store";
 import { useRouter } from "next/navigation";
-import Loader from "../../services/Loader/spinner";
 import { State_data } from "../../context/context";
+import { staffAPIURL } from "../../services/api-url/staff-api-url";
+import { authorizationKey } from "../../services/staff-api/api";
+import { Password } from "../../formik/password";
+import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
 
 export default function FormPageCustomers(){
     const {successMessage, setSuccessMessage} = useContext(State_data);
     const [saveAndAddNewCustomer, setSaveAndAddNewCustomer] = useState<boolean>(false);
-    const [customerDetails, setCustomerDetails] = useState<any>();
-    const {createCustomerData, createCustomerMutate, createCustomerIsLoading, createCustomerIsValidating, createCustomerError} = useCreateCustomer(customerDetails);
+    const [customerDetails, setCustomerDetails] = useState<any>({
+      info: "",
+      result: ""
+    });
     let router = useRouter();
     const handleSaveAndAddNewCustomer = (e: any) => {
         e.preventDefault();
         setSaveAndAddNewCustomer(!saveAndAddNewCustomer)
     }
+    
+    async function handleCreate(details: any){
+      const response = await fetch(staffAPIURL.createCustomer, {
+        method: 'POST',
+        body: JSON.stringify(details),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization":  authorizationKey
+        },
+      });
+      const data = await response.json();
+      setCustomerDetails((prev: any) => ({...prev, result: data}));
+    }
+    
+    useEffect(() => {
+      if(customerDetails?.info !== ""){
+        handleCreate(customerDetails?.info);
+      }
+    }, [customerDetails?.info?.code]);
+
+
     return(
         <Holder>
           <ConstantNav />
           <Section>
-           {successMessage.createCustomer && createCustomerData.code === 200 &&
-           <SuccessMessage 
-            name="createCustomer"
-            messageTitle="Customer has been successfully added to the list." 
-            successMessageShow={successMessage.createCustomer} 
-           />
-           }
-          
-          {successMessage.createCustomer && createCustomerData.code !== 200 &&
-           <SuccessMessage 
-           id="failed"
-           messageTitle="Sorry! Customer cannot be added to the list!" 
-           successMessageShow={successMessage.createCustomer} 
-           name="createCustomer"
-           />
-           }
-
-          {successMessage.createCustomer && createCustomerError && 
-           <SuccessMessage 
-            messageTitle="Error occured! Check your network connection." 
-            id='failed'
-            successMessageShow={successMessage.createCustomer} 
-            name="createCustomer"
-           />
-           }
-
-           {
-             (createCustomerIsLoading || createCustomerIsValidating) && 
-             <Loader />
-           }
+          {
+            customerDetails.result !== "" && customerDetails.info !== "" && 
+            <ErrorAndSucccessHandlers
+            name="createCsutomer"
+            successName={successMessage.createCsutomer}
+            message={customerDetails?.result?.code} 
+            code={customerDetails?.info?.code}
+            successmessage="Customer successfully added to the list!"
+            failedmessage="Sorry, customer cannot be added to the list!"
+            staffAndCustomer={customerDetails?.result}
+            error={customerDetails?.result?.code !== 200}
+            loading={customerDetails?.result === "undefined" && customerDetails?.info !== ""}
+            data={customerDetails?.result}
+            />
+          }
 
            <Link href="/dashboard/customers">
                 <div className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
@@ -86,16 +93,13 @@ export default function FormPageCustomers(){
                     .required('Required'),
                   })}
                   onSubmit={async (values) => {
-                    setTimeout(() => {
-                        console.log(customerDetails, createCustomerData)
-                        setCustomerDetails(values)
-                        setSuccessMessage((prev: any) => ({...prev, createCustomer: true}));
-                        if(!saveAndAddNewCustomer && createCustomerData.code === 200){
-                          let timer = setTimeout(() => {
-                              router.replace('/dashboard/customers')
-                          }, 6000);
-                        }
-                    }, 1000);
+                      setCustomerDetails((prev: any) => ({...prev, result: "", info: {...values, code: Password()}}))
+                      setSuccessMessage((prev: any) => ({...prev, createCustomer: true}));
+                      if(!saveAndAddNewCustomer && customerDetails?.result?.code === 200){
+                        setTimeout(() => {
+                            router.replace('/dashboard/customers')
+                        }, 6000);
+                      }
                   }}
                 >
 

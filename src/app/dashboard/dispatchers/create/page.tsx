@@ -1,5 +1,5 @@
 'use client'
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Formik, Form } from 'formik';
 import SuccessMessage from "../../successmessage";
 import Hero from "../../preferences/hero";
@@ -16,17 +16,19 @@ import Holder from "../../holder";
 import ConstantNav from "../../constantNav";
 import Section from "../../section";
 import { Password } from "../../formik/password";
-import { useCreateDispatcher } from "../../services/swr-functions/staff-swr";
-import Loader from "../../services/Loader/spinner";
 import { State_data } from "../../context/context";
+import { staffAPIURL } from "../../services/api-url/staff-api-url";
+import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
 
 export default function FormPageDispatcher({handleOpenForm}: any){
     const {successMessage, setSuccessMessage} = useContext(State_data);
     const [saveAndAddNewRider, setSaveAndAddNewRider] = useState<boolean>(false);
     const [passwordString, setPasswordString] = useState<boolean>(true)
     const [generatePassword, setGeneratePassword] = useState<boolean>(true);
-    const [dispatcherDetails, setDispatcherDetails] = useState<any>();
-    const {createDispatcherData, createDispatcherError, createDispatcherIsLoading, createDispatcherIsValidating, createDispatcherMutate} = useCreateDispatcher(dispatcherDetails)
+    const [dispatcherDetails, setDispatcherDetails] = useState<any>({
+        info: "",
+        result: ""
+    });
     const router = useRouter();
     const handleSaveAndAddNewRider = (e: any) => {
         e.preventDefault();
@@ -37,47 +39,46 @@ export default function FormPageDispatcher({handleOpenForm}: any){
         router.replace('/dashboard/administrators/create')
     }
 
+    async function handleCreate(details: any){
+        const response = await fetch(staffAPIURL.createDispatcher, {
+            method: 'POST',
+            body: JSON.stringify(dispatcherDetails),
+            headers: {
+                "Content-Type": "application/json"
+            },
+        });
+        const data = await response.json();
+        setDispatcherDetails((prev: any) => ({...prev, result: data}))
+    }
+
+    useEffect(() => {
+        if(dispatcherDetails?.info !== ''){
+            handleCreate(dispatcherDetails?.info)
+        }
+    }, [dispatcherDetails?.info?.code])
 
     return(
         <Holder>
             <ConstantNav />
-            <Section>
-            {successMessage.createDispatcher && createDispatcherData?.code === 200 && 
-                    <SuccessMessage 
-                    messageTitle="Dispatcher has been successfully added to the list!" 
-                    successMessageShow={successMessage.createDispatcher} 
-                    name="createDispatcher"                    
-                    />
-                }
-
-                {
-                    createDispatcherError && successMessage.createDispatcher &&
-                    <SuccessMessage
-                    successMessageShow={successMessage.createDispatcher}
-                    name="createDispatcher"                    
-                    id="failed"
-                    messageTitle="Dispatcher cannot be added. Check network connection!"
-                    />
-                }     
-
-                {
-                    createDispatcherData?.data !== 200 && successMessage.createDispatcher &&
-                    <SuccessMessage
-                    successMessageShow={successMessage.createDispatcher}
-                    name="createDispatcher"                    
-                    id="failed"
-                    messageTitle="Sorry, Dispatcher cannot be added to the list!"
-                    />
-                }     
-                
-                {
-                    (createDispatcherIsLoading || createDispatcherIsValidating) &&
-                    <Loader />
-                }     
+            <Section>   
             <Link href="/dashboard/dispatchers" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                 <i className="icon ion-md-arrow-back"></i>
             </Link>
-
+            {
+            dispatcherDetails.result !== "" && dispatcherDetails.info !== "" && 
+            <ErrorAndSucccessHandlers
+            name="createShipment"
+            successName={successMessage.createShipment}
+            message={dispatcherDetails?.result?.code} 
+            code={dispatcherDetails?.info?.code}
+            successmessage="Dispatcher successfully added to the list!"
+            failedmessage="Sorry, dispatcher cannot be added to the list!"
+            staffAndCustomer={dispatcherDetails?.result}
+            error={dispatcherDetails?.result?.code !== 200}
+            loading={dispatcherDetails?.result === "undefined" && dispatcherDetails?.info !== ""}
+            data={dispatcherDetails?.result}
+            />
+          }
             <Formik
                   initialValues={{
                     address: {
@@ -112,9 +113,8 @@ export default function FormPageDispatcher({handleOpenForm}: any){
                   })}
                   onSubmit={(values) => {
                     setTimeout(() => {
-                        console.log(createDispatcherData)
                         setSuccessMessage((prev: any) => ({...prev, createDispatcher: true}));
-                        setDispatcherDetails(values);
+                        setDispatcherDetails((prev: any) => ({...prev, result:"", info: {...values, code: Password()}}));
                     }, 1000);
                   }}
                 >
