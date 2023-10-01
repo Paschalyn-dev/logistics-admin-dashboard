@@ -22,8 +22,8 @@ export default function PreferencesNav(){
         return () => window.removeEventListener('resize', checkWidth);
     });
 
-    const minipage = localStorage.getItem('minipage');
     useEffect(() => {
+        const minipage = localStorage.getItem('minipage');
         if(minipage) {
           setClicked(JSON.parse(minipage))
         }
