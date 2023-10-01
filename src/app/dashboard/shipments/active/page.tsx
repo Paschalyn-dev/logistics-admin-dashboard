@@ -28,7 +28,7 @@ export default function Shipments(){
     const [successmessage, setSuccessMessage] = useState<boolean>(true)
     const {parcelAllData, parcelAllError, parcelAllIsLoading, parcelAllIsValiddating, parcelAllMutate} = useAllParcelsFetcher();
     const {parcelRange} = useContext<any | string>(State_data);
-    const {parcelRangeData, parcelRangeIsLoading, parcelRangeError, parcelRangeIsValidating} = useSearchParcelRange(parcelRange);
+    const {parcelRangeData, parcelRangeIsLoading, parcelRangeError, parcelRangeIsValidating, parcelRangeMutate} = useSearchParcelRange(parcelRange);
 
     const handleOpenSearch = () => {
         setOpenUIBoxes((prev: any) => ({...prev, shipmentSearch: true, shipmentClearData: true}))
@@ -82,7 +82,7 @@ export default function Shipments(){
                     </span>Clear Filter</button>
                 }
                {openUIBoxes.shipmentSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
-               {openUIBoxes.shipmentPopup && <Popup text="Shipment" closeFill={handleCloseFill} name='parcels' popupShow={openUIBoxes.shipmentPopup} id={deleteWithId.parcels} />}
+               {openUIBoxes.shipmentPopup && <Popup text="Shipment" closeFill={handleCloseFill} mutate={parcelAllMutate} mutateSearch={parcelRangeMutate} name='parcels' popupShow={openUIBoxes.shipmentPopup} id={deleteWithId.parcels} />}
                {
                    parcelAllError && successmessage &&
                    <SuccessMessage
@@ -92,7 +92,7 @@ export default function Shipments(){
                    messageTitle="Active shipments cannot be fetched. Check network connection!"
                    />
                 }
-            {
+            {/* {
                 parcelRangeError && openUIBoxes.shipmentSearch && successmessage &&
                 <SuccessMessage
                 successMessageShow={successmessage}
@@ -100,7 +100,7 @@ export default function Shipments(){
                 id="failed"
                 messageTitle="Searching failed, check network connection!"
                 />
-            }
+            } */}
             <BoxesHolder>
                 {parcelAllData?.data &&
                 (parcelAllData.data.map((parcel: any) => {

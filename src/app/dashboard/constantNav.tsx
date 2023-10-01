@@ -7,13 +7,11 @@ import * as React from "react";
 
 
 export default function ConstantNav(){
-    let myWidth = 0;
+    useEffect(() => {
+        setWindowWidth(window.innerWidth)
+    }, []);
     
-    if(typeof window !== "undefined"){
-        myWidth = window.innerWidth;
-    }  
-
-    const [windowWidth, setWindowWidth]= useState<number>(myWidth);
+    const [windowWidth, setWindowWidth]= useState<number>(0);
     
     useEffect(function onFirstMount() {
         function checkWidth() {

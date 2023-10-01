@@ -5,7 +5,7 @@ import OrdersNav from "../../orders"
 import Hero from "../../preferences/hero"
 import Section from "../../section"
 import Link from "next/link";
-import { useDeleteParcels, useViewParcels } from "../../services/swr-functions/customer-swr";
+import { useViewParcels } from "../../services/swr-functions/customer-swr";
 import MiniText from "../../minitext"
 import useDateHandler from "../../date"
 import { NumberComma } from "../../numberComma"
@@ -41,7 +41,7 @@ export default function EditParcel({ params }: { params: {id: number}}){
                 Delete
               </button>
             </div>
-            {openUIBoxes && <Popup text="Shipment" closeFill={handleCloseFill} popupShow={openUIBoxes} name="parcels" id={deleteWithId.parcels} />}
+            {openUIBoxes && <Popup text="Shipment" viewDelete={true} closeFill={handleCloseFill} popupShow={openUIBoxes} name="parcels" id={deleteWithId.parcels} />}
             <EditHeading subheading="Description" />
             <MiniText minitext={viewParcelData?.data?.description || 'N/A'} />
 

@@ -48,7 +48,7 @@ export default function EditParcel({ params }: { params: {id: number}}){
                 Delete
               </button>
             </div>
-            {openUIBoxes.dispatcherPopup && <Popup text="Dispatcher" closeFill={handleCloseFill} name="dispatchers" popupShow={openUIBoxes.dispatcherPopup} id={deleteWithId.dispatchers} />}
+            {openUIBoxes.dispatcherPopup && <Popup text="Dispatcher" viewDelete={true} closeFill={handleCloseFill} name="dispatchers" popupShow={openUIBoxes.dispatcherPopup} id={deleteWithId.dispatchers} />}
 
             <EditHeading subheading="Email Address" />
             <MiniText minitext={viewDispatcherData?.data?.email || 'N/A'} />

@@ -1,7 +1,6 @@
 'use client'
 import { useState, useContext, useEffect } from "react";
 import { Formik, Form } from 'formik';
-import SuccessMessage from "../../successmessage";
 import Hero from "../../preferences/hero";
 import SubHeading from "../../preferences/website/subheading";
 import * as Yup from 'yup';
@@ -19,6 +18,7 @@ import { Password } from "../../formik/password";
 import { State_data } from "../../context/context";
 import { staffAPIURL } from "../../services/api-url/staff-api-url";
 import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
+import { authorizationKeyCustomer } from "../../services/customer-api/api";
 
 export default function FormPageDispatcher({handleOpenForm}: any){
     const {successMessage, setSuccessMessage} = useContext(State_data);
@@ -27,7 +27,8 @@ export default function FormPageDispatcher({handleOpenForm}: any){
     const [generatePassword, setGeneratePassword] = useState<boolean>(true);
     const [dispatcherDetails, setDispatcherDetails] = useState<any>({
         info: "",
-        result: ""
+        result: "",
+        code: ""
     });
     const router = useRouter();
     const handleSaveAndAddNewRider = (e: any) => {
@@ -42,33 +43,41 @@ export default function FormPageDispatcher({handleOpenForm}: any){
     async function handleCreate(details: any){
         const response = await fetch(staffAPIURL.createDispatcher, {
             method: 'POST',
-            body: JSON.stringify(dispatcherDetails),
+            body: JSON.stringify(details),
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": authorizationKeyCustomer
+                // "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTU1MTE2MjJ9.N_IW7YA6Gr7vuXPxZTvQbrRrd1VU2QeohI-DL1NRR_w"
+    
             },
         });
         const data = await response.json();
-        setDispatcherDetails((prev: any) => ({...prev, result: data}))
+        setDispatcherDetails((prev: any) => ({...prev, result: data}));
     }
 
     useEffect(() => {
-        if(dispatcherDetails?.info !== ''){
-            handleCreate(dispatcherDetails?.info)
+        if(dispatcherDetails?.info !== ""){
+          handleCreate({...dispatcherDetails?.info});
         }
-    }, [dispatcherDetails?.info?.code])
+    }, [dispatcherDetails?.code]);
+
+    useEffect(() => {
+        if(!saveAndAddNewRider && dispatcherDetails?.result?.code === 200){
+            setTimeout(() => {
+                router.replace('/dashboard/dispatchers')
+            }, 6000);
+        }
+    }, [dispatcherDetails?.result])
 
     return(
         <Holder>
             <ConstantNav />
-            <Section>   
-            <Link href="/dashboard/dispatchers" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
-                <i className="icon ion-md-arrow-back"></i>
-            </Link>
+            <Section>
             {
             dispatcherDetails.result !== "" && dispatcherDetails.info !== "" && 
             <ErrorAndSucccessHandlers
-            name="createShipment"
-            successName={successMessage.createShipment}
+            name="createDispatcher"
+            successName={successMessage.createDispatcher}
             message={dispatcherDetails?.result?.code} 
             code={dispatcherDetails?.info?.code}
             successmessage="Dispatcher successfully added to the list!"
@@ -79,6 +88,10 @@ export default function FormPageDispatcher({handleOpenForm}: any){
             data={dispatcherDetails?.result}
             />
           }
+            <Link href="/dashboard/dispatchers" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
+                <i className="icon ion-md-arrow-back"></i>
+            </Link>
+
             <Formik
                   initialValues={{
                     address: {
@@ -94,29 +107,23 @@ export default function FormPageDispatcher({handleOpenForm}: any){
                   }}
                   validationSchema={Yup.object({
                     address: Yup.object({
-                        state: Yup.string().required('This field is required.'),
-                        street: Yup.string().required('This field is required.'),
+                        state: Yup.string(),
+                        street: Yup.string(),
                     }),
                     fullName: Yup.string()
-                    .min(5, 'Name must be five characters or more.')
-                    .required('This field is required.'),
+                    .min(1, 'Name must be five characters or more.'),
                     email: Yup.string()
-                    .email('This email address seems invalid.')
-                    .required('This field is required.'),
+                    .email('This email address seems invalid.'),
                     phone: Yup.number()
-                    .min(1, 'Must be 1 character or more.')
-                    .required('This field is required.'),
+                    .min(1, 'Must be 1 character or more.'),
                     password: Yup.string()
-                    .required('No password provided.')
                     .min(8, 'Password is too short. It should be 8 characters or more')
                     .matches(/[a-zaA-z0-9]/, 'Password can only contain letters and numbers.')
                   })}
                   onSubmit={(values) => {
-                    setTimeout(() => {
-                        setSuccessMessage((prev: any) => ({...prev, createDispatcher: true}));
-                        setDispatcherDetails((prev: any) => ({...prev, result:"", info: {...values, code: Password()}}));
-                    }, 1000);
-                  }}
+                    setDispatcherDetails((prev: any) => ({...prev, result: "", info: {...values}, code: Password()}));
+                    setSuccessMessage((prev: any) => ({...prev, createDispatcher: true}));
+                }}
                 >
                     {
                         ({ values, handleSubmit }) => (

@@ -17,7 +17,7 @@ export default function InsideNav({link, name, icon, tooltip, title, clicked, ha
     //     handleClick(clicked)
     // });
     return(
-        <>
+        <div>
                 <Link href={link}>
                     <button
                     onClick={() => handleClick(name)}
@@ -26,6 +26,6 @@ export default function InsideNav({link, name, icon, tooltip, title, clicked, ha
                         <p className={clicked === name ? "" : "mb-1 text-gray-500"}>{title}</p>
                     </button>
                 </Link>
-        </>
+        </div>
     )
 }

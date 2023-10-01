@@ -3,17 +3,21 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import DarkFill from "../../darkfill";
 import { customerAPIUrl } from "../api-url/customer-api-url";
-import { authorizationKey } from "../customer-api/api";
 import { staffAPIURL } from "../api-url/staff-api-url";
+import { authorizationKey } from "../staff-api/api";
+import { authorizationKeyCustomer } from "../customer-api/api";
 type POPUP_TYPE = {
     closeFill: any;
     popupShow: boolean;
     id: number;
     text: string;
     name?: string;
+    viewDelete?: boolean;
+    mutate?: any;
+    mutateSearch?: any;
 }
 
-export default function Popup({closeFill, name, popupShow, id, text}: POPUP_TYPE){
+export default function Popup({closeFill, mutateSearch, mutate, name, popupShow, viewDelete, id, text}: POPUP_TYPE){
     const [details, setDetails] = useState({
         text: "",
         isShow: false,
@@ -49,13 +53,20 @@ export default function Popup({closeFill, name, popupShow, id, text}: POPUP_TYPE
     const handleClose = () => {
         setDetails((prev: any) => ({...prev, isShow: false}));
         closeFill();
+        if(viewDelete === true){
+            router.back();
+        }
+        else{
+            mutate();
+            mutateSearch();
+        }
     }
     
     async function handleDeleteParcel(parcel: any){
         const response = await fetch(customerAPIUrl.deleteParcels(parcel), {
             method: 'DELETE',
             headers: {
-                'Authorization': authorizationKey
+                'Authorization': authorizationKeyCustomer
             }
         });
         const data = await response.json();
@@ -70,7 +81,7 @@ export default function Popup({closeFill, name, popupShow, id, text}: POPUP_TYPE
             }
         });
         const data = await response.json();
-        setServicesId((prev: any) => ({...prev, customersResult: data}));
+         setServicesId((prev: any) => ({...prev, customersResult: data}));
     }
 
     async function handleDeleteAdministrators(admin: any){
@@ -113,9 +124,7 @@ export default function Popup({closeFill, name, popupShow, id, text}: POPUP_TYPE
     
     useEffect(() => {
         setServicesId((prev: any) => ({...prev, customersId: id}));
-        console.log('asdfghjfdsa')
         handleDeleteCustomers(servicesId.customersId);
-        // router.replace('/dashboard/customers')
     }, [haveClicked.customers === true]);
     
     useEffect(() => {
@@ -136,7 +145,7 @@ export default function Popup({closeFill, name, popupShow, id, text}: POPUP_TYPE
     useEffect(() => {
         if(servicesId.parcelsResult !== ""){
             if(servicesId?.parcelsResult?.code === 200) {
-                setDetails((prev: any) => ({...prev, text: "Shipment", isShow: true}))
+                setDetails((prev: any) => ({...prev, text: "Shipment", isShow: true}));
             }
         }
     }, [servicesId.parcelsResult]);
@@ -155,10 +164,10 @@ export default function Popup({closeFill, name, popupShow, id, text}: POPUP_TYPE
         if(servicesId.dispatchersResult !== ""){
             if(servicesId?.dispatchersResult?.code === 200) {
                 setDetails((prev: any) => ({...prev, text: "Dispatcher", isShow: true}))
+                setTimeout(() => {router.replace('/dashboard/dispatchers')}, 3000);
             }
         }
     }, [servicesId.dispatchersResult]);
-
 
     useEffect(() => {
         if(servicesId.administratorsResult !== ""){

@@ -10,6 +10,7 @@ export const staffAPIURL = {
     fetchStaff: `https://logapi.logistixng.com/api/b2b/${data}/staff`,
     createDispatcher: `https://logapi.logistixng.com/api/b2b/${data}/rider`,
     fetchCustomers: `https://logapi.logistixng.com/api/b2b/${data}/subscribers`,
+    bankCodesAndLogos: `https://nigerianbanks.xyz`,
     fetchMessages: `https://logapi.logistixng.com/api/b2b/${data}/inmails`,
     countStaff: `https://logapi.logistixng.com/api/b2b/${data}/staff/count`,
     countDispatcher: `https://logapi.logistixng.com/api/b2b/${data}/riders/count`,

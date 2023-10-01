@@ -1,9 +1,33 @@
 'use client'
 import useSWR from "swr";
-import { accountFetcher, cardFetcher, countRidersFetcher, countStaffFetcher, deleteBankAccountFetcher, deleteClassicPricing, deleteDistancePricing, deleteLocationsFetcher, deletePreferenceFetcher, fetchCustomersFetcher, fetchMessagesFetcher, fetchStaffFetcher, getBankAccount, getDistancePricing, getLocationsFetcher, locationsFetcher, postDistancePricing } from "../staff-api/api";
+import { accountFetcher, bankLogoAndDetailsFetcher, cardFetcher, countRidersFetcher, countStaffFetcher, createCustomerFetcher, createDispatcher, createStaffFetcher, deleteBankAccountFetcher, deleteClassicPricing,deleteDistancePricing, deleteLocationsFetcher, deletePreferenceFetcher, fetchCustomersFetcher, fetchMessagesFetcher, fetchStaffFetcher, getBankAccount, getDistancePricing, getLocationsFetcher, locationsFetcher, postDistancePricing } from "../staff-api/api";
 import { STAFFSWRKEYS } from "../swr-keys/staff-keys";
 import { useRouter } from "next/navigation";
 
+
+export function useCreateCustomer(customerDetails: any){
+    const {data, error, isValidating, mutate, isLoading} = useSWR(STAFFSWRKEYS.createCustomer, 
+        () => createCustomerFetcher(customerDetails));
+        return {
+            createCustomerData: data,
+            createCustomerError: error,
+            createCustomerIsValidating: isValidating,
+            createCustomerIsLoading: isLoading,
+            createCustomerMutate: mutate
+        }
+}
+
+export function useCreateStaff(staffDetails: any){
+    const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.createStaff,
+        () => createStaffFetcher(staffDetails));
+    return{
+        createStaffData: data,
+        createStaffError: error,
+        createStaffIsValidating: isValidating,
+        createStaffIsLoading: isLoading,
+        createStaffMutate: mutate
+    }
+}
 
 export function useFetchStaff(){
     const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.fetchStaff, 
@@ -32,6 +56,19 @@ export function useFetchCustomers(){
     }
 }
 
+export function useFetchBankCodesAndLogos(){
+    const {data, error, isLoading, isValidating, mutate} = useSWR(STAFFSWRKEYS.fetchBankCodesAndLogos, 
+        () => bankLogoAndDetailsFetcher());
+
+    return {
+        bankCodesAndDetailsData: data,
+        bankCodesAndDetailsError: error,
+        bankCodesAndDetailsIsValidating: isValidating,
+        bankCodesAndDetailsIsLoading: isLoading,
+        bankCodesAndDetailsMutate: mutate
+    }
+}
+
 export function useFetchMessages(){
     const {data, error, isLoading, isValidating, mutate} = useSWR(STAFFSWRKEYS.fetchCustomers, 
         () => fetchMessagesFetcher());
@@ -42,6 +79,19 @@ export function useFetchMessages(){
         fetchMessagesIsValidating: isValidating,
         fetchMessagesIsLoading: isLoading,
         fetchMessagesMutate: mutate
+    }
+}
+
+export function useCreateDispatcher(dispatcherDetails: any){
+    const {data, error, isLoading, isValidating, mutate} = useSWR(STAFFSWRKEYS.createDispatcher, 
+        () => createDispatcher(dispatcherDetails));
+
+    return {
+        createDispatcherData: data,
+        createDispatcherError: error,
+        createDispatcherIsValidating: isValidating,
+        createDispatcherIsLoading: isLoading,
+        createDispatcherMutate: mutate
     }
 }
 
@@ -163,6 +213,45 @@ export function useGetBankAccount(){
         }
 }
 
+
+// export function useDeleteCustomer(id: number){
+//     const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.deleteCustomer, 
+//         () => deleteCustomerFetcher(id));
+//     return{
+//         deleteCustomerData: data,
+//         deleteCustomerError: error,
+//         deleteCustomerMutate: mutate,
+//         deleteCustomerIsLoading: isLoading,
+//         deleteCustomerIsValidating: isValidating 
+//     }
+// }
+
+// export function useDeleteStaff(id: number){
+//     const router = useRouter();
+//     const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.deleteStaff, 
+//         () => deleteStaffFetcher(id));
+//     return{
+//         deleteStaffData: data,
+//         deleteStaffError: error,
+//         deleteStaffMutate: mutate,
+//         deleteStaffIsLoading: isLoading,
+//         deleteStaffIsValidating: isValidating 
+//     }
+// }
+
+// export function useDeleteDispatcher(id: number){
+//     const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.deleteDispatcher, 
+//         () => deleteDispatcherFetcher(id));
+//     return{
+//         deleteDispatcherData: data,
+//         deleteDispatcherError: error,
+//         deleteDispatcherMutate: mutate,
+//         deleteDispatcherIsLoading: isLoading,
+//         deleteDispatcherIsValidating: isValidating 
+//     }
+// }
+
+
 export function useDeleteBankAccount(id: number){
     const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.deleteAccount, 
         () => deleteBankAccountFetcher(id));
@@ -174,6 +263,18 @@ export function useDeleteBankAccount(id: number){
         deleteBankAccountIsValidating: isValidating 
     }
 }
+
+// export function useDeleteMessages(id: number){
+//     const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.deleteMessages, 
+//         () => deleteMessagesFetcher(id));
+//     return{
+//         deleteMessagesData: data,
+//         deleteMessagesError: error,
+//         deleteMessagesMutate: mutate,
+//         deleteMessagesIsLoading: isLoading,
+//         deleteMessagesIsValidating: isValidating 
+//     }
+// }
 
 export function useDeleteDistancePricing(id: number){
     const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.deleteDistancePricing, 

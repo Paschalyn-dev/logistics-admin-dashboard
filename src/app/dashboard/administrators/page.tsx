@@ -78,7 +78,7 @@ export default function Administrators(){
                 }
                 
                 {openUIBoxes.administratorSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} /> }   
-                {openUIBoxes.administratorPopup && <Popup text="Administrator" closeFill={handleCloseFill} popupShow={openUIBoxes.administratorPopup} name="administrators" id={deleteWithId.administrators} />}
+                {openUIBoxes.administratorPopup && <Popup text="Administrator" closeFill={handleCloseFill} popupShow={openUIBoxes.administratorPopup} mutateSearch={administratorsRange} mutate={fetchStaffMutate} name="administrators" id={deleteWithId.administrators} />}
 
                 {
                     fetchStaffError && successMessage.administrator &&
@@ -100,12 +100,12 @@ export default function Administrators(){
                 }
                 <BoxesHolder>
                 {fetchStaffData?.data && !openUIBoxes.administratorClearData && 
-                (fetchStaffData.data.map((staff: any) => {
+                (fetchStaffData?.data?.map((staff: any) => {
                     return(
                     <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                             <div>
-                                <p className="capitalize text-lg mt-2">{staff.fullName}</p>
-                                <p className="text-sm my-2 capitalize">{staff.role}</p>
+                                <p className="capitalize text-lg mt-2">{staff?.fullName}</p>
+                                <p className="text-sm my-2 capitalize">{staff?.role}</p>
                             </div>
 
                             <hr className="my-4" />
@@ -168,12 +168,12 @@ export default function Administrators(){
 
                 <BoxesHolder>    
                     {  administratorsRangeData?.data && openUIBoxes.administratorClearData &&
-                            (administratorsRangeData.data.map((staff: any) => {
+                            (administratorsRangeData?.data.map((staff: any) => {
                                 return(
                                 <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                                         <div>
-                                            <p className="capitalize text-lg mt-2">{staff.fullName}</p>
-                                            <p className="text-sm my-2 capitalize">{staff.role}</p>
+                                            <p className="capitalize text-lg mt-2">{staff?.fullName}</p>
+                                            <p className="text-sm my-2 capitalize">{staff?.role}</p>
                                         </div>
             
                                 <hr className="my-4" />

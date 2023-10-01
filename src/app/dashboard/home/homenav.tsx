@@ -8,14 +8,13 @@ import * as React from "react";
 
 
 export default function HomeNav(){
-  let myWidth = 0;
   const [clickIt, setClickIt] = useState<string>('');
-  
-  if(typeof window !== "undefined"){
-    myWidth = window.innerWidth;
-  }
 
-  const [windowWidth, setWindowWidth]= useState<number>(myWidth);
+  const [windowWidth, setWindowWidth]= useState<number>(0);
+
+  useEffect(() => {
+    setWindowWidth(window.innerWidth)
+  }, []);
 
   useEffect(function onFirstMount() {
       function checkWidth() {

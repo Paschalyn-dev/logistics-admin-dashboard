@@ -2,8 +2,8 @@ import { customerAPIUrl } from "../api-url/customer-api-url";
 
 
 
-// const authorizationKey = staffStore[staffStore.length - 1]?.authToken;
-export const authorizationKey = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTExODgzNDZ9.73G4_gAI_mexLVUYQOkaJN7XCaIj0iHqj5b2g9yYIa8";
+// const authorizationKeyCustomer = staffStore[staffStore.length - 1]?.authToken;
+export const authorizationKeyCustomer = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTU1MTE2MjJ9.N_IW7YA6Gr7vuXPxZTvQbrRrd1VU2QeohI-DL1NRR_w";
 
 
 export const createParcelFetcher = async(parcelDetails: any) => {
@@ -12,7 +12,7 @@ export const createParcelFetcher = async(parcelDetails: any) => {
         body: JSON.stringify(parcelDetails),
         headers: {
             "Content-Type": "application/json",
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         },
     })
     const data = await response.json();
@@ -24,7 +24,7 @@ export const countParcelsFetcher = async() => {
     const response = await fetch(customerAPIUrl.countParcels, {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         },
     })
 
@@ -36,7 +36,7 @@ export const parcelsDeliveredFetcher = async() => {
     const response = await fetch(customerAPIUrl.parcelsDelivered, {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -57,7 +57,7 @@ export const parcelRangeFetcher = async (parcelRangeQuery: any) => {
     const response = await fetch(customerAPIUrl.searchParcels(parcelRangeQuery), {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -70,7 +70,7 @@ export const customerRangeFetcher = async (customersRangeQuery: any) => {
     const response = await fetch(customerAPIUrl.searchCustomers(customersRangeQuery), {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -82,7 +82,7 @@ export const dispatchersRangeFetcher = async (dispatchersRangeQuery: any) => {
     const response = await fetch(customerAPIUrl.searchDispatchers(dispatchersRangeQuery), {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -94,7 +94,7 @@ export const administratorsRangeFetcher = async (administratorsRangeQuery: any) 
     const response = await fetch(customerAPIUrl.searchAdminisrators(administratorsRangeQuery), {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -106,7 +106,7 @@ export const transactionsRangeFetcher = async (transactionsRangeQuery: any) => {
     const response = await fetch(customerAPIUrl.searchTransactions(transactionsRangeQuery), {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -118,7 +118,7 @@ export const messagesRangeFetcher = async (messagesRangeQuery: any) => {
     const response = await fetch(customerAPIUrl.searchMessages(messagesRangeQuery), {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -130,7 +130,7 @@ export const reviewsRangeFetcher = async (reviewsRangeQuery: any) => {
     const response = await fetch(customerAPIUrl.searchReviews(reviewsRangeQuery), {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -150,7 +150,7 @@ export const fetchAllParcelsFetcher = async() => {
     const response = await fetch(customerAPIUrl.parcelsAll, {
         method: 'GET',
         headers:{
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         },
     });
     const data = await response.json();
@@ -162,7 +162,7 @@ export const fetchAllDispatchersFetcher = async() => {
     const response = await fetch(customerAPIUrl.dispatchersAll, {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         },
     });
     const data = await response.json();
@@ -173,7 +173,7 @@ export const fetchAllReviews = async() => {
     const response = await fetch(customerAPIUrl.fetchReviews, {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         },
     });
     const data = await response.json();
@@ -184,7 +184,7 @@ export const fetchTransactionsFetcher = async() => {
     const response = await fetch(customerAPIUrl.transactions, {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         },
     });
     const data = await response.json();
@@ -196,7 +196,7 @@ export const billingInvoiceFetcher = async() => {
     const response = await fetch(customerAPIUrl.billingInvoice, {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         },
     });
     const data = await response.json();
@@ -208,7 +208,7 @@ export const activeShipmentsCountFetcher = async() => {
     const response = await fetch(customerAPIUrl.activeShipmentsCount, {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         },
     });
     const data = await response.json();
@@ -219,7 +219,7 @@ export const todayRevenueFetcher = async() => {
     const response = await fetch(customerAPIUrl.todayRevenue, {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         },
     });
     const data = await response.json();
@@ -231,7 +231,7 @@ export const viewParcelFetcher = async(id: number) => {
     const response = await fetch(customerAPIUrl.viewParcels(id), {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -243,7 +243,7 @@ export const editParcelFetcher = async(id: number, parcelDetails: any) =>{
         method: 'PUT',
         body: JSON.stringify(parcelDetails),
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -255,7 +255,7 @@ export const viewCustomerFetcher = async(id: number) =>{
     const response = await fetch(customerAPIUrl.viewCustomer(id), {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -266,7 +266,7 @@ export const viewDispatcherFetcher = async(id: number) =>{
     const response = await fetch(customerAPIUrl.viewDispatcher(id), {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -277,7 +277,7 @@ export const viewStaffFetcher = async(id: number) =>{
     const response = await fetch(customerAPIUrl.viewStaff(id), {
         method: 'GET',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -290,7 +290,7 @@ export const businessChangeFetcher = async(changeBearer: any) =>{
         body: JSON.stringify(changeBearer),
         headers: {
             "Content-Type": "application/json",
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -309,7 +309,7 @@ export const deleteParcel = async(id: number) => {
     const response = await fetch(customerAPIUrl.deleteParcels(id), {
         method: 'DELETE',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -320,7 +320,7 @@ export const deleteUserFetcher = async(id: number) =>{
     const response = await fetch(customerAPIUrl.deleteUser(id), {
         method: 'DELETE',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -331,7 +331,7 @@ export const deleteBusinessFetcher = async(id: number) =>{
     const response = await fetch(customerAPIUrl.deleteBusiness(id), {
         method: 'DELETE',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();
@@ -342,7 +342,7 @@ export const deleteReviewFetcher = async(id: number) =>{
     const response = await fetch(customerAPIUrl.deleteReviews(id), {
         method: 'DELETE',
         headers: {
-            'Authorization': authorizationKey
+            'Authorization': authorizationKeyCustomer
         }
     });
     const data = await response.json();

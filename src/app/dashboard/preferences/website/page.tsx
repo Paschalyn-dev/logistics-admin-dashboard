@@ -14,11 +14,11 @@ import SuccessMessage from "../../successmessage";
 
 export default function WebsitePreferences(){
     const {getBusinessData, getBusinessError, getBusinessIsLoading, getBusinessIsValidating, getBusinessMutate} = useGetBusiness();
-    console.log(getBusinessData?.data?.title);
 
     const [formData, setFormData] = useState<any>({
         active: getBusinessData?.data?.active,
         additionalInfo: getBusinessData?.data?.additionalInfo,
+        entryText: getBusinessData?.data?.entryText,
         address: {
             city: getBusinessData?.data?.address?.city,
             country: getBusinessData?.data?.address?.country,
@@ -151,7 +151,7 @@ export default function WebsitePreferences(){
                     <SubHeading subheading="Title" />
                     <input name="title" value={formData?.title} onChange={handleFormData} type="text" className="w-full bg-gray-100 p-3 rounded-lg outline-0 "  />
                     <SubHeading subheading="Entry Text" />
-                    <input name="entry_text" value={getBusinessData?.data?.entryText} onChange={handleFormData} type="text" className="w-full bg-gray-100 p-3 rounded-lg outline-0 "  />
+                    <input name="entry_text" value={formData?.entryText} onChange={handleFormData} type="text" className="w-full bg-gray-100 p-3 rounded-lg outline-0 "/>
                     <SubHeading subheading="Maintenance Mode"/>
                     <p className="mt-2 text-sm">If for any reason you need to take your website offline, you can turn on maintenance mode.</p>
                     <ToggleButton onOff={formData.maintenance} handleOnOff={handleToggleOnOff} title={formData.maintenance ? "Turn On" : "Turn Off"} />

@@ -1,5 +1,5 @@
 export const data = 'cakenus';
-export const company = 18;
+export const company: number = 18;
 const today = new Date();
 var yesterday = new Date(today.getTime());
 yesterday.setDate(today.getDate() - 1);

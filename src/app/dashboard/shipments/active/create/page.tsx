@@ -1,7 +1,6 @@
 'use client'
 import { useState, useEffect } from "react";
 import { Formik, Form } from 'formik';
-import SuccessMessage from "../../../successmessage";
 import Hero from "../../../preferences/hero";
 import SubHeading from "../../../preferences/website/subheading";
 import * as Yup from 'yup';
@@ -16,15 +15,14 @@ import { useRouter } from "next/navigation";
 import OrdersNav from "../../../orders";
 import { useContext } from "react";
 import TextArea from "../../../formik/textarea";
-import { useAllDispatchersFetcher, useCreateParcel } from "../../../services/swr-functions/customer-swr";
+import { useAllDispatchersFetcher } from "../../../services/swr-functions/customer-swr";
 import {company, customerAPIUrl, data} from "./../../../services/api-url/customer-api-url";
-import Loader from "@/app/dashboard/services/Loader/spinner";
 import { State_data, phoneRegExp } from "@/app/dashboard/context/context";
 import { useFetchCustomers } from "@/app/dashboard/services/swr-functions/staff-swr";
 import ShowCustomers from "@/app/dashboard/showCustomers";
-import { authorizationKey } from "@/app/dashboard/services/customer-api/api";
-import { Password } from "@/app/dashboard/formik/password";
+import { authorizationKeyCustomer } from "@/app/dashboard/services/customer-api/api";
 import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
+import { Password } from "@/app/dashboard/formik/password";
 
 export default function FormPageShipments(){
     const {successMessage, setSuccessMessage, id} = useContext(State_data);
@@ -46,7 +44,8 @@ export default function FormPageShipments(){
     const router = useRouter();
     const [createParcel, setCreateParcel] = useState<any>({
         info: "",
-        result: ""
+        result: "",
+        code: ""
     })
     
     async function handleCreate(details: any){
@@ -55,7 +54,9 @@ export default function FormPageShipments(){
             body: JSON.stringify(details),
             headers: {
                 "Content-Type": "application/json",
-                'Authorization': authorizationKey
+                // 'Authorization': authorizationKeyCustomer
+                "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTU1MTE2MjJ9.N_IW7YA6Gr7vuXPxZTvQbrRrd1VU2QeohI-DL1NRR_w"
+
             },
         })
         const data = await response.json();
@@ -64,10 +65,9 @@ export default function FormPageShipments(){
 
     useEffect(() => {
         if(createParcel?.info !== ""){
-          handleCreate(createParcel?.info);
+          handleCreate({...createParcel?.info});
         }
-        console.log(createParcel, handleCreate(createParcel?.info))
-      }, [createParcel?.info?.code]);
+      }, [createParcel?.code]);
 
     function handleSaveAndAddNewRider() {
         setHandleToggleParcelButtons((prev: any) => ({
@@ -104,7 +104,15 @@ export default function FormPageShipments(){
     
     useEffect(() => {
         setWindowDetails(window)
-    }, [])
+    }, [typeof window !== 'undefined']);
+
+    useEffect(() => {
+        if(!handleToggleParcelButtons.saveAndAddNewCustomer && createParcel?.result?.code === 200){
+            setTimeout(() => {
+                router.replace('/dashboard/shipments/active')
+            }, 6000);                        
+        }
+    }, [createParcel?.result])
 
     return(
         <Holder>
@@ -132,19 +140,19 @@ export default function FormPageShipments(){
 
             <Formik
                   initialValues={{
-                      amount: "",
+                      amount: 0,
                       card: {
                           authorizationCode: "",
                           email: ""
                         },
                         company: company,
-                        completed: handleToggleParcelButtons.parcelDelivered,
                         description: "",
+                        completed: handleToggleParcelButtons.parcelDelivered,
                         destination:{
-                            address: fetchCustomersData?.data[findDestinationIndex]?.user?.address,
-                            email: fetchCustomersData?.data[findDestinationIndex]?.user?.email,
-                            name: fetchCustomersData?.data[findDestinationIndex]?.user?.name,
-                            phone: fetchCustomersData?.data[findDestinationIndex]?.user?.phone
+                            address: fetchCustomersData?.data[findDestinationIndex]?.user?.address || "",
+                            email: fetchCustomersData?.data[findDestinationIndex]?.user?.email || "",
+                            name: fetchCustomersData?.data[findDestinationIndex]?.user?.name || "",
+                            phone: fetchCustomersData?.data[findDestinationIndex]?.user?.phone || "",
                     },
                     fragile: handleToggleParcelButtons.parcelFragility,
                     meta: {
@@ -180,10 +188,10 @@ export default function FormPageShipments(){
                     paid: handleToggleParcelButtons.customerPaid,
                     paymentType: "",
                     pickUp: {
-                        address: fetchCustomersData?.data[findCustomerIndex]?.user?.address,
-                        email: fetchCustomersData?.data[findCustomerIndex]?.user?.email,
-                        name: fetchCustomersData?.data[findCustomerIndex]?.user?.name,
-                        phone: fetchCustomersData?.data[findCustomerIndex]?.user?.phone,
+                        address: fetchCustomersData?.data[findCustomerIndex]?.user?.address || "",
+                        email: fetchCustomersData?.data[findCustomerIndex]?.user?.email || "",
+                        name: fetchCustomersData?.data[findCustomerIndex]?.user?.name || "",
+                        phone: fetchCustomersData?.data[findCustomerIndex]?.user?.phone || "",
                     },
                     picked: handleToggleParcelButtons.parcelPicked,
                     reference: "",
@@ -204,8 +212,8 @@ export default function FormPageShipments(){
                         name: Yup.string().notRequired(),
                         phone: Yup.string()
                         .matches(phoneRegExp, 'Phone number is not valid')
-                        .min(15, 'Must be 15 characters or more.')
-                        .notRequired(),
+                        .min(1, 'Must be 1 character or more.')
+                        .notRequired(),   
                         email: Yup.string().email('This email seems invalid!').notRequired(),
                         address: Yup.string().notRequired(),
                     }),
@@ -225,12 +233,7 @@ export default function FormPageShipments(){
                 })}
                 onSubmit={async (values) => {
                     setSuccessMessage((prev: any) => ({...prev, createShipment: true}));
-                    setCreateParcel((prev: any) => ({...prev, result: "", info: {...values, code: Password()}}));
-                    if(!handleToggleParcelButtons.saveAndAddNewCustomer && createParcel?.result?.code === 200){
-                        setTimeout(() => {
-                            router.replace('/dashboard/shipments/active')
-                        }, 6000);                        
-                    }
+                    setCreateParcel((prev: any) => ({...prev, result: "", code: Password(), info: {...values}}));
                 }}
                 enableReinitialize={true}
                 >

@@ -6,8 +6,6 @@ import Input from "../input";
 import Section from "../section";
 import { useState, useContext, useEffect } from "react";
 import SearchFilter from "./search";
-import { useFetchCustomers } from "../services/swr-functions/staff-swr";
-import SubHeading from "../preferences/website/subheading";
 import SuccessMessage from "../successmessage";
 import SkeletonLoading from "../services/eventhandlers/skeleton-loading";
 import BoxesHolder from "../boxesholder";
@@ -15,6 +13,9 @@ import { State_data } from "../context/context";
 import { useCustomerSearchRange } from "../services/swr-functions/customer-swr";
 import useDateHandler from "../date";
 import Link from "next/link";
+import ErrorAndSucccessHandlers from "../services/eventhandlers/error-and-success-handlers";
+import SubHeading from "../preferences/website/subheading";
+import { useFetchCustomers } from "../services/swr-functions/staff-swr";
 
 export default function Customers(){
     const [inputData, setInputData] = useState<string>('');
@@ -73,15 +74,20 @@ export default function Customers(){
                         </span>Clear Filter</button>
                     }
                     {openUIBoxes.customerSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} /> }  
-                        {
-                            fetchCustomersError && successMessage.customer &&
-                            <SuccessMessage
-                            successMessageShow={successMessage.customer}
-                            name="customer"
-                            id="failed"
-                            messageTitle="Customers cannot be fetched. Check network connection!"
-                            />
-                        }
+                    {   successMessage.customers &&
+                        <ErrorAndSucccessHandlers 
+                        name="customers"
+                        successName={successMessage.customers}
+                        message={fetchCustomersData?.code} 
+                        code={fetchCustomersData?.code}
+                        successmessage=""
+                        failedmessage="Sorry, customers cannot be fetched!"
+                        staffAndCustomer={fetchCustomersData}
+                        error={fetchCustomersData?.code !== 200}
+                        loading={fetchCustomersData === "undefined" && fetchCustomersData== ""}
+                        data={fetchCustomersData}
+                        />
+                    }
                         {/* {
                             customerRangeError && !customerRangeData?.data && openUIBoxes.customerSearch && successMessage.customer &&
                             <SuccessMessage
@@ -94,7 +100,7 @@ export default function Customers(){
                     <BoxesHolder>
                     {
                         fetchCustomersData?.data && !openUIBoxes.customerClearData &&
-                         fetchCustomersData.data.map((customer: any) => {
+                         fetchCustomersData?.data?.map((customer: any) => {
                             let date  = new Date(customer?.user?.createdAt?.slice(0, 10))
                             return (
                                 <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">

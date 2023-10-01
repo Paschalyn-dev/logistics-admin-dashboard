@@ -1,7 +1,6 @@
 'use client'
 import { useState, useContext, useEffect } from "react";
 import { Formik, Form } from 'formik';
-import SuccessMessage from "../../successmessage";
 import Hero from "../../preferences/hero";
 import * as Yup from 'yup';
 import TextInput from "../../formik/inputtypes";
@@ -54,6 +53,14 @@ export default function FormPageAdministrators(){
         }
     }, [staffDetails?.info?.code])
 
+    useEffect(() => {
+        if(!saveAndAddNewStaff && staffDetails?.result?.code === 200){
+            setTimeout(() => {
+                router.replace('/dashboard/administrators')
+            }, 6000);
+        }
+    }, [staffDetails?.result])
+
     const handleDispatcherPage = () => {
         router.replace('/dashboard/dispatchers/create')
     }
@@ -68,8 +75,8 @@ export default function FormPageAdministrators(){
             {
             staffDetails.result !== "" && staffDetails.info !== "" && 
             <ErrorAndSucccessHandlers
-            name="createCsutomer"
-            successName={successMessage.createCsutomer}
+            name="createAdministrator"
+            successName={successMessage.createAdministrator}
             message={staffDetails?.result?.code} 
             code={staffDetails?.info?.code}
             successmessage="Administrator successfully added to the list!"

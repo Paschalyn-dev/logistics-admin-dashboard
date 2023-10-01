@@ -7,14 +7,12 @@ import InsideNav from "../home/insidenav";
 
 
 export default function PreferencesNav(){
-    let myWidth = 0;
     const [clicked, setClicked]= useState<string>('website');
-    
-    if(typeof window !== 'undefined'){
-        myWidth = window.innerWidth;
-    }
+    const [windowWidth, setWindowWidth]= useState<number>(0);
 
-    const [windowWidth, setWindowWidth]= useState<number>(myWidth);
+    useEffect(() => {
+        setWindowWidth(window.innerWidth)
+    }, []);
 
     useEffect(() => {
         function checkWidth(){
@@ -23,6 +21,7 @@ export default function PreferencesNav(){
         window.addEventListener("resize", checkWidth);
         return () => window.removeEventListener('resize', checkWidth);
     });
+
     const minipage = localStorage.getItem('minipage');
     useEffect(() => {
         if(minipage) {

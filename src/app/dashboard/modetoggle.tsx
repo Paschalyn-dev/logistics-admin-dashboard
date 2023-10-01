@@ -12,7 +12,6 @@ export default function ModeToggle(){
     useEffect(() => {
         localStorage.setItem('currentMode', JSON.stringify('currentMode'));
     })
-    console.log(mode)
     return(
         <div>
             <div className="cursor-pointer" onClick={() => setMode(!mode)}>

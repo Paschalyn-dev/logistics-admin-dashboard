@@ -49,7 +49,7 @@ export default function EditParcel({ params }: { params: {id: number}}){
                 Delete
               </button>
             </div>
-            {openUIBoxes.administratorPopup && <Popup name="administrators" text="Administrators" closeFill={handleCloseFill} popupShow={openUIBoxes.administratorPopup} id={deleteWithId.administrators} />}
+            {openUIBoxes.administratorPopup && <Popup name="administrators" viewDelete={true} text="Administrators" closeFill={handleCloseFill} popupShow={openUIBoxes.administratorPopup} id={deleteWithId.administrators} />}
             <EditHeading subheading="Email Address" />
             <MiniText minitext={viewStaffData?.data?.email || 'N/A'} />
 
@@ -60,7 +60,7 @@ export default function EditParcel({ params }: { params: {id: number}}){
             <MiniText minitext={
                 viewStaffData?.data?.address?.street 
                 + " " + viewStaffData?.data?.address?.state 
-                + ", " + viewStaffData?.data?.address.country
+                + ", " + viewStaffData?.data?.address?.country
                 || 'No'} />
 
             <EditHeading subheading="Created"/>

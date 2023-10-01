@@ -22,7 +22,8 @@ export default function FormPageCustomers(){
     const [saveAndAddNewCustomer, setSaveAndAddNewCustomer] = useState<boolean>(false);
     const [customerDetails, setCustomerDetails] = useState<any>({
       info: "",
-      result: ""
+      result: "",
+      code: ""
     });
     let router = useRouter();
     const handleSaveAndAddNewCustomer = (e: any) => {
@@ -47,8 +48,15 @@ export default function FormPageCustomers(){
       if(customerDetails?.info !== ""){
         handleCreate(customerDetails?.info);
       }
-    }, [customerDetails?.info?.code]);
+    }, [customerDetails?.code]);
 
+    useEffect(() => {
+      if(!saveAndAddNewCustomer && customerDetails?.result?.code === 200){
+          setTimeout(() => {
+              router.replace('/dashboard/customers')
+          }, 6000);
+      }
+  }, [customerDetails?.result])
 
     return(
         <Holder>
@@ -57,8 +65,8 @@ export default function FormPageCustomers(){
           {
             customerDetails.result !== "" && customerDetails.info !== "" && 
             <ErrorAndSucccessHandlers
-            name="createCsutomer"
-            successName={successMessage.createCsutomer}
+            name="createCustomer"
+            successName={successMessage.createCustomer}
             message={customerDetails?.result?.code} 
             code={customerDetails?.info?.code}
             successmessage="Customer successfully added to the list!"
@@ -93,13 +101,8 @@ export default function FormPageCustomers(){
                     .required('Required'),
                   })}
                   onSubmit={async (values) => {
-                      setCustomerDetails((prev: any) => ({...prev, result: "", info: {...values, code: Password()}}))
+                      setCustomerDetails((prev: any) => ({...prev, result: "", info: {...values}, code: Password()}))
                       setSuccessMessage((prev: any) => ({...prev, createCustomer: true}));
-                      if(!saveAndAddNewCustomer && customerDetails?.result?.code === 200){
-                        setTimeout(() => {
-                            router.replace('/dashboard/customers')
-                        }, 6000);
-                      }
                   }}
                 >
 

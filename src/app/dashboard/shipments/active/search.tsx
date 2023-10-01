@@ -111,7 +111,10 @@ export default function SearchFilter({inputData, closeFill}: any){
         }
         return(
             <>
-        <div className="cursor-pointer z-20 bottom-0 fixed h-screen w-screen " onClick={() => closeFill((prev: any) => ({...prev, shipmentSearch: false}))}/>
+        <div className="cursor-pointer z-20 bottom-0 fixed h-screen w-screen "/>
+        <div onClick={() => closeFill((prev: any) => ({...prev, shipmentSearch: false}))} className="text-center flex justify-end text-gray-50">
+            <i className="icon ion-md-close bg-red-500 px-3 py-2 mr-5"></i>
+        </div>
             <div className="flex justify-center items-start laptop:w-3/4 after-tablet:w-10/12 tablet:w-full phone:w-full"> 
             <div className="relative animate__animated animate__headShake z-30 bg-gray-50 p-6 phone:h-4/6 tablet:h-4/6 mt-10 w-3/4 rounded-lg">
                 <div className="flex justify-start gap-2 items-center">

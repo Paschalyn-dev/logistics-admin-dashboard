@@ -15,6 +15,7 @@ export const STAFFSWRKEYS = {
     cardVerify: 'CARD_VERIFY',
     locations: 'LOCATIONS',
     fetchLocations: 'FETCH_LOCATIONS',
+    fetchBankCodesAndLogos: 'FETCH_BANK_CODES_AND_LOGOS',
     postDistancePricing: 'POST_DISTANCE_PRICING',
     getDistancePricing: 'GET_DISTANCE_PRICING',
     deleteStaff: 'DELETE_STAFF', 

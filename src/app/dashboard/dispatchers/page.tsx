@@ -71,7 +71,7 @@ export default function Dispatcher(){
                             </span>Clear Filter</button>
                         }
                     {openUIBoxes.dispatcherSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
-                    {openUIBoxes.dispatcherPopup && <Popup text="Rider" name="dispatchers" closeFill={handleCloseFill} popupShow={openUIBoxes.dispatcherPopup} id={deleteWithId.dispatchers} />}
+                    {openUIBoxes.dispatcherPopup && <Popup text="Rider" name="dispatchers" closeFill={handleCloseFill} popupShow={openUIBoxes.dispatcherPopup} mutate={dispatcherAllMutate} mutateSearch={dispatchersRangeMutate} id={deleteWithId.dispatchers} />}
                     
                     {
                         dispatcherAllError && successMessage.dispatcher &&
