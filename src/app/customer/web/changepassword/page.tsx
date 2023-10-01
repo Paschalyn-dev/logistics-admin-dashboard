@@ -11,7 +11,7 @@ import { useState, useEffect, useContext } from "react";
 import { Password } from "@/app/dashboard/formik/password";
 import { State_data } from "@/app/dashboard/context/context";
 import { customerAPIUrl } from "@/app/dashboard/services/api-url/customer-api-url";
-import { authorizationKey } from "@/app/dashboard/services/customer-api/api";
+import { authorizationKeyCustomer } from "@/app/dashboard/services/customer-api/api";
 import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
 
 export default function     CustomerChangePassword(){
@@ -29,7 +29,7 @@ export default function     CustomerChangePassword(){
             body: JSON.stringify(passwordDetails),
             headers:{
                 "Content-Type": "application/json",
-                'Authorization': authorizationKey
+                'Authorization': authorizationKeyCustomer
             },
         })
         const data = await response.json();
