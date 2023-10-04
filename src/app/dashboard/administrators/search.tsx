@@ -6,10 +6,10 @@ import { useAdministratorsSearchRange } from "../services/swr-functions/customer
 
 export default function SearchFilter({inputData, closeFill}: any){
     const {inputField, setInputField, searchFields, setSearchFields, createdAtEnd, setCreatedAtEnd, setCreatedAtStart, createdAtStart, administratorsRange, setAdministratorsRange} = useContext<any | string>(State_data);
-    const {administratorsRangeMutate} = useAdministratorsSearchRange(administratorsRange)
+    const {administratorsRangeMutate} = useAdministratorsSearchRange('')
 
     const [searchToggleButtons, setSearchToggleButtons] = useState({
-        name: false,
+        fullName: false,
         email: false,
         phone: false
     })
@@ -29,7 +29,7 @@ export default function SearchFilter({inputData, closeFill}: any){
 
     function handleName(){
         setSearchToggleButtons((prev: any) => ({
-                ...prev, name: !searchToggleButtons.name
+                ...prev, fullName: !searchToggleButtons.fullName
         }))
     }
 
@@ -75,7 +75,7 @@ export default function SearchFilter({inputData, closeFill}: any){
         handleSearchField();
         handleSetCreatedAtEnd();
         handleSetCreatedAtStart();
-        administratorsRangeMutate();
+        administratorsRangeMutate(administratorsRange);
         setAdministratorsRange({inputField, searchFields})
     // if(parcelRangeData !== 'undefined' && !parcelRangeIsLoading && !parcelRangeIsValidating) closeFill(false)
     }
@@ -92,12 +92,12 @@ export default function SearchFilter({inputData, closeFill}: any){
                 
                 <ToggleButton
                 title="Name"                 
-                onOff={searchToggleButtons.name} 
+                onOff={searchToggleButtons.fullName} 
                 handleOnOff={handleName}              
                 />
 
                 <ToggleButton
-                title="Paid"
+                title="Email"
                 onOff={searchToggleButtons.email} 
                 handleOnOff={handleEmail}              
                 />

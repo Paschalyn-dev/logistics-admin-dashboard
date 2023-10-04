@@ -9,7 +9,7 @@ import { useState, useEffect, useContext } from "react";
 import SuccessMessage from "../successmessage";
 import SkeletonLoading from "../services/eventhandlers/skeleton-loading";
 import SubHeading from "../preferences/website/subheading";
-import useDateHandler from "../date";
+import { useDateHandler } from "../date";
 import { State_data } from "../context/context";
 import SearchFilter from "./search";
 import Popup from "../services/eventhandlers/popup";
@@ -72,13 +72,13 @@ export default function Reviews(){
                {openUIBoxes.reviewSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
                {
                    fetchAllReviewsError && successMessage.reviews &&
-                   <SuccessMessage
+                <SuccessMessage
                 successMessageShow={successMessage.reviews}
                 name="reviews"
                 id="failed"
                 messageTitle="Reviews cannot be fetched. Check network connection!"
                 />
-            }
+                }
                {
                    reviewsRangeError && openUIBoxes.reviewSearch && successMessage.reviews &&
                    <SuccessMessage
@@ -107,7 +107,6 @@ export default function Reviews(){
                 <div className="h-full flex flex-wrap tablet:justify-start phone:justify-start m-auto items-start tablet:gap-5 phone:gap-3 mt-5 w-full p-1">
                     {  fetchAllReviewsData?.data && !openUIBoxes.reviewClearData &&
                         fetchAllReviewsData.data.map((reviews: any) => {
-                            const mydate = new Date(reviews?.updatedAt.slice(0, 10));
                             return(
                                 <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 flex justify-center items-center flex-col tablet:w-4/12 px-5 py-10">
                                     <div className="shadow-sm border px-1 py-2 text-4xl rounded-full">
@@ -119,7 +118,7 @@ export default function Reviews(){
                                     <p className="mb-5 text-gray-600 text-sm">{reviews?.user?.name || 'Anonymous'}</p>
                                     <div className="text-center">
                                         <p className="text-gray-600 text-sm">{reviews?.review || 'No rating'}</p>
-                                        <p className="text-gray-400">{useDateHandler(mydate)}</p>
+                                        <p className="text-gray-400">{useDateHandler(reviews?.createdAt)}</p>
                                     </div>
                                 </div>
                             )
@@ -138,7 +137,6 @@ export default function Reviews(){
 
                     {  reviewsRangeData?.data && openUIBoxes.reviewClearData &&
                         reviewsRangeData.data.map((reviews: any) => {
-                            const mydate = new Date(reviews?.updatedAt.slice(0, 10));
                             return(
                                 <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 flex justify-center items-center flex-col tablet:w-4/12 px-5 py-10">
                                     <div className="shadow-sm border px-1 py-2 text-4xl rounded-full">
@@ -150,7 +148,7 @@ export default function Reviews(){
                                     <p className="mb-5 text-gray-600 text-sm">{reviews?.user?.name || 'Anonymous'}</p>
                                     <div className="text-center">
                                         <p className="text-gray-600 text-sm">{reviews?.review || 'No rating'}</p>
-                                        <p className="text-gray-400">{useDateHandler(mydate)}</p>
+                                        <p className="text-gray-400">{useDateHandler(reviews?.createdAt)}</p>
                                     </div>
                                 </div>
                             )

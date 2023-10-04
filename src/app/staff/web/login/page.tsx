@@ -22,7 +22,7 @@ export default function Staff(){
     const [passwordString, setPasswordString] = useState<boolean>(true)
     const [staff, setStaff] = useState<any>({
         info: '',
-        result: ''
+        result: '',
     });
     const {successMessage} = useContext(State_data)
 

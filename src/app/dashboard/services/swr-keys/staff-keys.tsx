@@ -1,5 +1,6 @@
 export const STAFFSWRKEYS = {
     staffKey: 'STAFF_CREDENTIALS',
+    trackParcels: 'TRACK_PARCELS',
     adminKey: 'ADMIN_INFO', 
     forgetPasswordKey: 'FORGET_PASSWORD_KEY',
     changePassword: 'CHANGE_PASSWORD_KEY',

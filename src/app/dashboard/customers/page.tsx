@@ -6,12 +6,11 @@ import Input from "../input";
 import Section from "../section";
 import { useState, useContext, useEffect } from "react";
 import SearchFilter from "./search";
-import SuccessMessage from "../successmessage";
 import SkeletonLoading from "../services/eventhandlers/skeleton-loading";
 import BoxesHolder from "../boxesholder";
 import { State_data } from "../context/context";
 import { useCustomerSearchRange } from "../services/swr-functions/customer-swr";
-import useDateHandler from "../date";
+import { useDateHandler } from "../date";
 import Link from "next/link";
 import ErrorAndSucccessHandlers from "../services/eventhandlers/error-and-success-handlers";
 import SubHeading from "../preferences/website/subheading";
@@ -101,10 +100,9 @@ export default function Customers(){
                     {
                         fetchCustomersData?.data && !openUIBoxes.customerClearData &&
                          fetchCustomersData?.data?.map((customer: any) => {
-                            let date  = new Date(customer?.user?.createdAt?.slice(0, 10))
                             return (
                                 <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
-                                    <p className="text-xs">{useDateHandler(date)}</p>
+                                    <p className="text-xs">{useDateHandler(customer?.user?.createdAt)}</p>
                                     <h3 className="text-lg">{customer?.user?.name}</h3>
                                     <p>{customer?.user?.parcels || 0} parcels shipped</p>
                                     <hr className="my-2" />
@@ -154,10 +152,9 @@ export default function Customers(){
                     <BoxesHolder>
                     {  customerRangeData?.data && !fetchCustomersData?.data &&
                         (customerRangeData?.data?.map((customer: any) => {
-                            let date  = new Date(customer?.user?.createdAt?.slice(0, 10))
                             return (
                             <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
-                                <p className="text-xs">{useDateHandler(date)}</p>
+                                <p className="text-xs">{useDateHandler(customer?.user?.createdAt)}</p>
                                 <h3 className="text-lg">{customer?.user?.name}</h3>
                                 <p>{customer?.user?.parcels || 0} parcels shipped</p>
                                 <hr className="my-2" />

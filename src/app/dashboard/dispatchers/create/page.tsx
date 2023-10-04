@@ -19,6 +19,7 @@ import { State_data } from "../../context/context";
 import { staffAPIURL } from "../../services/api-url/staff-api-url";
 import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
 import { authorizationKeyCustomer } from "../../services/customer-api/api";
+import { authorizationKey } from "../../services/staff-api/api";
 
 export default function FormPageDispatcher({handleOpenForm}: any){
     const {successMessage, setSuccessMessage} = useContext(State_data);
@@ -46,8 +47,7 @@ export default function FormPageDispatcher({handleOpenForm}: any){
             body: JSON.stringify(details),
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": authorizationKeyCustomer
-                // "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTU1MTE2MjJ9.N_IW7YA6Gr7vuXPxZTvQbrRrd1VU2QeohI-DL1NRR_w"
+                "Authorization": authorizationKey
     
             },
         });

@@ -1,8 +1,9 @@
 'use client'
 import useSWR from "swr";
-import { accountFetcher, bankLogoAndDetailsFetcher, cardFetcher, countRidersFetcher, countStaffFetcher, createCustomerFetcher, createDispatcher, createStaffFetcher, deleteBankAccountFetcher, deleteClassicPricing,deleteDistancePricing, deleteLocationsFetcher, deletePreferenceFetcher, fetchCustomersFetcher, fetchMessagesFetcher, fetchStaffFetcher, getBankAccount, getDistancePricing, getLocationsFetcher, locationsFetcher, postDistancePricing } from "../staff-api/api";
+import { accountFetcher, bankLogoAndDetailsFetcher, cardFetcher, countRidersFetcher, countStaffFetcher, createCustomerFetcher, createDispatcher, createStaffFetcher, deleteBankAccountFetcher, deleteClassicPricing,deleteDistancePricing, deleteLocationsFetcher, deletePreferenceFetcher, fetchCustomersFetcher, fetchMessagesFetcher, fetchStaffFetcher, getBankAccount, getDistancePricing, getLocationsFetcher, locationsFetcher, postDistancePricing} from "../staff-api/api";
 import { STAFFSWRKEYS } from "../swr-keys/staff-keys";
 import { useRouter } from "next/navigation";
+import { staffAPIURL } from "../api-url/staff-api-url";
 
 
 export function useCreateCustomer(customerDetails: any){
@@ -16,6 +17,19 @@ export function useCreateCustomer(customerDetails: any){
             createCustomerMutate: mutate
         }
 }
+
+
+// export function useTrackParcel(){
+//     const {data, error, isValidating, isLoading, mutate} = useSWR(STAFFSWRKEYS.trackParcels, 
+//         () => trackShipment());
+//         return{
+//             trackShipmentData: data,
+//             trackShipmentIsLoading: isLoading,
+//             trackShipmentIsValidating: isValidating,
+//             trackShipmentMutate: mutate,
+//             trackShipmentError: error
+//         }
+// }
 
 export function useCreateStaff(staffDetails: any){
     const {data, error, mutate, isLoading, isValidating} = useSWR(STAFFSWRKEYS.createStaff,

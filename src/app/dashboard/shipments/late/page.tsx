@@ -12,6 +12,7 @@ import { State_data } from "../../context/context";
 import BoxesHolder from "../../boxesholder";
 import Link from "next/link";
 import Popup from "../../services/eventhandlers/popup";
+import { useDateHandler } from "../../date";
 
 export default function Late(){
     const {parcelLatesData, parcelLatesError, parcelLatesIsLoading, parcelLatesIsValiddating} = useLateParcels();
@@ -49,7 +50,7 @@ export default function Late(){
                                         <p className="text-green-600 text-xs">LATE</p>
                                         <p className="capitalize text-lg mt-2">{parcel.name}</p>
                                         <p className="text-blue-600 text-xs my-2 uppercase">{parcel.trackId}</p>
-                                        <p className="text-xs">{parcel.updatedAt}</p>
+                                        <p className="text-xs">{useDateHandler(parcel?.createdAt)}</p>
                                     </div>
 
                                     <div>

@@ -13,8 +13,12 @@ import Hero from "../hero";
 import SubHeading from "../website/subheading";
 import ButtonAndMessage from "./buttonandmessage";
 import { useBusiness, useGetBusiness } from "../../services/swr-functions/customer-swr";
-import { useFetchLocations, useLocations, usePostDistancePricing } from "../../services/swr-functions/staff-swr";
+import { useFetchLocations, useGetDistancePricing } from "../../services/swr-functions/staff-swr";
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
+import { staffAPIURL } from "../../services/api-url/staff-api-url";
+import { authorizationKey } from "../../services/staff-api/api";
+import { Password } from "../../formik/password";
+import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
 
 type CURRENTSTATES = {
     showPriceRange: boolean,
@@ -35,11 +39,8 @@ const initialState: CURRENTSTATES = {
     PayOnDelivery: payment?.includes('PAY_ON_DELIVERY') ? true : false,
     PayOnPickup: payment?.includes('PAY_ON_PICKUP') ? true : false,
 }
-const [locationsSwap, setLocationsSwap] = useState<boolean>(false);
-
 useEffect(() => {
     getBusinessMutate();
-    locationsMutate();
 }, [])
 
 const reducer = (state: any, action: any) => {
@@ -66,23 +67,25 @@ const reducer = (state: any, action: any) => {
     }
 }
 
-    const {globaldata, globalPriceList, setGlobalPriceList, setGlobalData, setSuccessMessage, successMessage} = useContext<any | string>(State_data);
+    const {globaldata, setGlobalPriceList, setGlobalData, setSuccessMessage, successMessage} = useContext<any | string>(State_data);
     const [state, dispatch] = useReducer(reducer, initialState);
     let paymentMethods: string[] = [];
-    const {locationsData, locationsError, locationsIsLoading, locationsIsValidating, locationsMutate} = useLocations({locations: globaldata})
+    const [priceAndLocationsDelete, setPriceAndLocationsDelete] = useState<any>({
+        priceInfo: "",
+        priceResult: "",
+        priceCode: "",
+        locationsInfo: "",
+        locationsResult: "",
+        locationsDeleteInfo: "",
+        locationsDeleteResult: "",
+        locationsDeleteCode: "",
+    })
     const handleShowPriceRange = () => {
        dispatch({type: "SHOWPRICERANGE", payload: !initialState.showPriceRange})
     }
 
-    // console.log("defghjk",locationsData, globaldata);
-
     const handlePaymentOptions2 = () => {
         setSuccessMessage((prev: any) => ({...prev, paymentOptions: true}))
-    }
-
-    const handleDeliveryLocations = () => {
-        setSuccessMessage((prev: any) => ({...prev, deliveryLocations: true}))
-        setLocationsSwap(false);
     }
 
     const handleShowStates = () => {
@@ -96,29 +99,91 @@ const reducer = (state: any, action: any) => {
     const handlePayInstantly = () => {
         dispatch({type: "PAYINSTANTLY", payload: !initialState.payInstantly})
     }
-
+    
     const handlePayOnDelivery = () => {
         dispatch({type: "PAYONDELIVERY", payload: !initialState.PayOnDelivery})
     }
-
+    
     const handlePayOnPickup = () => {
         dispatch({type: "PAYONPICKUP", payload: !initialState.PayOnPickup})
+    }
+
+    const handleSaveStates = () => {
+        setPriceAndLocationsDelete((prev: any) => ({...prev, locationsInfo: [...globaldata], locationsCode: Password()}))
+        setSuccessMessage((prev: any) => ({...prev, deliveryLocations: true}))
     }
 
     if(state.payInstantly) paymentMethods.push('PAY_NOW');
     if(state.payOnDelivery) paymentMethods.push('PAY_ON_DELIVERY');
     if(state.payOnPickup) paymentMethods.push('PAY_ON_PICKUP');
-    const {postDistancePriceData,
-           postDistancePriceError, 
-           postDistancePriceIsLoading,
-           postDistancePriceIsValidating,
-           postDistancePriceMutate} = usePostDistancePricing(globalPriceList[globalPriceList?.length - 1]);
-    const {businessChangeData, businessChangeError, businessChangeIsLoading, businessChangeIsValidating, businessChangeMutate} = useBusiness(paymentMethods);
-    const {getLocationsData, getLocationsError, getLocationsIsLoading, getLocationsIsValidating, getLocationsMutate} = useFetchLocations()
-    useEffect(()=> {
-      locationsMutate();
-    }, [locationsData?.data])
 
+    const {businessChangeData, businessChangeError, businessChangeIsLoading, businessChangeIsValidating, businessChangeMutate} = useBusiness(paymentMethods);
+    const {getLocationsData, getLocationsError, getLocationsIsLoading, getLocationsIsValidating, getLocationsMutate} = useFetchLocations();
+    const {getDistancePriceData, getDistancePriceError, getDistancePriceIsLoading, getDistancePriceIsValidating, getDistancePriceMutate} = useGetDistancePricing();
+
+    async function handleAddStates(locations: any){
+        const response = await fetch(staffAPIURL.locations, {
+            method: 'PUT', 
+            body: JSON.stringify(locations),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTExODgzNDZ9.73G4_gAI_mexLVUYQOkaJN7XCaIj0iHqj5b2g9yYIa8"
+            },
+        });
+        const data = await response.json();
+        setPriceAndLocationsDelete((prev: any) => ({...prev, locationsResult: data}));
+        getLocationsMutate();
+    }
+
+    async function handleLocationsDelete(id: any){
+        const response = await fetch(staffAPIURL.deleteLocations(id), {
+            method: 'DELETE',
+            headers: {
+                'Authorization': authorizationKey
+            }
+        });
+        const data = await response.json();
+        setPriceAndLocationsDelete((prev: any) => ({...prev, locationsDeleteResult: data}));
+        getLocationsMutate();
+    }
+
+    async function handleDeleteDistancePricing(id: number){
+        const response = await fetch(staffAPIURL.deleteDistancePricing(id), {
+            method: 'DELETE',
+            headers: {
+                'Authorization': authorizationKey
+            }
+        });
+        const data = await response.json();
+        setPriceAndLocationsDelete((prev: any) => ({...prev, priceResult: data}));
+        getDistancePriceMutate();
+    }
+
+    useEffect(() => {
+        if(priceAndLocationsDelete.locationsInfo !== ""){
+            handleAddStates(priceAndLocationsDelete.locationsInfo)
+        }
+    }, [priceAndLocationsDelete?.locationsCode]);
+
+    useEffect(() => {
+        if(priceAndLocationsDelete.locationsDeleteInfo !== ""){
+            handleLocationsDelete(priceAndLocationsDelete.locationsDeleteInfo)
+        }
+    }, [priceAndLocationsDelete?.locationsDeleteCode]);
+
+    useEffect(() => {
+        if(priceAndLocationsDelete.priceInfo !== ""){
+            handleDeleteDistancePricing(priceAndLocationsDelete.priceInfo)
+        }
+    }, [priceAndLocationsDelete.priceCode]);
+
+    const filteredPriceRange = getDistancePriceData?.data?.filter((price: any) => price?.from !== null && price?.to !== null).sort((a: any, b: any) => a.from - b.from);
+    const highestPriceRangeTo = getDistancePriceData?.data?.filter((price: any) => price?.from !== null && price?.to !== null)?.sort((a: any, b: any) => a.to - b.to);
+    useEffect(() => {
+        setGlobalPriceList((prev: any) => ({...prev, ...filteredPriceRange}));
+    },[filteredPriceRange?.length]);
+
+    console.log(globaldata)
 
     return(
         <Holder>
@@ -127,8 +192,26 @@ const reducer = (state: any, action: any) => {
                 <SkeletonLoading title="payment methods" loadingSearching="Loading" />
             }
             {
-                locationsIsValidating || locationsIsLoading || getLocationsIsLoading || getLocationsIsValidating &&
+                getLocationsIsValidating || getLocationsIsLoading  || getLocationsIsLoading || getLocationsIsValidating &&
                 <SkeletonLoading title="pickup and delivery locations" loadingSearching="Loading" />
+            }
+            {
+                getDistancePriceIsLoading && 
+                <SkeletonLoading title="distance price" loadingSearching="Loading" />
+            }
+            {  priceAndLocationsDelete.priceInfo !== "" && priceAndLocationsDelete.priceResult !== "" &&
+                <ErrorAndSucccessHandlers
+                name="deliveryPriceDelete"
+                successName={successMessage.deliveryPriceDelete}
+                message={priceAndLocationsDelete?.priceResult?.code} 
+                code={priceAndLocationsDelete?.code}
+                successmessage="Distance entry successfully deleted"
+                failedmessage="Sorry, cannot delete distance parameters"
+                staffAndCustomer={priceAndLocationsDelete?.priceResult}
+                error={priceAndLocationsDelete?.priceResult?.code !== 200}
+                loading={priceAndLocationsDelete?.priceResult === "" && priceAndLocationsDelete?.priceInfo !== "" && priceAndLocationsDelete?.priceCode !== ""}
+                data={priceAndLocationsDelete?.priceResult}
+                />
             }
             <PreferencesNav />
             <Section>
@@ -170,38 +253,28 @@ const reducer = (state: any, action: any) => {
                         
                         <div className="mb-3 rounded-lg bg-gray-200 h-fit w-full p-5">
                             <div className="animate__animated animate__bounceInDown flex justify-start items-center gap-1 flex-wrap">
-                            {locationsSwap && locationsData?.data && globaldata?.map((data: string, i:number) => (
-                                    <div className="flex bg-gray-50 py-2 px-3 phone:text-xs laptop:text-sm w-fit my-2 rounded-full justify-center items-center gap-5">
-                                        <p>{data}</p>
-                                        <span onClick={() => setGlobalData(globaldata.filter((item:string, index:number) => i !== index ))} 
-                                        className="text-red-500 cursor-pointer font-extrabold">
-                                            <i title="Delete" className="icon ion-md-close"></i>
-                                        </span>
-                                    </div>
-                                ))
-                            }
-                            {
-                                !locationsSwap && locationsData?.data && locationsData?.data?.map((location: string, i:number) => (
-                                    <div className="animate__animated animate__fadeIn flex bg-gray-50 py-2 px-3 phone:text-xs laptop:text-sm w-fit my-2 rounded-full justify-center items-center gap-5">
-                                        <p>{location}</p>
-                                        <span onClick={() => setLocationsSwap(true)} 
-                                        className="text-red-500 cursor-pointer font-extrabold">
-                                            <i title="Delete" className="icon ion-md-close"></i>
-                                        </span>
-                                    </div>
-                                ))
-                            }
+                                {globaldata?.length > 0 && globaldata?.map((data: any, i:number) => {
+                                        return(
+                                            <div key={i} className="flex bg-gray-50 py-2 px-3 phone:text-xs laptop:text-sm w-fit my-2 rounded-full justify-center items-center gap-5">
+                                            <p>{data}</p>
+                                            <span onClick={() => setPriceAndLocationsDelete((prev: any) => ({...prev, locationsDeleteInfo: data?.id, locationsDeleteCode: Password()}))} 
+                                            className="text-red-500 cursor-pointer font-extrabold">
+                                                <i title="Delete" className="icon ion-md-close"></i>
+                                            </span>
+                                        </div>
+                                        )
+                                    })
+                                }
                             </div>
-                            <p className="relative text-xs text-right bottom-0 right-0">{locationsData?.data?.length} {locationsData?.data?.length > 1 ? "entries" : "entry"}</p>
+                            <p className="relative text-xs text-right bottom-0 right-0">{globaldata?.length} {globaldata?.length > 1 ? "entries" : "entry"}</p>
                         </div>
                         <ButtonAndMessage 
-                        error={locationsError}
-                        mutate={locationsMutate}  
+                        error={priceAndLocationsDelete?.locationsResult === "" && priceAndLocationsDelete?.locationsInfo !== "" }
                         title={successMessage.deliveryLocations}                  
                         name="deliveryLocations"
-                        handleClick={handleDeliveryLocations}
+                        handleClick={handleSaveStates}
                         successmessage="Your locations has been updated!" 
-                        code={locationsData?.code}
+                        code={priceAndLocationsDelete?.locationsResult?.code}
                         failedmessage="Sorry, locations cannot be updated!"
                         errormessage="Error occured, Check your network!"
                         buttonName="Save Locations"
@@ -228,19 +301,21 @@ const reducer = (state: any, action: any) => {
                             <i className="icon ion-md-add"></i>
                         }
                         </div>
-                        <h1 className="my-2 text-lg">All Entries ({globalPriceList.length})</h1>
+                        <h1 className="my-2 text-lg">All Entries ({filteredPriceRange?.length})</h1>
                     </span>
-                    <h1 className="font-bold text-normal">Your business covers from  {globalPriceList.length > 0 ? globalPriceList[0]?.location : "0"}km to  {globalPriceList.length > 0 ? globalPriceList[globalPriceList.length - 1]?.destination : "0"}km.</h1>
+                    <h1 className="font-bold text-normal">Your business covers from {filteredPriceRange?.length ? filteredPriceRange[0]?.from  : "0"}km to {highestPriceRangeTo?.length ? highestPriceRangeTo[highestPriceRangeTo?.length - 1]?.to : "0"}km.</h1>
                     <div className="mb-3">
                    { state.showPriceRange &&
                     <div className="w-full flex-wrap my-4 h-fit flex justify-start gap-2 items-center">
                         {
-                            globalPriceList.length > 0 && globalPriceList.map((price: any, mainindex:number) => {
-                               return( 
+                            filteredPriceRange?.length > 0 && filteredPriceRange?.map((price: any, mainindex:number) => {
+                               return(
                                 <div key={mainindex} className="flex animate__animated animate__headShake justify-start rounded-3xl items-center gap-3 shadow-sm p-3 bg-white">
-                                    <p>{price.from}km - {price.to}km @  <b>₦{price.amount}</b></p>
+                                    <p>{price?.from || "0"}km - {price?.to || "0"}km @  <b>₦{price?.amount || "0"}</b></p>
                                     <span
-                                    onClick={() => setGlobalPriceList((prev:any) => prev.filter((item:any, index:number) => index !== mainindex))}
+                                     onClick={() => {
+                                        setPriceAndLocationsDelete((prev: any) => ({...prev, priceCode: Password(), priceInfo: price?.id, priceResult: ""}))
+                                    }}
                                      className="rounded-full text-gray-50 px-1 cursor-pointer w-5 text-center text-sm bg-red-500/90"><i className="icon ion-md-close"></i></span>
                                 </div>
                             )})
@@ -248,7 +323,7 @@ const reducer = (state: any, action: any) => {
                     </div>
                    }
                    </div>
-                    <AddItem showCalculator={state.showCalculator} handleShowCalculator={handleShowCalculator} />
+                    <AddItem showCalculator={state.showCalculator} mutate={getDistancePriceMutate()} handleShowCalculator={handleShowCalculator} />
                     {state.showCalculator && <OpenCalculator handleNoShow={handleShowCalculator} />}
                 </div>
              </Hero>

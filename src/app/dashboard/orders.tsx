@@ -4,16 +4,10 @@ import ToggleNav from "./toggleNav";
 import Sidebar from "./sidebar";
 import InsideNav from "./home/insidenav";
 
-export default function OrdersNav(){
-    let myWidth = 0;
-    
-    const [clickIt, setClickIt] = useState<string>('');
-    
-    if(typeof window !== "undefined"){
-        myWidth = window.innerWidth;
-    }  
-    
-    const [windowWidth, setWindowWidth]= useState<number>(myWidth);
+export default function OrdersNav(){   
+    const [clickIt, setClickIt] = useState<string>('active');
+        
+    const [windowWidth, setWindowWidth]= useState<number>(0);
     
     useEffect(() => {
         function checkWidth(){
@@ -22,6 +16,19 @@ export default function OrdersNav(){
         window.addEventListener("resize", checkWidth);
         return () => window.removeEventListener('resize', checkWidth);
     });
+
+    useEffect(() => {
+        const ordersPage = localStorage.getItem('ordersPage');
+        if(ordersPage) {
+          setClickIt(JSON.parse(ordersPage))
+          // router.replace(`/dashboard/${JSON.parse(ordersPage)}`);
+        }
+        setWindowWidth(window.innerWidth);
+      }, []);
+      
+      useEffect(() => {
+        localStorage.setItem('ordersPage', JSON.stringify(clickIt))
+      }, [clickIt]);
   
 
     return(

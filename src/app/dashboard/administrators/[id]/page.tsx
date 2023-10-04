@@ -4,11 +4,11 @@ import Holder from "../../holder"
 import Hero from "../../preferences/hero"
 import Section from "../../section"
 import Link from "next/link";
-import { useDeleteParcels, useViewStaff } from "../../services/swr-functions/customer-swr";
+import { useViewStaff } from "../../services/swr-functions/customer-swr";
 import MiniText from "../../minitext"
-import useDateHandler from "../../date"
+import {useDateHandler} from "../../date"
 import EditHeading from "../../editHeading"
-import {useContext, useState } from "react";
+import {useContext } from "react";
 import Popup from "../../services/eventhandlers/popup"
 import { useEffect } from "react";
 import ConstantNav from "../../constantNav";
@@ -27,7 +27,6 @@ export default function EditParcel({ params }: { params: {id: number}}){
       viewStaffMutate();
     }, [viewStaffMutate()]);
     const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
-    let date  = new Date(viewStaffData?.data?.createdAt?.slice(0, 10))
     return(
       <Holder>
         <ConstantNav />
@@ -64,7 +63,7 @@ export default function EditParcel({ params }: { params: {id: number}}){
                 || 'No'} />
 
             <EditHeading subheading="Created"/>
-            <MiniText minitext={useDateHandler(date)} />
+            <MiniText minitext={useDateHandler(viewStaffData?.data?.createdAt)} />
           </Hero>
         </Section>
       </Holder>

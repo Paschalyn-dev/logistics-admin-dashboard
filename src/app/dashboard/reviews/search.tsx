@@ -73,7 +73,7 @@ export default function SearchFilter({inputData, closeFill}: any){
     // if(parcelRangeData !== 'undefined' && !parcelRangeIsLoading && !parcelRangeIsValidating) closeFill(false)
     }
     return(
-        <>
+        <div>
     <div className="cursor-pointer z-20 bottom-0 fixed h-screen w-screen " onClick={() => closeFill((prev: any) => ({...prev, reviewSearch: false}))}/>
         <div className="flex justify-center items-start laptop:w-3/4 after-tablet:w-10/12 tablet:w-full phone:w-full"> 
         <div className="relative animate__animated animate__headShake z-30 bg-gray-50 p-6 phone:h-4/6 tablet:h-4/6 mt-10 w-3/4 rounded-lg">
@@ -84,13 +84,13 @@ export default function SearchFilter({inputData, closeFill}: any){
             <div className="flex flex-wrap justify-between items-center">
 
             <ToggleButton
-            title="Parcel"                 
+            title="Rating"                 
             onOff={searchToggleButtons.rating} 
             handleOnOff={handleParcel}              
             />
 
             <ToggleButton
-            title="Amount"
+            title="Review"
             onOff={searchToggleButtons.review}   
             handleOnOff={handleAmount}            
             />
@@ -106,6 +106,6 @@ export default function SearchFilter({inputData, closeFill}: any){
         </form>
         </div>
         </div>
-        </>
+        </div>
 )
 }

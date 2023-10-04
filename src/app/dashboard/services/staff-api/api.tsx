@@ -38,6 +38,13 @@ export const createStaffFetcher = async(staffDetails: any) => {
     return data;
 } 
 
+// export const trackShipment = async() => {
+//     const response = await fetch(staffAPIURL.trackShipment, {
+//         method: 'GET'
+//     });
+//     const data = await response.json();
+//     return data;
+// }
 
 export const createDispatcher = async(dispatcherDetails: any) => {
     const response = await fetch(staffAPIURL.createDispatcher, {
@@ -176,7 +183,7 @@ export const getLocationsFetcher = async() => {
     const response = await fetch(staffAPIURL.fetchLocations, {
         method: 'GET',
         headers: {
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTExODgzNDZ9.73G4_gAI_mexLVUYQOkaJN7XCaIj0iHqj5b2g9yYIa8"
+            "Authorization": authorizationKey
         },
     });
     const data = await response.json();

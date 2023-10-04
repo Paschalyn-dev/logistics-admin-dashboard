@@ -11,7 +11,7 @@ export default function PreferencesNav(){
     const [windowWidth, setWindowWidth]= useState<number>(0);
 
     useEffect(() => {
-        setWindowWidth(window.innerWidth)
+        setWindowWidth(window.innerWidth);
     }, []);
 
     useEffect(() => {

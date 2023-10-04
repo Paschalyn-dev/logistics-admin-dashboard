@@ -91,19 +91,19 @@ export default function SearchFilter({inputData, closeFill}: any){
             </div>
             <div className="flex flex-wrap justify-between items-center">
             <ToggleButton
-            title="ID"  
+            title="Name"  
             onOff={searchToggleButtons.name}
             handleOnOff={handleName}               
             />
 
             <ToggleButton
-            title="Parcel"                 
+            title="Email"                 
             onOff={searchToggleButtons.email} 
             handleOnOff={handleEmail}              
             />
 
             <ToggleButton
-            title="Amount"
+            title="Message"
             onOff={searchToggleButtons.message}   
             handleOnOff={handleMessage}            
             />

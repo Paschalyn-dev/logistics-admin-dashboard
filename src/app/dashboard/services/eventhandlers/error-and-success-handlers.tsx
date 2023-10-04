@@ -13,42 +13,42 @@ export default function ErrorAndSucccessHandlers({staffAndCustomer, successmessa
     }, [code])
 
     return(
-        <>
+        <div>
             {(loading) && <Loader />}
-                {(error && staffAndCustomer && !data && successName) &&
+                {(staffAndCustomer && (!data || data === "undefined") && successName) &&
                     (
-                    <>
+                    <div>
                             <SuccessMessage 
                             messageTitle="Error occured! Check your network connection."
                             id="failed"
                             name={name}
                             successMessageShow={successName}
                             />
-                        </>
+                    </div>
                     )
                 }
                 {
                     (staffAndCustomer && data?.code && data?.code === 200 && successName) &&
-                    <>
+                    <div>
                         <SuccessMessage 
                         messageTitle={successmessage}
                         name={name}
                         successMessageShow={successName}
                         />
-                    </> 
+                    </div> 
                 }
 
                 {
-                    (staffAndCustomer && data?.code && data?.data && data?.code !== 200 && successName) &&
-                        <>
+                    (staffAndCustomer && data?.code && data?.code !== 200 && data?.name?.includes('error') && successName) &&
+                        <div>
                             <SuccessMessage 
                             messageTitle={failedmessage}
                             id="failed"
                             name={name}
                             successMessageShow={successName}
                             />
-                        </>
+                        </div>
                 }
-        </>
+        </div>
     )
 }

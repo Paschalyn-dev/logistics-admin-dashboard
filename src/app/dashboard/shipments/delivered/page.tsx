@@ -12,6 +12,7 @@ import BoxesHolder from "../../boxesholder";
 import Popup from "../../services/eventhandlers/popup";
 import { State_data } from "../../context/context";
 import Link from "next/link";
+import { useDateHandler } from "../../date";
 
 export default function Delivered(){
     const {setDeleteWithId, deleteWithId, openUIBoxes, successMessage, setSuccessMessage, setOpenUIBoxes} = useContext(State_data);
@@ -53,8 +54,8 @@ export default function Delivered(){
                                 <div>
                                     <p className="text-green-600 text-xs">DELIVERED</p>
                                     <p className="capitalize text-lg mt-2">{parcel.name}</p>
-                                    <p className="text-blue-600 text-xs my-2 uppercase">{parcel.trackId}</p>
-                                    <p className="text-xs">{parcel.updatedAt}</p>
+                                    <Link title="View on Tracker" target="_blank" href={`https://radar.logistix.africa/track/${parcel?.trackId}`} className="text-blue-600 text-xs my-2 uppercase">{parcel?.trackId}</Link>
+                                    <p className="text-xs">{useDateHandler(parcel?.createdAt)}</p>
                                 </div>
 
                                 <div>

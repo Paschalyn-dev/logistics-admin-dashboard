@@ -5,7 +5,7 @@ import Section from "../../section"
 import Link from "next/link";
 import { useViewDispatcher } from "../../services/swr-functions/customer-swr";
 import MiniText from "../../minitext"
-import useDateHandler from "../../date"
+import {useDateHandler} from "../../date"
 import EditHeading from "../../editHeading"
 import Popup from "../../services/eventhandlers/popup"
 import { useEffect, useState, useContext } from "react";
@@ -26,7 +26,6 @@ export default function EditParcel({ params }: { params: {id: number}}){
     useEffect(() => {
       viewDispatcherMutate();
     }, []);
-    const date = new Date (viewDispatcherData?.data?.createdAt.slice(0, 10));
     return(
       <Holder>
         <ConstantNav />
@@ -62,7 +61,7 @@ export default function EditParcel({ params }: { params: {id: number}}){
                 + viewDispatcherData?.data?.address?.street || 'N/A'} />
 
             <EditHeading subheading="Created" />
-            <MiniText minitext={useDateHandler(date)} />
+            <MiniText minitext={useDateHandler(viewDispatcherData?.data?.createdAt)} />
 
             <SubHeading subheading="Documents" />
 

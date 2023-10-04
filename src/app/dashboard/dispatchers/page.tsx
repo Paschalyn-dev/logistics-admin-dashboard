@@ -15,6 +15,7 @@ import Link from "next/link";
 import { UIBOXES } from "../shipments/active/page";
 import { State_data } from "../context/context";
 import Popup from "../services/eventhandlers/popup";
+import { useDateHandler } from "../date";
 
 export default function Dispatcher(){
     const [inputData, setInputData] = useState('');
@@ -114,6 +115,7 @@ export default function Dispatcher(){
                                 <div>
                                     <p className="text-lg">{dispatcher.fullName}</p>
                                     <p className="text-base">{dispatcher.parcels ? dispatcher.parcels : "0"} Parcel{dispatcher.parcels > 1 && "s"}</p>
+                                    <p className="text-xs">{useDateHandler(dispatcher?.createdAt)}</p>
                                 </div>
 
                                 <div>
@@ -182,6 +184,7 @@ export default function Dispatcher(){
                                 <div>
                                     <p className="text-lg">{dispatcher.fullName}</p>
                                     <p className="text-base">{dispatcher.parcels ? dispatcher.parcels : "0"} Parcel{dispatcher.parcels > 1 && "s"}</p>
+                                    <p className="text-xs">{useDateHandler(dispatcher?.createdAt)}</p>
                                 </div>
 
                                 <div>
@@ -252,7 +255,7 @@ export default function Dispatcher(){
                 <br/>
                 <SubHeading subheading="Map"/>
                 <p className="w-9/12 mt-1 text-sm text-center">You will be able to view the current location of your dispatchers on the map in real-time.</p>
-                <div className="p-2 text-sm bg-green-100 text-green-600 w-fit rounded-lg">COMING SOON</div>
+                <div className="p-2 text-sm bg-green-100 text-green-600 w-fit mt-2 rounded-lg">COMING SOON</div>
             </div>
             )
         }       

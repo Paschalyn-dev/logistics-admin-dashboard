@@ -7,7 +7,7 @@ import Section from "../../section"
 import Link from "next/link";
 import { useViewParcels } from "../../services/swr-functions/customer-swr";
 import MiniText from "../../minitext"
-import useDateHandler from "../../date"
+import {useDateHandler} from "../../date"
 import { NumberComma } from "../../numberComma"
 import EditHeading from "../../editHeading"
 import {useState, useContext } from "react";
@@ -21,7 +21,6 @@ export default function EditParcel({ params }: { params: {id: number}}){
 } 
  const {viewParcelData} = useViewParcels(params.id)
  const {setDeleteWithId, deleteWithId} = useContext(State_data);
-  const date = new Date (viewParcelData?.data?.createdAt.slice(0, 10));
     return(
       <Holder>
         <OrdersNav />
@@ -31,7 +30,7 @@ export default function EditParcel({ params }: { params: {id: number}}){
           </Link>
           <Hero comingsoon="Not Picked" description={viewParcelData?.data?.trackId.toUpperCase()} icon="icon ion-md-cube" heading={viewParcelData?.data?.name}>
             <div className="flex justify-center items-center w-full gap-2">
-              <Link href="" className="bg-green-500 border-4 hover:bg-green-600 phone:py-1 phone:px-2 tablet:py-2 phone:text-base text-gray-50 tablet:px-3 tablet:text-lg rounded-lg">Track</Link>
+              <Link target="_blank" href={`https://radar.logistix.africa/track/${viewParcelData?.data?.trackId}`} className="bg-green-500 border-4 hover:bg-green-600 phone:py-1 phone:px-2 tablet:py-2 phone:text-base text-gray-50 tablet:px-3 tablet:text-lg rounded-lg">Track</Link>
               <Link href={`/dashboard/shipments/${viewParcelData?.data?.id}/edit`} className="bg-blue-500 border-4 hover:bg-blue-600 tablet:py-2 phone:py-1 text-gray-50 phone:text-base phone:px-2 tablet:px-3 tablet:text-lg rounded-lg">Edit</Link>
               <button className="bg-red-500 border-4 hover:bg-red-600 py-2 text-gray-50 phone:py-1 phone:px-2 phone:text-base tablet:py-2 tablet:px-3 tablet:text-lg rounded-lg"
                   onClick={() => {
@@ -46,7 +45,7 @@ export default function EditParcel({ params }: { params: {id: number}}){
             <MiniText minitext={viewParcelData?.data?.description || 'N/A'} />
 
             <EditHeading subheading="Shipped"/>
-            <MiniText minitext={useDateHandler(date)} />
+            <MiniText minitext={useDateHandler(viewParcelData?.data?.createdAt)} />
 
             <EditHeading subheading="Fragile"/>
             <MiniText minitext={viewParcelData?.data?.fragile ? 'Yes' : 'No'} />

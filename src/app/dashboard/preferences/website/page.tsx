@@ -14,7 +14,7 @@ import SuccessMessage from "../../successmessage";
 
 export default function WebsitePreferences(){
     const {getBusinessData, getBusinessError, getBusinessIsLoading, getBusinessIsValidating, getBusinessMutate} = useGetBusiness();
-
+    const [uploadFile, setUploadFile] = useState<any>('')
     const [formData, setFormData] = useState<any>({
         active: getBusinessData?.data?.active,
         additionalInfo: getBusinessData?.data?.additionalInfo,
@@ -95,8 +95,9 @@ export default function WebsitePreferences(){
             return {...prev, socialAccounts: {...formData.socialAccounts, [name]: value}}
         })
     }
-
-
+    // let reader  = new FileReader();
+    // reader.readAsDataURL(document.getElementById('upload'));
+      
     const {businessChangeData, businessChangeError, businessChangeIsLoading,businessChangeIsValidating, businessChangeMutate} = useBusiness(formData)
     
     return(
@@ -124,12 +125,17 @@ export default function WebsitePreferences(){
                   <div className="flex phone:flex-col laptop:gap-10 phone:text-center phone:justify-center laptop:justify-start laptop:flex-row phone:items-center laptop:items-center w-full h-fit">
                     <div>
                     <span className="rounded-full flex justify-center items-center bg-gray-200/40 p-1 shadow h-fit w-fit">
-                        <img src="https://cakenus.logistix.africa/logo-icon.svg" alt="logo" />
+                        <img title={uploadFile} src={uploadFile?.length ? uploadFile : "https://cakenus.logistix.africa/logo-icon.svg"} alt="logo" />
                     </span>
-                    <span className="relative w-full flex justify-between items-center bottom-10">
-                        <input type="file" className="rounded-full shadow h-fit bg-gray-50 w-6" />
+                    <span className="relative w-full flex justify-between items-center bottom-10">             
+                       <span title={uploadFile} className="relative rounded-full shadow h-fit cursor-pointer bg-gray-50 w-6">
+                            <label title={uploadFile} className=" cursor-pointer rounded-full" htmlFor="upload">
+                                <i className="icon ion-md-camera"></i>
+                            </label>
+                            <input id='upload' name='upload'  onChange={(e: any) => setUploadFile(e.target.value)} value={uploadFile} type="file" className="absolute w-0 z-1 top-10 left-10 text-sm text-gray-50" />
+                        </span> 
                             {/* <i className="icon ion-md-camera"></i> */}
-                        <button className="rounded-full shadow h-fit bg-gray-50 w-6">
+                        <button onClick={() => setUploadFile('')} className="rounded-full shadow h-fit bg-gray-50 w-6">
                             <i className="icon ion-md-close"></i>
                         </button>
                     </span>

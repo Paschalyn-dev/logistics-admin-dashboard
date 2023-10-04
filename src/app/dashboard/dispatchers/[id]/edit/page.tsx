@@ -1,5 +1,5 @@
 'use client'
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from "next/navigation";
@@ -19,13 +19,20 @@ import UploadFile from "@/app/dashboard/formik/file";
 import ToggleButton from "@/app/dashboard/preferences/shipment/toggleButton";
 import Button from "@/app/dashboard/button";
 import { State_data } from "@/app/dashboard/context/context";
+import { staffAPIURL } from "@/app/dashboard/services/api-url/staff-api-url";
+import { authorizationKey } from "@/app/dashboard/services/staff-api/api";
+import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
 
 export default function EditDispatchers({ params }: { params: {id: number}}){
     const {successMessage, setSuccessMessage} = useContext(State_data);
     const [saveAndAddNewRider, setSaveAndAddNewRider] = useState<boolean>(false);
     const [passwordString, setPasswordString] = useState<boolean>(true)
     const [generatePassword, setGeneratePassword] = useState<boolean>(true);
-    const [dispatcherDetails, setDispatcherDetails] = useState<any>();
+    const [dispatcherDetails, setDispatcherDetails] = useState<any>({
+        info: "",
+        result: "",
+        code: ""
+    });
     const {viewDispatcherData, 
         viewDispatcherError, 
         viewDispatcherIsLoading, 
@@ -38,45 +45,58 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
         setSaveAndAddNewRider(!saveAndAddNewRider)
     }
     
-    const handleAdministratorsPage = () => {
-        router.replace('/dashboard/administrators/create')
+    async function handleEdit(details: any, id: any){
+        const response = await fetch(staffAPIURL.editDispatcher(id), {
+            method: 'PUT',
+            body: JSON.stringify(details),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": authorizationKey    
+            },
+        });
+        const data = await response.json();
+        setDispatcherDetails((prev: any) => ({...prev, result: data}));
     }
+
+    useEffect(() => {
+        if(dispatcherDetails?.info !== ""){
+          handleEdit({...dispatcherDetails?.info}, viewDispatcherData?.data?.id);
+        }
+    }, [dispatcherDetails?.code]);
+
+    useEffect(() => {
+        if(!saveAndAddNewRider && dispatcherDetails?.result?.code === 200){
+            setTimeout(() => {
+                router.replace('/dashboard/dispatchers')
+            }, 5000);
+        }
+    }, [dispatcherDetails?.result])
+
     return(
         <Holder>
             <ConstantNav />
             <Section>
-            {/* {showSuccessMessage && createDispatcherData?.code === 200 && 
-                    <SuccessMessage
-                    messageTitle="Dispatcher has been successfully added to the list!" 
-                    successMessageShow={showSuccessMessage} 
-                    handleShowSuccessMessage={setShowSuccessMessage} 
-                    />
-                }
 
-                {
-                    createDispatcherError && showSuccessMessage &&
-                    <SuccessMessage
-                    successMessageShow={showSuccessMessage}
-                    handleShowSuccessMessage={setShowSuccessMessage}
-                    id="failed"
-                    messageTitle="Dispatcher cannot be added. Check network connection!"
-                    />
-                }     
+            {
+                (viewDispatcherIsLoading || viewDispatcherIsValidating) &&
+                <Loader />
+            }     
+            {
+                dispatcherDetails.result !== "" && dispatcherDetails.info !== "" && dispatcherDetails?.code !== '' &&
+                <ErrorAndSucccessHandlers
+                name="editDispatcher"
+                successName={successMessage.editDispatcher}
+                message={dispatcherDetails?.result?.code} 
+                code={dispatcherDetails?.info?.code}
+                successmessage="Dispatcher details successfully updated!"
+                failedmessage="Sorry, dispatcher details cannot be updated!"
+                staffAndCustomer={dispatcherDetails?.result}
+                error={dispatcherDetails?.result?.code !== 200}
+                loading={dispatcherDetails?.result === "undefined" && dispatcherDetails?.info !== ""}
+                data={dispatcherDetails?.result}
+                />
+            }
 
-                {
-                    createDispatcherData?.data !== 200 && showSuccessMessage &&
-                    <SuccessMessage
-                    successMessageShow={showSuccessMessage}
-                    handleShowSuccessMessage={setShowSuccessMessage}
-                    id="failed"
-                    messageTitle="Sorry, Dispatcher cannot be added to the list!"
-                    />
-                }      */}
-                
-                {
-                    (viewDispatcherIsLoading || viewDispatcherIsValidating) &&
-                    <Loader />
-                }     
             <Link href="/dashboard/dispatchers" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                 <i className="icon ion-md-arrow-back"></i>
             </Link>
@@ -125,10 +145,8 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                     .required('This field is required.'),
                   })}
                   onSubmit={(values) => {
-                    setTimeout(() => {
-                        setSuccessMessage((prev: any) => ({...prev, editDispatcher: true}));
-                        setDispatcherDetails(values);
-                    }, 1000);
+                    setSuccessMessage((prev: any) => ({...prev, editDispatcher: true}));
+                    setDispatcherDetails((prev: any) => ({...prev, code: Password(), result: "", info: {...values}}) );
                   }}
                   enableReinitialize={true}
                 >
@@ -198,8 +216,15 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                                     type="file"
                                     {...getFieldProps('roadWorthiness')}
                                     />
-                                
                                 </div>
+
+                                <ToggleButton 
+                                title="Save & Update Customer."
+                                icon="icon ion-md-information-circle-outline"
+                                handleOnOff={handleSaveAndAddNewRider}
+                                onOff={saveAndAddNewRider}
+                                description="Enable this if you want to edit more details on this dispatcher immediately after clicking on the save button."
+                                />  
 
                                 <Button
                                 type="submit" 

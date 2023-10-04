@@ -29,12 +29,12 @@ export default function ToggleNav(){
           { 
             showNav && windowWidth <= 1025 &&
             <div>
-            <div onClick={() => setShowNav(false) } 
-              className="left-64 animate__animated animate__slideInLeft tablet:left-72 fixed top-2 z-30 bg-amber-500 text-stone-900 cursor-pointer hover:shadow-xl text-xl w-fit px-4 py-2 rounded-full">
-              <i className="icon ion-md-close" title="Close"></i>
+              <div onClick={() => setShowNav(false) } 
+                className="left-64 animate__animated animate__slideInLeft tablet:left-72 fixed top-2 z-30 bg-amber-500 text-stone-900 cursor-pointer hover:shadow-xl text-xl w-fit px-4 py-2 rounded-full">
+                <i className="icon ion-md-close" title="Close"></i>
+              </div>
+              <div onClick={() => setShowNav(false)} className="cursor-pointer invert bg-gray-50 z-10 bottom-0 opacity-10 fixed top-0 h-full w-full "></div>
             </div>
-            {/* <div onClick={() => setShowNav(false)} className="cursor-pointer invert bg-gray-50 z-10 bottom-0 opacity-10 fixed top-0 h-full w-full "></div> */}
-          </div>
           }
         </div>
         
@@ -42,8 +42,8 @@ export default function ToggleNav(){
           {
             !showNav && windowWidth <= 1025 &&    
             <div onClick={() => setShowNav(true)} 
-            className="bg-amber-500 text-stone-900 cursor-pointer hover:shadow-xl text-xl w-fit px-4 py-2 rounded-full ">
-            <i className="icon ion-md-menu" title="Menu"></i>
+              className="bg-amber-500 text-stone-900 cursor-pointer hover:shadow-xl text-xl w-fit px-4 py-2 rounded-full ">
+              <i className="icon ion-md-menu" title="Menu"></i>
           </div>
           }
         </div>

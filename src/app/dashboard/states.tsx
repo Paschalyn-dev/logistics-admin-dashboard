@@ -56,14 +56,16 @@ const handleDone = () => {
     }
 }
 
+console.log(globaldata)
+
 useEffect(() => {
     locationsMutate();
 }, [globaldata])
 
     return(
-        <>
+        <div>
         <DarkFill handleNoShow={handleShow} />
-        <> 
+        <div> 
             <div className={ show ? "fixed z-30 animate__animated animate__zoomIn flex justify-center items-center phone:h-screen laptop:h-screen top-0 bottom-0 phone:-ml-10  laptop:w-3/4 after-tablet:w-10/12 after-tablet:ml-5 laptop:ml-0 tablet:w-full phone:w-full" : 
              "animate__animated animate__zoomOut h-0 hidden"}>
                 <div className="relative bg-gray-50 p-6 phone:h-4/6 tablet:h-4/6 mt-10 w-3/4 rounded-lg">
@@ -145,7 +147,7 @@ useEffect(() => {
                  </span>
                 </div>
             </div>
-        </>
-        </>
+        </div>
+        </div>
     )
 }

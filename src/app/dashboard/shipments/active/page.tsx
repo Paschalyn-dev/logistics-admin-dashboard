@@ -11,7 +11,7 @@ import SubHeading from "../../preferences/website/subheading";
 import SuccessMessage from "../../successmessage";
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
 import BoxesHolder from "../../boxesholder";
-import useDateHandler from "../../date";
+import { useDateHandler } from "../../date";
 import { State_data } from "../../context/context";
 import Popup from "../../services/eventhandlers/popup";
 import Link from "next/link";
@@ -104,15 +104,14 @@ export default function Shipments(){
             <BoxesHolder>
                 {parcelAllData?.data &&
                 (parcelAllData.data.map((parcel: any) => {
-                    let date  = new Date(parcel?.updatedAt?.slice(0, 10))
                     return(
                         <div className={!openUIBoxes.shipmentClearData ? "bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5" : "hidden"}>
                         <div className="flex justify-between">
                             <div>
                                 <p className="text-red-600 text-xs">NOT PICKED</p>
                                 <p className="laptop:text-lg my-1 phone:text-base">{parcel.name}</p>
-                                <p className="text-blue-600 mb-1 text-xs uppercase">{parcel.trackId}</p>
-                                <p className="text-xs">{useDateHandler(date)}</p>
+                                <Link title="View on Tracker" target="_blank" href={`https://radar.logistix.africa/track/${parcel?.trackId}`} className="text-blue-600 mb-1 text-xs uppercase">{parcel?.trackId}</Link>
+                                <p className="text-xs">{useDateHandler(parcel?.createdAt)}</p>
                             </div>
 
                             <div>
@@ -125,7 +124,6 @@ export default function Shipments(){
                                     <i className="icon ion-md-create"></i>
                                 </Link>
                                 <span onClick={() => {
-                                    console.log(parcel.id, "New parcel");
                                     setOpenUIBoxes((prev: any) => ({...prev, shipmentPopup: true}));
                                     setDeleteWithId((prev: any) => ({...prev, parcels: parcel.id}));
                                 }}
@@ -180,15 +178,14 @@ export default function Shipments(){
             <BoxesHolder>
             {  parcelRangeData?.data &&
                 (parcelRangeData?.data?.map((parcelRange: any) => {
-                    let date  = new Date(parcelRange?.updatedAt?.slice(0, 10))
                     return(
                         <div className={openUIBoxes.shipmentClearData  ? "bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5": "hidden"}>
                         <div className="flex justify-between">
                             <div>
                             <p className={parcelRange.completed || parcelRange.paid || parcelRange.picked ? "text-green-600 text-xs" :"text-red-600 text-xs"}>{parcelRange.completed && parcelRange.paid && parcelRange.picked ? 'DELIVERED' : parcelRange.completed || parcelRange.picked || parcelRange.paid ? 'NOT PICKED' : "NOT PICKED"}</p>
                             <p className="laptop:text-lg my-1 phone:text-base">{parcelRange.name}</p>
-                            <p className="text-blue-600 mb-1 text-xs uppercase">{parcelRange.trackId}</p>
-                                <p className="text-xs">{useDateHandler(date)}</p>
+                            <Link title="View on Tracker" target="_blank" href={`https://radar.logistix.africa/track/${parcelRange?.trackId}`} className="text-blue-600 mb-1 text-xs uppercase">{parcelRange?.trackId}</Link>
+                                <p className="text-xs">{useDateHandler(parcelRange?.createdAt)}</p>
                             </div>
                             
                             <div>

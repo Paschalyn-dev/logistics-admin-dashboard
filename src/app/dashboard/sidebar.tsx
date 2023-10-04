@@ -1,45 +1,44 @@
 'use client';
 import Link from "next/link";
 import '../globals.css';
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { logout } from "./services/libs/staff-auth";
 import { customerLogout } from "./services/libs/customer-auth";
-import { State_data } from "./context/context";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 // import SuccessMessage from "./successmessage";
 
-
 export default function Sidebar() {
-  let myWidth = 0;
-  const [clicked, setClicked] = useState<string>('welcome');
-  if(typeof window !== 'undefined'){
-    myWidth = window.innerWidth;
-  }
-  const [windowWidth, setWindowWidth]= useState<number>(myWidth);
+  const [clicked, setClicked] = useState<any>('welcome');
+  const [windowWidth, setWindowWidth]= useState<number>(0);
   const router = useRouter();
+  const params = useParams();
   function handleSignOut(){
     logout();
     customerLogout();
     router.replace('/');
-}
+  }
+  console.log(decodeURIComponent(params.source), "decodeparams")
+  console.log(params.source, "params")
   useEffect(function onFirstMount() {
     function checkWidth(){
       setWindowWidth(window.innerWidth);
     }
     window.addEventListener("resize", checkWidth);
     return () => window.removeEventListener('resize', checkWidth);
-});
+  });
 
   useEffect(() => {
     const page = localStorage.getItem('page');
     if(page) {
       setClicked(JSON.parse(page))
+      // router.replace(`/dashboard/${JSON.parse(page)}`);
     }
-  }, [])
-
+    setWindowWidth(window.innerWidth);
+  }, []);
+  
   useEffect(() => {
     localStorage.setItem('page', JSON.stringify(clicked))
-  }, [clicked])
+  }, [clicked]);
 
     return(
       <div className={ windowWidth <= 1025 ? "animate__animated animate__slideInLeft fixed flex flex-col justify-start items-center z-20 top-0 bottom-0 left-0 text-white w-fit h-full bg-stone-900 text-center shadow-lg" : "fixed flex flex-col justify-start items-center z-20 top-0 bottom-0 left-0 text-white w-fit h-full bg-stone-900 text-center shadow-lg"}>
@@ -62,19 +61,19 @@ export default function Sidebar() {
           </div>
 
          
-          <div onClick={() => setClicked('home')}>
+          <div onClick={() => setClicked('home/overview')}>
             <Link href="/dashboard/home/overview" 
-              className={clicked === "home" ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
-                <i id={clicked === "home" ? "yellow-color" : "white-color"} className="icon ion-md-home" title="Home"></i>
-                <h1 className={clicked === "home" ? " " : "text-gray-100/70"}>Home</h1>
+              className={clicked === "home/overview" ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
+                <i id={clicked === "home/overview" ? "yellow-color" : "white-color"} className="icon ion-md-home" title="Home"></i>
+                <h1 className={clicked === "home/overview" ? " " : "text-gray-100/70"}>Home</h1>
             </Link>
           </div>
           
-          <div onClick={() => setClicked('shipments')}>
+          <div onClick={() => setClicked('shipments/active')}>
             <Link href="/dashboard/shipments/active" 
-            className={clicked === "shipments" ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
-                <i id={clicked ==="shipments" ? "yellow-color" : "white-color"} className="icon ion-md-cube" title="Cube"></i>
-                <h1 className={clicked === "shipments" ? " " : "text-gray-100/70"}>Shipments</h1>
+            className={clicked === "shipments/active" ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
+                <i id={clicked ==="shipments/active" ? "yellow-color" : "white-color"} className="icon ion-md-cube" title="Cube"></i>
+                <h1 className={clicked === "shipments/active" ? " " : "text-gray-100/70"}>Shipments</h1>
             </Link>
           </div>
 
@@ -110,11 +109,11 @@ export default function Sidebar() {
             </Link>
           </div>
 
-          <div onClick={() => setClicked('preferences')}>
+          <div onClick={() => setClicked('preferences/website')}>
             <Link href="/dashboard/preferences/website" 
-            className={clicked === "preferences" ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
-              <i id={clicked ==="preferences" ? "yellow-color" : "white-color"}  className="icon ion-md-brush" title="Design"></i>
-              <h1 className={clicked === "preferences" ? " " : "text-gray-100/70"}>Preferences</h1>
+            className={clicked === "preferences/website" ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
+              <i id={clicked ==="preferences/website" ? "yellow-color" : "white-color"}  className="icon ion-md-brush" title="Design"></i>
+              <h1 className={clicked === "preferences/website" ? " " : "text-gray-100/70"}>Preferences</h1>
             </Link>
           </div>
 

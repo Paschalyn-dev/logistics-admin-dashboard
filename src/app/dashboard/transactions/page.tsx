@@ -15,7 +15,7 @@ import SearchFilter from "./search";
 import Popup from "../services/eventhandlers/popup";
 import Input from "../input";
 import { NumberComma } from "../numberComma";
-import useDateHandler from "../date";
+import { useDateHandler } from "../date";
 import Link from "next/link";
 
 export default function Transactions(){
@@ -38,9 +38,7 @@ export default function Transactions(){
     useEffect(() => {
         fetchTransactionsMutate(fetchTransactionsData);
     }, [openUIBoxes.transactionClearData !== true]);
-
-    console.log("sdgyujikuhgfds",fetchTransactionsData)
-    
+   
     return(
         <Holder>
                {
@@ -145,7 +143,6 @@ export default function Transactions(){
                  {
                      fetchTransactionsData?.data &&
                      fetchTransactionsData?.data?.map((record: any, index: any) => {
-                         const myDate = new Date(record?.createdAt?.slice(0, 10))
                          return (
                             <div>
                                 <Link href={`/dashboard/shipments/${record.id}`} key={index} className="grid grid-cols-6 gap-4">
@@ -154,7 +151,7 @@ export default function Transactions(){
                                     <p className="col-span-1 text-left">{record.name}</p>
                                     <p className="col-span-1 text-left">₦{NumberComma(record.amount)}</p>
                                     <p className="col-span-1 text-left">{record.paid ? 'Yes' : 'No'}</p>
-                                    <p className="col-span-1 text-left">{useDateHandler(myDate)}</p>
+                                    <p className="col-span-1 text-left">{useDateHandler(record?.createdAt)}</p>
                                 </Link>
                                 <hr className="my-4" />
                             </div>

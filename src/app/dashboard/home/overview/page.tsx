@@ -203,7 +203,7 @@ export default function Overview(){
                             <div>
                                 <div className="flex justify-start text-gray-500 text-sm items-center gap-1">
                                     <span className="w-2 rounded-sm h-2 bg-green-600"></span>
-                                    <p>{dispatcher.fullName}</p>
+                                    <p>{dispatcher?.fullName.length > 10 ? dispatcher.fullName.slice(0, 10) + "..." : dispatcher?.fullName}</p>
                                 </div>
                                 <h1>{dispatcher?.parcels || 0}%</h1>
                             </div>

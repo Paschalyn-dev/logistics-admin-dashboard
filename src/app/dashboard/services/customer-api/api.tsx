@@ -260,6 +260,7 @@ export const viewCustomerFetcher = async(id: number) =>{
     return data;
 }
 
+
 export const viewDispatcherFetcher = async(id: number) =>{
     const response = await fetch(customerAPIUrl.viewDispatcher(id), {
         method: 'GET',

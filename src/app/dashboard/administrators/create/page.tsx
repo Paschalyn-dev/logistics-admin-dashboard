@@ -24,7 +24,8 @@ export default function FormPageAdministrators(){
     const [passwordString, setPasswordString] = useState<boolean>(true)
     const [staffDetails, setStaffDetails] = useState<any>({
         info: "",
-        result: ""
+        result: "",
+        code: ""
     })
     const [generatePassword, setGeneratePassword] = useState<boolean>(true)
     const router = useRouter()
@@ -51,13 +52,13 @@ export default function FormPageAdministrators(){
         if(staffDetails?.info !== ""){
             handleCreate(staffDetails?.info)
         }
-    }, [staffDetails?.info?.code])
+    }, [staffDetails?.code])
 
     useEffect(() => {
-        if(!saveAndAddNewStaff && staffDetails?.result?.code === 200){
+        if(staffDetails?.result?.code === 200){
             setTimeout(() => {
                 router.replace('/dashboard/administrators')
-            }, 6000);
+            }, 5000);
         }
     }, [staffDetails?.result])
 
@@ -123,8 +124,8 @@ export default function FormPageAdministrators(){
                     .matches(/[a-zaA-z0-9]/, 'Password can only contain letters and numbers.'),
                   })}
                   onSubmit={async (values) => {
-                        setSuccessMessage((prev: any) => ({...prev, createAdministrator: true}));
-                        setStaffDetails((prev: any) => ({...prev, result: "", info: {...values, code: Password()}}));
+                    setSuccessMessage((prev: any) => ({...prev, createAdministrator: true}));
+                    setStaffDetails((prev: any) => ({...prev, result: "", info: {...values}, code: Password()}));
                   }}
                 >
                     {

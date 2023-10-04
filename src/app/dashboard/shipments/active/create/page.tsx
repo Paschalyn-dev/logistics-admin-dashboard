@@ -134,6 +134,7 @@ export default function FormPageShipments(){
             data={createParcel?.result}
             />
           }
+          
             <Link href="/dashboard/shipments/active" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                 <i className="icon ion-md-arrow-back"></i>
             </Link>

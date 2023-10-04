@@ -1,5 +1,5 @@
 'use client'
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import Link from "next/link";
@@ -12,52 +12,84 @@ import Hero from "@/app/dashboard/preferences/hero";
 import TextInput from "@/app/dashboard/formik/inputtypes";
 import Button from "@/app/dashboard/button";
 import { State_data, phoneRegExp } from "@/app/dashboard/context/context";
+import { Password } from "@/app/dashboard/formik/password";
+import { staffAPIURL } from "@/app/dashboard/services/api-url/staff-api-url";
+import { authorizationKey } from "@/app/dashboard/services/staff-api/api";
+import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
+import { useRouter } from "next/navigation";
+import ToggleButton from "@/app/dashboard/preferences/shipment/toggleButton";
 
 export default function editAdministrators({ params }: { params: {id: number}}){
     const {successMessage, setSuccessMessage} = useContext(State_data);
     const [saveAndAddNewStaff, setSaveAndAddNewStaff] = useState<boolean>(false);
-    const [staffDetails, setStaffDetails] = useState<any>()
+    const [staffDetails, setStaffDetails] = useState<any>({
+        info: "", 
+        result: "",
+        code: ""
+    });
+    const router = useRouter();
     const {viewStaffData, 
            viewStaffError,
            viewStaffIsLoading,
            viewStaffIsValidating,
            viewStaffMutate} = useViewStaff(params.id);
+    
+    const handleSaveAndAddNewAdministrator = (e: any) => {
+        e.preventDefault();
+        setSaveAndAddNewStaff(!saveAndAddNewStaff)
+    }
+    async function handleEdit(details: any, id: any){
+        const response = await fetch(staffAPIURL.editStaff(id), {
+            method: 'PUT',
+            body: JSON.stringify(details),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": authorizationKey
+                // "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTExODgzNDZ9.73G4_gAI_mexLVUYQOkaJN7XCaIj0iHqj5b2g9yYIa8"
+            }
+        });
+        const data = await response.json();
+        setStaffDetails((prev: any) => ({...prev, result: data}));
+    }
+
+    useEffect(() => {
+        if(staffDetails?.info !== ""){
+            handleEdit({...staffDetails?.info}, viewStaffData?.data?.id)
+        }
+    }, [staffDetails?.code]);
+
+    useEffect(() => {
+        if(!saveAndAddNewStaff && staffDetails?.result?.code === 200){
+            setTimeout(() => {
+                router.replace('/dashboard/dispatchers')
+            }, 5000);
+        }
+    }, [staffDetails?.result]);
+    
     return(
         <Holder>
             <ConstantNav />
             <Section>
-                {/* {showSuccessMessage && createStaffData?.code === 200 && 
-                    <SuccessMessage 
-                    messageTitle="Administrator has been successfully added to the list!" 
-                    successMessageShow={showSuccessMessage} 
-                    handleShowSuccessMessage={setShowSuccessMessage} 
-                    />
-                }
 
-                {
-                    createStaffError && showSuccessMessage &&
-                    <SuccessMessage
-                    successMessageShow={showSuccessMessage}
-                    handleShowSuccessMessage={setShowSuccessMessage}
-                    id="failed"
-                    messageTitle="Administrator cannot be added. Check network connection!"
-                    />
-                }     
-
-                {
-                    createStaffData?.data !== 200 && showSuccessMessage &&
-                    <SuccessMessage
-                    successMessageShow={showSuccessMessage}
-                    handleShowSuccessMessage={setShowSuccessMessage}
-                    id="failed"
-                    messageTitle="Sorry, adminstrator cannot be added to the list!"
-                    />
-                }      */}
-                
-                {
-                    (viewStaffIsLoading || viewStaffIsValidating) &&
-                    <Loader />
-                }     
+            {
+                (viewStaffIsLoading || viewStaffIsValidating) &&
+                <Loader />
+            }     
+            {
+                staffDetails.result !== "" && staffDetails.info !== "" && staffDetails?.code !== '' &&
+                <ErrorAndSucccessHandlers
+                name="editStaff"
+                successName={successMessage.editStaff}
+                message={staffDetails?.result?.code} 
+                code={staffDetails?.info?.code}
+                successmessage="Administrator details successfully updated!"
+                failedmessage="Sorry, administrator details cannot be updated!"
+                staffAndCustomer={staffDetails?.result}
+                error={staffDetails?.result?.code !== 200}
+                loading={staffDetails?.result === "undefined" && staffDetails?.info !== ""}
+                data={staffDetails?.result}
+                />
+            }
             <Link href="/dashboard/administrators" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                     <i className="icon ion-md-arrow-back"></i>
             </Link>
@@ -98,10 +130,8 @@ export default function editAdministrators({ params }: { params: {id: number}}){
                     .required('This field is required.'),
                   })}
                   onSubmit={(values) => {
-                    setTimeout(() => {
-                        setSuccessMessage((prev: any) => ({...prev, editAdministrator: true}));
-                        setStaffDetails(values);
-                    }, 1000);
+                    setSuccessMessage((prev: any) => ({...prev, editAdministrator: true}));
+                    setStaffDetails((prev: any) => ({...prev, info: {...values}, code: Password(), result:""}));
                   }}
                   enableReinitialize = {true}
                 >
@@ -143,6 +173,14 @@ export default function editAdministrators({ params }: { params: {id: number}}){
                                 placeholder="Enter Location"
                                 {...getFieldProps('address.street')}
                                 /> 
+                                
+                                <ToggleButton
+                                title="Save & Update Administrator."
+                                icon="icon ion-md-information-circle-outline"
+                                handleOnOff={handleSaveAndAddNewAdministrator}
+                                onOff={saveAndAddNewStaff}
+                                description="Enable this if you want to edit more details on this administrator immediately after clicking on the save button."
+                                />  
 
                                 <Button
                                 buttonName="Save" />

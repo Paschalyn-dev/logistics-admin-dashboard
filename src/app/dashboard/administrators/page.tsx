@@ -15,6 +15,7 @@ import { State_data } from "../context/context";
 import { useAdministratorsSearchRange } from "../services/swr-functions/customer-swr";
 import Link from "next/link";
 import Popup from "../services/eventhandlers/popup";
+import { useDateHandler } from "../date";
 
 export default function Administrators(){
     const {fetchStaffData, fetchStaffError, fetchStaffIsLoading, fetchStaffIsValidating, fetchStaffMutate} = useFetchStaff();
@@ -106,6 +107,7 @@ export default function Administrators(){
                             <div>
                                 <p className="capitalize text-lg mt-2">{staff?.fullName}</p>
                                 <p className="text-sm my-2 capitalize">{staff?.role}</p>
+                                <p className="text-xs">{useDateHandler(staff?.createdAt)}</p>
                             </div>
 
                             <hr className="my-4" />
@@ -174,6 +176,7 @@ export default function Administrators(){
                                         <div>
                                             <p className="capitalize text-lg mt-2">{staff?.fullName}</p>
                                             <p className="text-sm my-2 capitalize">{staff?.role}</p>
+                                            <p className="text-xs">{useDateHandler(staff?.createdAt)}</p>
                                         </div>
             
                                 <hr className="my-4" />
