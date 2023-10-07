@@ -15,7 +15,7 @@ export default function ErrorAndSucccessHandlers({staffAndCustomer, successmessa
     return(
         <div>
             {(loading) && <Loader />}
-                {(staffAndCustomer && (!data || data === "undefined") && successName) &&
+                {((!data || data === "")  && successName) &&
                     (
                     <div>
                             <SuccessMessage 

@@ -24,16 +24,22 @@ export default function     CustomerChangePassword(){
     const {successMessage} = useContext(State_data)
 
     async function handleChangePassword(passwordDetails: any){
-        const response = await fetch(customerAPIUrl.changePassword,{
-            method: 'PUT',
-            body: JSON.stringify(passwordDetails),
-            headers:{
-                "Content-Type": "application/json",
-                'Authorization': authorizationKeyCustomer
-            },
-        })
-        const data = await response.json();
-        setChangePassword((prev: any) => ({...prev, result: data}));
+        try{
+
+            const response = await fetch(customerAPIUrl.changePassword,{
+                method: 'PUT',
+                body: JSON.stringify(passwordDetails),
+                headers:{
+                    "Content-Type": "application/json",
+                    'Authorization': authorizationKeyCustomer
+                },
+            })
+            const data = await response.json();
+            setChangePassword((prev: any) => ({...prev, result: data}));
+        }
+        catch(err){
+            setChangePassword((prev: any) => ({...prev, result: ''}));
+        }
     }
 
     useEffect(() => {
@@ -68,7 +74,7 @@ export default function     CustomerChangePassword(){
                     <h5 className="text-sm text-gray-800">CakenUs Services</h5>
                 </div>
                 {
-                    changePassword.result !== "" && changePassword.info !== "" && 
+                    changePassword.info !== "" && 
                     <ErrorAndSucccessHandlers
                     name="staffAndCustomerChangePassword"
                     successName={successMessage.staffAndCustomerChangePassword}

@@ -22,18 +22,24 @@ export default function StaffChangePassword(){
         result: ""
     });
     const router = useRouter();
-    const {successMessage} = useContext(State_data)
+    const {successMessage} = useContext(State_data);
+
     async function handleChangePassword(values: any){
-        const response = await fetch(staffAPIURL.changeStaffPassword, {
-            method: 'PUT',
-            body: JSON.stringify(values),
-            headers:{
-                "Content-Type": "application/json",
-                "Authorization": authorizationKey
-            },
-        })
-        const data = await response.json();
-        setChangeStaffPassword((prev: any) => ({...prev, result: data}));
+        try{
+
+            const response = await fetch(staffAPIURL.changeStaffPassword, {
+                method: 'PUT',
+                body: JSON.stringify(values),
+                headers:{
+                    "Content-Type": "application/json",
+                    "Authorization": authorizationKey
+                },
+            })
+            const data = await response.json();
+            setChangeStaffPassword((prev: any) => ({...prev, result: data}));
+        }catch(err){
+            setChangeStaffPassword((prev: any) => ({...prev, result: ''}));
+        }
     }
 
     useEffect(() => {
@@ -68,7 +74,7 @@ export default function StaffChangePassword(){
                     <h5 className="text-sm text-gray-800">CakenUs Services</h5>
                 </div>
                 {
-                    changeStaffPassword.result !== "" && changeStaffPassword.info !== "" && 
+                   changeStaffPassword.info !== "" && 
                     <ErrorAndSucccessHandlers
                     name="staffAndCustomerChangePassword"
                     successName={successMessage.staffAndCustomerChangePassword}

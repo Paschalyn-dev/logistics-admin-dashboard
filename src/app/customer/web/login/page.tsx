@@ -24,17 +24,25 @@ export default function Customer(){
         info: "",
         result: ""
     });
-    const {successMessage} = useContext(State_data)
+    const {successMessage} = useContext(State_data);
+
+
     async function handleLogin(val: any){
-        const response = await fetch(customerAPIUrl.fetchCustomer, {
-            method: "POST",
-            body: JSON.stringify(val),
-            headers: {
-            "Content-Type": "application/json",
-        },
-    })
-    const data = await response.json();
-    setCustomer((prev: any) => ({...prev, result: data}));
+        try{
+
+            const response = await fetch(customerAPIUrl.fetchCustomer, {
+                method: "POST",
+                body: JSON.stringify(val),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            const data = await response.json();
+            setCustomer((prev: any) => ({...prev, result: data}));
+        }
+        catch(err){
+            setCustomer((prev: any) => ({...prev, result: ''}));
+        }
     }
 
     useEffect(() => {
@@ -42,7 +50,6 @@ export default function Customer(){
         const user = customer?.result?.data;
         if(customer?.result?.code === 200 && customer?.result?.data?.isDefaultPassword === false) {
             customerLogin(user.authToken)
-            // staffStore.push(user);
             let timer = setTimeout(() => {
                 router.replace('/dashboard/welcome');
             }, 5000);
@@ -50,7 +57,6 @@ export default function Customer(){
         }
         if(customer?.result?.code === 200 && customer?.result?.data?.isDefaultPassword === true){
             router.replace('/customer/web/changepassword')
-            // staffStore.push(user);
         }  
     }
     },[customer?.result])
@@ -76,7 +82,7 @@ export default function Customer(){
                         <h5 className="text-sm text-gray-800">CakenUs Services</h5>
                     </div>
                     {
-                        customer.result !== "" && customer.info !== "" && 
+                        customer.info && 
                         <ErrorAndSucccessHandlers 
                         name="staffAndCustomerLogin"
                         successName={successMessage.staffAndCustomerLogin}

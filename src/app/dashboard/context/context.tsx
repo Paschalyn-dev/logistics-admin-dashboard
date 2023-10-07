@@ -149,7 +149,7 @@ export default function Context({children}: any){
         deliveryPriceDelete: true,
         deliveryPriceFetch: true,
         changePassword: false,
-        staffAndCustomerForgotPassword: false,
+        staffAndCustomerForgotPassword: true,
         staffAndCustomerChangePassword: false,
         staffAndCustomerLogin: false,
         signOut: false,
