@@ -1,17 +1,19 @@
 'use client'
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import ToggleButton from "../preferences/shipment/toggleButton";
 import { State_data } from "../context/context";
 import { useCustomerSearchRange } from "../services/swr-functions/customer-swr";
+import { customerAPIUrl } from "../services/api-url/customer-api-url";
+import { authorizationKeyCustomer } from "../services/customer-api/api";
+import { Password } from "../formik/password";
 
 export default function SearchFilter({inputData, closeFill}: any){
-    const {inputField, setInputField, searchFields, setSearchFields, createdAtEnd, setCreatedAtEnd, setCreatedAtStart, createdAtStart, customersRange, setCustomersRange} = useContext<any | string>(State_data);
-    const {customerRangeMutate} = useCustomerSearchRange(customersRange)
+    const {inputField, searchData, setSearchData, setInputField, searchFields, setSearchFields, createdAtEnd, setCreatedAtEnd, setCreatedAtStart, createdAtStart, customersRange, setCustomersRange} = useContext<any | string>(State_data);
     const [searchToggleButtons, setSearchToggleButtons] = useState({
-        name: false,
-        email: false,
-        phone: false,
-        address: false
+        name: true,
+        email: true,
+        phone: true,
+        address: true
     })
 
     const [formData, setFormData] =  useState({
@@ -75,15 +77,35 @@ export default function SearchFilter({inputData, closeFill}: any){
         }))
     }
 
+    async function handleSearch(customersRangeQuery: any){
+        const response = await fetch(customerAPIUrl.searchCustomers(customersRangeQuery), {
+            method: 'GET',
+            headers: {
+                'Authorization': authorizationKeyCustomer
+            }
+        });
+        const data = await response.json();
+        setSearchData((prev: any) => ({...prev, customerResult: data}));
+    }
+
+    useEffect(() => {
+        handleInput();
+    }, [inputData]);
+
+    useEffect(() => {
+        if(customersRange !== null){
+            handleSearch(customersRange);
+        }
+    }, [searchData?.customerCode])
+
     function handleSearchSubmit(e: any){
         e.preventDefault();
-        handleInput();
         handleSearchField();
         handleSetCreatedAtEnd();
         handleSetCreatedAtStart();
-        customerRangeMutate()
-        setCustomersRange({inputField, searchFields})
-    // if(parcelRangeData !== 'undefined' && !parcelRangeIsLoading && !parcelRangeIsValidating) closeFill(false)
+        setCustomersRange({inputField, searchFields});
+        setSearchData((prev: any) => ({...prev, customerResult: "", customerCode: Password()}));
+        setTimeout(() => {closeFill((prev: any) => ({...prev, customerSearch: false}));}, 500)
     }
     return(
         <>

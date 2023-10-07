@@ -1,9 +1,12 @@
 'use client'
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ToggleButton from "../preferences/shipment/toggleButton";
 import { State_data } from "./../context/context"
 import {useContext} from "react";
 import { useDispatcherSearchRange } from "../services/swr-functions/customer-swr";
+import { customerAPIUrl } from "../services/api-url/customer-api-url";
+import { authorizationKeyCustomer } from "../services/customer-api/api";
+import { Password } from "../formik/password";
 
 
 export default function SearchFilter({inputData, closeFill}: any){
@@ -11,17 +14,18 @@ export default function SearchFilter({inputData, closeFill}: any){
         setInputField, 
         searchFields, 
         setSearchFields, 
-        createdAtEnd, 
+        createdAtEnd,
+        searchData, 
+        setSearchData, 
         setCreatedAtEnd, 
         setCreatedAtStart, 
         createdAtStart, 
         dispatchersRange,
         setDispatchersRange} = useContext<any | string>(State_data);
-    const {dispatchersRangeMutate} = useDispatcherSearchRange(dispatchersRange)
     const [searchToggleButtons, setSearchToggleButtons] = useState({
-        fullName: false,
-        email: false,
-        phone: false
+        fullName: true,
+        email: true,
+        phone: true
     })
 
     const [formData, setFormData] =  useState({
@@ -55,18 +59,18 @@ export default function SearchFilter({inputData, closeFill}: any){
         }))
     }
 
-    const handleInput = () => {
-        setInputField((prev: any) => ({
-            ...prev, dispatchersRange: inputData,
-        }))
-    }
     
     const handleSearchField = () => {
         setSearchFields((prev: any) => ({
             ...prev, dispatchersRange: filtered(),
         }))
     }
-
+    
+    const handleInput = () => {
+        setInputField((prev: any) => ({
+            ...prev, dispatchersRange: inputData,
+        }))
+    }
     const handleSetCreatedAtStart = () => {
         setCreatedAtStart((prev: any) => ({
             ...prev, dispatchersRange: formData.startdate
@@ -79,14 +83,34 @@ export default function SearchFilter({inputData, closeFill}: any){
         }))
     }
 
+    async function handleSearch(dispatchersRangeQuery: any){
+        const response = await fetch(customerAPIUrl.searchDispatchers(dispatchersRangeQuery), {
+            method: 'GET',
+            headers: {
+            'Authorization': authorizationKeyCustomer
+        }
+        });
+        const data = await response.json();
+        setSearchData((prev: any) => ({...prev, dispatcherResult: data}));
+    }
+    useEffect(() => {
+        handleInput();
+    }, [inputData]);
+
+    useEffect(() => {
+        if(dispatchersRange !== null){
+            handleSearch(dispatchersRange);
+        }
+    }, [searchData?.dispatcherCode])
+    
     function handleSearchSubmit(e: any){
         e.preventDefault();
-        handleInput();
         handleSearchField();
         handleSetCreatedAtEnd();
         handleSetCreatedAtStart();
-        dispatchersRangeMutate()
-        setDispatchersRange({inputField, searchFields})        
+        setDispatchersRange({inputField, searchFields});
+        setSearchData((prev: any) => ({...prev, dispatcherResult: "", dispatcherCode: Password()}));
+        setTimeout(() => {closeFill((prev: any) => ({...prev, dispatcherSearch: false}));}, 500)
     }
     return(
         <>

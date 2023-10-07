@@ -1,17 +1,19 @@
 'use client'
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ToggleButton from "../preferences/shipment/toggleButton";
 import { useTransactionsSearchRange } from "../services/swr-functions/customer-swr";
 import { State_data } from "../context/context";
 import { useContext} from "react";
+import { customerAPIUrl } from "../services/api-url/customer-api-url";
+import { authorizationKeyCustomer } from "../services/customer-api/api";
+import { Password } from "../formik/password";
 
 
 export default function SearchFilter({inputData, closeFill}: any){
-    const {inputField, setInputField, searchFields, setSearchFields, createdAtEnd, setCreatedAtEnd, setCreatedAtStart, createdAtStart, setAmountEnd, setAmountStart, amountStart, amountEnd, transactionsRange, setTransactionsRange} = useContext<any | string>(State_data);
-    const {transactionsRangeMutate} = useTransactionsSearchRange(transactionsRange);
+    const {inputField, setInputField, searchFields, setSearchFields, createdAtEnd, setCreatedAtEnd, setCreatedAtStart, createdAtStart, setAmountEnd, setAmountStart, amountStart, amountEnd, reviewsRange, setReviewsRange, setSearchData, searchData} = useContext<any | string>(State_data);
     const [searchToggleButtons, setSearchToggleButtons] = useState({
-        rating: false,
-        review: false
+        rating: true,
+        review: true
     })
     
     const [formData, setFormData] =  useState({
@@ -40,27 +42,48 @@ export default function SearchFilter({inputData, closeFill}: any){
     }
     const handleInput = () => {
         setInputField((prev: any) => ({
-            ...prev, transactionsRange: inputData,
+            ...prev, reviewsRange: inputData,
         }))
     }
     
     const handleSearchField = () => {
         setSearchFields((prev: any) => ({
-            ...prev, transactionsRange: filtered(),
+            ...prev, reviewsRange: filtered(),
         }))
     }
     
     const handleSetCreatedAtStart = () => {
         setCreatedAtStart((prev: any) => ({
-            ...prev, transactionsRange: formData.startdate
+            ...prev, reviewsRange: formData.startdate
         }))
     }
     
     const handleSetCreatedAtEnd = () => {
         setCreatedAtEnd((prev: any) => ({
-            ...prev, transactionsRange: formData.enddate
+            ...prev, reviewsRange: formData.enddate
         }))
     }
+
+    async function handleSearch(reviewsRangeQuery: any){
+        const response = await fetch(customerAPIUrl.searchReviews(reviewsRangeQuery), {
+            method: 'GET',
+            headers: {
+                'Authorization': authorizationKeyCustomer
+            }
+        });
+        const data = await response.json();
+        setSearchData((prev: any) => ({...prev, reviewResult: data}));
+    }
+
+    useEffect(() => {
+        handleInput();
+    }, [inputData]);
+
+    useEffect(() => {
+        if(reviewsRange !== null){
+            handleSearch(reviewsRange);
+        }
+    }, [searchData?.reviewCode])
     
     function handleSearchSubmit(e: any){
         e.preventDefault();
@@ -68,9 +91,9 @@ export default function SearchFilter({inputData, closeFill}: any){
         handleSearchField();
         handleSetCreatedAtEnd();
         handleSetCreatedAtStart();
-        transactionsRangeMutate();
-        setTransactionsRange({inputField, searchFields, amountStart, amountEnd, createdAtStart, createdAtEnd})
-    // if(parcelRangeData !== 'undefined' && !parcelRangeIsLoading && !parcelRangeIsValidating) closeFill(false)
+        setReviewsRange({inputField, searchFields, amountStart, amountEnd, createdAtStart, createdAtEnd});
+        setSearchData((prev: any) => ({...prev, reviewResult: "", reviewCode: Password()}));
+        setTimeout(() => {closeFill((prev: any) => ({...prev, reviewSearch: false}));}, 500)
     }
     return(
         <div>

@@ -9,23 +9,16 @@ import { useFetchMessages } from "../services/swr-functions/staff-swr";
 import SuccessMessage from "../successmessage";
 import SkeletonLoading from "../services/eventhandlers/skeleton-loading";
 import { useDateHandler } from "../date";
-import { UIBOXES } from "../shipments/active/page";
 import { State_data } from "../context/context";
-import { useMessagesSearchRange } from "../services/swr-functions/customer-swr";
 import SearchFilter from "./search";
 import Popup from "../services/eventhandlers/popup";
 import Input from "../input";
 
 export default function Message(){
-    const [inputData, setInputData] = useState<string>('');
-    const {setDeleteWithId, openUIBoxes, setOpenUIBoxes, messagesRange, deleteWithId, successMessage, setSuccessMessage} = useContext(State_data);
-    const {messagesRangeData, messagesRangeError, messagesRangeIsLoading, messagesRangeIsValidating, messagesRangeMutate} = useMessagesSearchRange(messagesRange)
+    const {setDeleteWithId, openUIBoxes, inputData, setSearchData, searchData, setOpenUIBoxes, messagesRange, deleteWithId, successMessage, setSuccessMessage} = useContext(State_data);
     const {fetchMessagesData, fetchMessagesError, fetchMessagesIsLoading, fetchMessagesIsValidating, fetchMessagesMutate} = useFetchMessages();
     const handleOpenSearch = () => {
         setOpenUIBoxes((prev: any) => ({...prev, messageSearch: true, messageClearData: true}))
-    }
-    const handleInputData = (e: any) => {
-        setInputData(e.target.value)
     }
     const handleClearData = () => {
         setOpenUIBoxes((prev: any) => ({...prev, messageClearData: false}))
@@ -43,23 +36,22 @@ export default function Message(){
         <Holder>
                {
                (fetchMessagesIsLoading || fetchMessagesIsValidating && !openUIBoxes.messageSearch) &&
-               <SkeletonLoading title="all messages." />
+               <SkeletonLoading title="all messages" />
                }
                {
-               (messagesRangeIsLoading || messagesRangeIsValidating && openUIBoxes.messageSearch) &&
-               <SkeletonLoading loadingSearching="Searching" title="messages." />                
+                ((searchData?.messageResult === "" && searchData?.messageCode !== "") && openUIBoxes.messageSearch) &&
+                <SkeletonLoading loadingSearching="Searching" title="messages" />                
                }
             <ConstantNav />
             <Section>
                 <Heading heading="Messages" />
                 {fetchMessagesData?.data?.length >= 0 && !openUIBoxes.messageClearData && <p>You have <span className="font-bold">{fetchMessagesData?.data?.length || 0}</span> message {fetchMessagesData?.data?.length > 1 && "s"}.</p>}
-               {messagesRangeData !== 'undefined' && openUIBoxes.messageClearData && <p><span className="font-bold">{messagesRangeData?.data?.length || 0}</span> message match(es) found.</p>}
+               {searchData?.messageResult !== '' && openUIBoxes.messageClearData && <p><span className="font-bold">{searchData?.messageResult?.data?.length || 0}</span> message match(es) found.</p>}
                <Input
-               name="messages"
+                name="message"
                 handleClick={handleOpenSearch}
                 placeholder="Search Shipments"
-                handleChange={handleInputData}
-                searchInput={inputData}
+                searchInput={inputData.message}
                 />
                 { openUIBoxes.messageClearData &&
                 <button onClick={handleClearData} className="text-red-500 mt-3 gap-2 flex font-bold text-sm">
@@ -67,7 +59,7 @@ export default function Message(){
                         <i className="icon ion-md-close"></i>
                     </span>Clear Filter</button>
                 }
-               {openUIBoxes.messageSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
+               {openUIBoxes.messageSearch && <SearchFilter inputData={inputData.message} closeFill={setOpenUIBoxes} />}
                {openUIBoxes.messagePopup && <Popup text="Message" closeFill={handleCloseFill} name="messages" popupShow={openUIBoxes.messagePopup} id={deleteWithId.messages} />}
                {
                 fetchMessagesError && successMessage.messages &&
@@ -78,21 +70,11 @@ export default function Message(){
                 messageTitle="Messages cannot be fetched. Check network connection!"
                 />
             }
-               {
-                   messagesRangeError && openUIBoxes.messageSearch && successMessage.messages &&
-                   <SuccessMessage
-                   successMessageShow={successMessage.messages}
-                   name="messages"
-                   id="failed"
-                   messageTitle="Searching failed, check network connection!"
-                   />
-                }
-
-                <div className="h-full flex flex-wrap tablet:justify-start phone:justify-start m-auto items-start tablet:gap-5 phone:gap-3 mt-5 w-full p-1">
+                <div className="h-full flex flex-wrap tablet:justify-start phone:justify-center items-start tablet:gap-5 phone:gap-3 mt-5 w-full p-1">
                     {fetchMessagesData?.data && !openUIBoxes.messageClearData &&
                     fetchMessagesData?.data?.map((message: any) => {
                         return(
-                        <div className="h-fit desktop:text-2xl text-left w-10/12 px-5 pt-2">
+                        <div className="h-fit bg-gray-50 text-left hover:shadow-sm w-full rounded-xl desktop:text-2xl laptop:w-10/12 px-5 mb-3 pt-2">
                             <div className="phone:text-xs laptop:text-sm desktop:text-xl tablet:flex phone:bg-transparent phone:gap-0 mb-3 justify-start tablet:rounded-full tablet:bg-amber-200/50 w-fit tablet:px-3 tablet:py-2 tablet:gap-2 items-center">
                                 <h3 className="font-bold">{message.name}</h3>
                                 <p className="flex justify-start gap-2 items-center">{useDateHandler(message?.createdAt)} </p>
@@ -136,8 +118,8 @@ export default function Message(){
                     </div>
                     )}
 
-                    {  messagesRangeData?.data && openUIBoxes.messageClearData &&
-                       messagesRangeData?.data?.map((message: any) => {
+                    {  searchData?.messageResult?.data && openUIBoxes.messageClearData &&
+                       searchData?.messageResult?.data?.map((message: any) => {
                         return(
                         <div className="h-fit desktop:text-2xl text-left w-10/12 px-5 pt-2">
                             <div className="phone:text-xs laptop:text-sm desktop:text-xl tablet:flex phone:bg-transparent phone:gap-0 mb-3 justify-start tablet:rounded-full tablet:bg-amber-200/50 w-fit tablet:px-3 tablet:py-2 tablet:gap-2 items-center">
@@ -172,7 +154,7 @@ export default function Message(){
                         )
                     })
                     }
-                    { (messagesRangeData?.data?.length === 0 || messagesRangeData?.data === 'undefined' || messagesRangeData?.code !== 200 && openUIBoxes.messageClearData) && (
+                    { (searchData?.messageResult?.data?.length === 0 || searchData?.messageResult?.data === '' || searchData?.messageResult?.code !== 200 && openUIBoxes.messageClearData) && (
                         <div className="flex flex-col w-full justify-center items-center">
                         <span className="-mb-16">
                             <i id="bigger" className="icon ion-md-chatboxes"></i>

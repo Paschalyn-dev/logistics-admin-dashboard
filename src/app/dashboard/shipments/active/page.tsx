@@ -4,17 +4,17 @@ import Holder from "../../holder";
 import Input from "../../input";
 import OrdersNav from "../../orders";
 import Section from "../../section";
-import { useState, useEffect, useContext } from "react";
+import { useEffect, useContext } from "react";
 import SearchFilter from "./search";
-import { useAllParcelsFetcher, useDeleteParcels, useSearchParcelRange } from "../../services/swr-functions/customer-swr";
+import { useAllParcelsFetcher } from "../../services/swr-functions/customer-swr";
 import SubHeading from "../../preferences/website/subheading";
-import SuccessMessage from "../../successmessage";
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
 import BoxesHolder from "../../boxesholder";
 import { useDateHandler } from "../../date";
 import { State_data } from "../../context/context";
 import Popup from "../../services/eventhandlers/popup";
 import Link from "next/link";
+import SuccessMessage from "../../successmessage";
 
 export type UIBOXES = {
     shipmentSearch: boolean;
@@ -23,19 +23,13 @@ export type UIBOXES = {
 }
 
 export default function Shipments(){
-    const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
-    const [inputData, setInputData] = useState<string>('');
-    const [successmessage, setSuccessMessage] = useState<boolean>(true)
+    const {setDeleteWithId, searchData, successMessage,  inputData, setInputData, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
     const {parcelAllData, parcelAllError, parcelAllIsLoading, parcelAllIsValiddating, parcelAllMutate} = useAllParcelsFetcher();
-    const {parcelRange} = useContext<any | string>(State_data);
-    const {parcelRangeData, parcelRangeIsLoading, parcelRangeError, parcelRangeIsValidating, parcelRangeMutate} = useSearchParcelRange(parcelRange);
-
+ 
     const handleOpenSearch = () => {
         setOpenUIBoxes((prev: any) => ({...prev, shipmentSearch: true, shipmentClearData: true}))
     }
-    const handleInputData = (e: any) => {
-        setInputData(e.target.value)
-    }
+
     const handleClearData = () => {
         setOpenUIBoxes((prev: any) => ({...prev, shipmentClearData: false}))
     }
@@ -44,68 +38,58 @@ export default function Shipments(){
         setOpenUIBoxes((prev: any) => ({...prev, shipmentPopup: false}))
     }
 
-    const lengthActive = parcelRangeData?.data?.filter((parcel: any) => !parcel.completed && !parcel.paid && !parcel.picked )
+    const lengthActive = searchData?.parcelResult?.data?.filter((parcel: any) => !parcel.completed && !parcel.paid && !parcel.picked )
 
     useEffect(() => {
         parcelAllMutate(parcelAllData);
-    }, [openUIBoxes.shipmentClearData !== true]);
+    }, [openUIBoxes?.shipmentClearData !== true]);
 
     return(
         <Holder>
-               {
-               (parcelAllIsLoading || parcelAllIsValiddating && !openUIBoxes.shipmentSearch) &&
-               <SkeletonLoading title="all active shipments." />
-               }
-               {
-               (parcelRangeIsLoading || parcelRangeIsValidating && openUIBoxes.shipmentSearch) &&
-               <SkeletonLoading loadingSearching="Searching" title="parcels." />                
-               }
+            {
+                (parcelAllIsLoading || parcelAllIsValiddating && !openUIBoxes?.shipmentSearch) &&
+                <SkeletonLoading title="all active shipments." />
+            }
+            {
+                ((searchData?.parcelResult === "" && searchData?.parcelCode !== "") && openUIBoxes.shipmentSearch) &&
+                <SkeletonLoading loadingSearching="Searching" title="shipments" />                
+            }
             <OrdersNav />
             <Section>
                <Heading heading="Active Orders" />
-               {parcelAllData?.data?.length >= 0 && !openUIBoxes.shipmentClearData && <p>You have <span className="font-bold">{parcelAllData?.data?.length || 0}</span> active shipment{parcelAllData?.data?.length > 1 && "s"}.</p>}
-               {parcelRangeData !== 'undefined' && openUIBoxes.shipmentClearData && <p><span className="font-bold">{lengthActive?.length || 0}</span> active parcel match(es) found.</p>}
+               {parcelAllData?.data?.length >= 0 && !openUIBoxes?.shipmentClearData && <p>You have <span className="font-bold">{parcelAllData?.data?.length || 0}</span> active shipment{parcelAllData?.data?.length > 1 && "s"}.</p>}
+               {searchData?.parcelResult !== '' && openUIBoxes?.shipmentClearData && <p><span className="font-bold">{lengthActive?.length || 0}</span> active parcel match(es) found.</p>}
                 <Input 
                 link="/dashboard/shipments/active/create"
                 phonetext="Add" 
-                name="active"
+                name="shipment"
                 laptoptext="New Shipment" 
                 handleClick={handleOpenSearch}
                 placeholder="Search Shipments"
-                handleChange={handleInputData}
-                searchInput={inputData}
+                searchInput={inputData.shipment}
                 />
-                { openUIBoxes.shipmentClearData &&
+                { openUIBoxes?.shipmentClearData &&
                 <button onClick={handleClearData} className="text-red-500 mt-3 gap-2 flex font-bold text-sm">
                     <span>
                         <i className="icon ion-md-close"></i>
                     </span>Clear Filter</button>
                 }
-               {openUIBoxes.shipmentSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
-               {openUIBoxes.shipmentPopup && <Popup text="Shipment" closeFill={handleCloseFill} mutate={parcelAllMutate} mutateSearch={parcelRangeMutate} name='parcels' popupShow={openUIBoxes.shipmentPopup} id={deleteWithId.parcels} />}
+               {openUIBoxes?.shipmentSearch && <SearchFilter inputData={inputData.shipment} closeFill={setOpenUIBoxes} />}
+               {openUIBoxes?.shipmentPopup && <Popup text="Shipment" closeFill={handleCloseFill} mutate={parcelAllMutate} mutateSearch={searchData?.parcelResult} name='parcels' popupShow={openUIBoxes.shipmentPopup} id={deleteWithId.parcels} />}
                {
-                   parcelAllError && successmessage &&
+                   parcelAllError && successMessage.activeShipment &&
                    <SuccessMessage
-                   successMessageShow={successmessage}
+                   successMessageShow={successMessage.activeShipment}
                    name="activeShipment"
                    id="failed"
                    messageTitle="Active shipments cannot be fetched. Check network connection!"
                    />
                 }
-            {/* {
-                parcelRangeError && openUIBoxes.shipmentSearch && successmessage &&
-                <SuccessMessage
-                successMessageShow={successmessage}
-                name="activeShipment"
-                id="failed"
-                messageTitle="Searching failed, check network connection!"
-                />
-            } */}
             <BoxesHolder>
                 {parcelAllData?.data &&
                 (parcelAllData.data.map((parcel: any) => {
                     return(
-                        <div className={!openUIBoxes.shipmentClearData ? "bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5" : "hidden"}>
+                        <div className={!openUIBoxes?.shipmentClearData ? "bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5" : "hidden"}>
                         <div className="flex justify-between">
                             <div>
                                 <p className="text-red-600 text-xs">NOT PICKED</p>
@@ -173,11 +157,11 @@ export default function Shipments(){
             </div>
             )}
                 
-            {openUIBoxes.shipmentClearData && <SubHeading subheading="Search Results" />}
-            {parcelRangeData !== 'undefined' && openUIBoxes.shipmentClearData && <p><span className="font-bold">{parcelRangeData?.data?.length || 0}</span> parcel match(es) in total.</p>}
+            {openUIBoxes?.shipmentClearData && <SubHeading subheading="Search Results" />}
+            {searchData?.parcelResult !== 'undefined' && openUIBoxes?.shipmentClearData && <p><span className="font-bold">{searchData?.parcelResult?.data?.length || 0}</span> parcel match(es) in total.</p>}
             <BoxesHolder>
-            {  parcelRangeData?.data &&
-                (parcelRangeData?.data?.map((parcelRange: any) => {
+            {  searchData?.parcelResult?.data &&
+                (searchData?.parcelResult?.data?.map((parcelRange: any) => {
                     return(
                         <div className={openUIBoxes.shipmentClearData  ? "bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5": "hidden"}>
                         <div className="flex justify-between">
@@ -237,14 +221,14 @@ export default function Shipments(){
                         )}))}
                     </BoxesHolder>
                         
-                    { (parcelRangeData?.data?.length === 0 || parcelRangeData?.data === 'undefined' || parcelRangeData?.code !== 200 && openUIBoxes.shipmentClearData) && (
+                    { (searchData?.parcelResult?.data?.length === 0 || searchData?.parcelResult?.data === 'undefined' || searchData?.parcelResult?.code !== 200 && openUIBoxes?.shipmentClearData) && (
                             <div className={openUIBoxes.shipmentClearData ? "flex flex-col w-full justify-center items-center" : "hidden"}>
                             <span className="-mb-16">
                                 <i id="bigger" className="icon ion-md-cube"></i>
                             </span>
                             <br/>
                             <SubHeading subheading="Search Results"/>
-                            <p className="w-5/12 mt-1 text-sm text-center">We found {parcelRangeData?.data?.length || 0} results in total.</p>
+                            <p className="w-5/12 mt-1 text-sm text-center">We found {searchData?.parcelResult?.data?.length || 0} results in total.</p>
                         </div>
                         )}
             </Section>

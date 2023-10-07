@@ -95,9 +95,17 @@ export default function WebsitePreferences(){
             return {...prev, socialAccounts: {...formData.socialAccounts, [name]: value}}
         })
     }
-    // let reader  = new FileReader();
-    // reader.readAsDataURL(document.getElementById('upload'));
-      
+
+    const imageChange = (e: any) => {
+        if (e.target.files && e.target.files.length > 0) {
+          setUploadFile(e.target.files[0]);
+        }
+      };
+
+    const removeSelectedImage = () => {
+        setUploadFile('');
+      };
+
     const {businessChangeData, businessChangeError, businessChangeIsLoading,businessChangeIsValidating, businessChangeMutate} = useBusiness(formData)
     
     return(
@@ -116,7 +124,7 @@ export default function WebsitePreferences(){
                  name="websiteError"
                  successMessageShow={successMessage.websiteError}
                  id="failed"
-                 messageTitle="Error occured! Check network connection!"
+                 messageTitle="Website details cannot be fetched! Check network connection!"
                 />
             }
             <PreferencesNav />
@@ -124,17 +132,17 @@ export default function WebsitePreferences(){
                 <div className="bg-gray-50 mt-5 p-5 rounded-2xl w-full relative h-full">
                   <div className="flex phone:flex-col laptop:gap-10 phone:text-center phone:justify-center laptop:justify-start laptop:flex-row phone:items-center laptop:items-center w-full h-fit">
                     <div>
-                    <span className="rounded-full flex justify-center items-center bg-gray-200/40 p-1 shadow h-fit w-fit">
-                        <img title={uploadFile} src={uploadFile?.length ? uploadFile : "https://cakenus.logistix.africa/logo-icon.svg"} alt="logo" />
-                    </span>
-                    <span className="relative w-full flex justify-between items-center bottom-10">             
+                        <span className="rounded-full relative flex justify-center items-center p-1">
+                            <img className={uploadFile ? "rounded-full brightness-50 bg-gray-200/40 p-1 shadow h-15 w-40" : "rounded-full bg-gray-200/40 p-1 shadow"} title={uploadFile} src={uploadFile ? URL.createObjectURL(uploadFile) : "https://cakenus.logistix.africa/logo-icon.svg"} alt="logo" />
+                            {uploadFile && <button className='absolute bg-green-700 p-1 rounded-xl text-gray-50 hover:bg-green-800 left-14'>Upload</button>}
+                        </span>
+                    <span className="relative w-full flex justify-center gap-20 items-center bottom-10">             
                        <span title={uploadFile} className="relative rounded-full shadow h-fit cursor-pointer bg-gray-50 w-6">
                             <label title={uploadFile} className=" cursor-pointer rounded-full" htmlFor="upload">
                                 <i className="icon ion-md-camera"></i>
                             </label>
-                            <input id='upload' name='upload'  onChange={(e: any) => setUploadFile(e.target.value)} value={uploadFile} type="file" className="absolute w-0 z-1 top-10 left-10 text-sm text-gray-50" />
+                            <input id='upload' name='upload'  onChange={imageChange}  accept="image/*" type="file" className="absolute w-0 z-1 top-10 left-10 text-sm text-gray-50" />
                         </span> 
-                            {/* <i className="icon ion-md-camera"></i> */}
                         <button onClick={() => setUploadFile('')} className="rounded-full shadow h-fit bg-gray-50 w-6">
                             <i className="icon ion-md-close"></i>
                         </button>

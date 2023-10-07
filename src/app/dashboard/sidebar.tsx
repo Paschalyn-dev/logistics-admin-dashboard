@@ -17,8 +17,6 @@ export default function Sidebar() {
     customerLogout();
     router.replace('/');
   }
-  console.log(decodeURIComponent(params.source), "decodeparams")
-  console.log(params.source, "params")
   useEffect(function onFirstMount() {
     function checkWidth(){
       setWindowWidth(window.innerWidth);

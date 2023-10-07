@@ -14,6 +14,7 @@ import { customerAPIUrl } from "../../services/api-url/customer-api-url";
 import { authorizationKeyCustomer } from "../../services/customer-api/api";
 import { Password } from "../../formik/password";
 import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
+import SuccessMessage from "../../successmessage";
 
 export default function Payments(){
   const [chargeBearer, setChargeBearer] =  useState<any>({
@@ -24,7 +25,7 @@ export default function Payments(){
   const {successMessage, setSuccessMessage} = useContext(State_data);
   const {bankCodesAndDetailsData, bankCodesAndDetailsError, bankCodesAndDetailsIsLoading, bankCodesAndDetailsIsValidating, bankCodesAndDetailsMutate} = useFetchBankCodesAndLogos();
   const {cardVerifyData, cardVerifyError, cardVerifyIsLoading, cardVerifyIsValidating, cardVerifyMutate} = useCardVerify();
-  const {getBankAccountData} =  useGetBankAccount();
+  const {getBankAccountData, getBankAccountError, getBankAccountIsIsLoading, getBankAccountIsMutate, getBankAccountIsValidating} =  useGetBankAccount();
   async function handleChargeBearer(chargeBearer: any){
     const response = await fetch(customerAPIUrl.business, {
       method: 'PUT',
@@ -62,7 +63,8 @@ export default function Payments(){
           }
 
           {
-            bankCodesAndDetailsIsLoading || bankCodesAndDetailsIsValidating &&
+            bankCodesAndDetailsIsLoading || bankCodesAndDetailsIsValidating || 
+            getBankAccountIsIsLoading || getBankAccountIsValidating &&
             <SkeletonLoading title="bank" loadingSearching="Loading" /> 
           }
 
@@ -81,6 +83,15 @@ export default function Payments(){
                   error={chargeBearer?.result?.code !== 200}
                   loading={chargeBearer?.result === "undefined" && chargeBearer?.info !== ""}
                   data={chargeBearer?.result}
+                  />
+                }
+                {
+                  (successMessage.paymentPreference && (bankCodesAndDetailsError || getBankAccountError ||  cardVerifyError)) &&
+                  <SuccessMessage
+                  successMessageShow={successMessage.paymentPreference}
+                  id="failed" 
+                  name="paymentPreference"
+                  messageTitle="Error occured! Check network connection!"
                   />
                 }
 

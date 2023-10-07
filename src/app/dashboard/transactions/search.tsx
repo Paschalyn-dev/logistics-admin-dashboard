@@ -1,18 +1,21 @@
 'use client'
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ToggleButton from "../preferences/shipment/toggleButton";
 import { useTransactionsSearchRange } from "../services/swr-functions/customer-swr";
 import { State_data } from "../context/context";
 import { useContext} from "react";
+import { Password } from "../formik/password";
+import { customerAPIUrl } from "../services/api-url/customer-api-url";
+import { authorizationKeyCustomer } from "../services/customer-api/api";
 
 
 export default function SearchFilter({inputData, closeFill}: any){
-    const {inputField, setInputField, searchFields, setSearchFields, createdAtEnd, setCreatedAtEnd, setCreatedAtStart, createdAtStart, setAmountEnd, setAmountStart, amountStart, amountEnd, transactionsRange, setTransactionsRange} = useContext<any | string>(State_data);
+    const {inputField, setInputField, searchFields, setSearchFields, createdAtEnd, setCreatedAtEnd, searchData, setSearchData, setCreatedAtStart, createdAtStart, setAmountEnd, setAmountStart, amountStart, amountEnd, transactionsRange, setTransactionsRange} = useContext<any | string>(State_data);
     const {transactionsRangeMutate} = useTransactionsSearchRange(transactionsRange);
     const [searchToggleButtons, setSearchToggleButtons] = useState({
-        trackId: false,
-        parcel: false,
-        amount: false
+        trackId: true,
+        parcel: true,
+        amount: true
     })
     
     const [formData, setFormData] =  useState({
@@ -83,9 +86,30 @@ export default function SearchFilter({inputData, closeFill}: any){
             ...prev, transactionsRange: formData.endprice
         }))
     }
+
+    async function handleSearch(transactionsRangeQuery: any){
+        const response = await fetch(customerAPIUrl.searchTransactions(transactionsRangeQuery), {
+            method: 'GET',
+            headers: {
+                'Authorization': authorizationKeyCustomer
+            }
+        });
+        const data = await response.json();
+        setSearchData((prev: any) => ({...prev, transactionResult: data}));
+    }
+
+    useEffect(() => {
+        handleInput();
+    }, [inputData]);
+
+    useEffect(() => {
+        if(transactionsRange !== null){
+            handleSearch(transactionsRange);
+        }
+    }, [searchData?.transactionCode])
+
     function handleSearchSubmit(e: any){
         e.preventDefault();
-        handleInput();
         handleSearchField();
         handleSetAmountEnd();
         handleSetCreatedAtEnd();
@@ -93,11 +117,13 @@ export default function SearchFilter({inputData, closeFill}: any){
         handleSetCreatedAtStart();
         transactionsRangeMutate();
         setTransactionsRange({inputField, searchFields, amountStart, amountEnd, createdAtStart, createdAtEnd})
-    // if(parcelRangeData !== 'undefined' && !parcelRangeIsLoading && !parcelRangeIsValidating) closeFill(false)
+        setSearchData((prev: any) => ({...prev, transactionResult: "", transactionCode: Password()}));
+        setTimeout(() => {closeFill((prev: any) => ({...prev, transactionSearch: false}));}, 500)    
     }
+
     return(
-        <div>
-    <div className="cursor-pointer z-20 bottom-0 fixed h-screen w-screen " onClick={() => closeFill((prev: any) => ({...prev, searchBox: false}))}/>
+        <>
+    <div className="cursor-pointer z-20 bottom-0 fixed h-screen w-screen " onClick={() => closeFill((prev: any) => ({...prev, transactionSearch: false}))}/>
         <div className="flex justify-center items-start laptop:w-3/4 after-tablet:w-10/12 tablet:w-full phone:w-full"> 
         <div className="relative animate__animated animate__headShake z-30 bg-gray-50 p-6 phone:h-4/6 tablet:h-4/6 mt-10 w-3/4 rounded-lg">
             <div className="flex justify-start gap-2 items-center">
@@ -140,6 +166,6 @@ export default function SearchFilter({inputData, closeFill}: any){
         </form>
         </div>
         </div>
-        </div>
+        </>
 )
 }

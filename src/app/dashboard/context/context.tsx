@@ -17,6 +17,29 @@ export default function Context({children}: any){
         customer: 0,
         destination: 0
     });
+    const [searchData, setSearchData] = useState<any>({
+        parcelInfo: "",
+        parcelResult: "",
+        parcelCode:  "",
+        customerInfo: "",
+        customerResult: "",
+        customerCode:  "",
+        dispatcherInfo: "",
+        dispatcherResult: "",
+        dispatcherCode:  "",
+        administratorInfo: "",
+        administratorResult: "",
+        administratorCode:  "",
+        transactionInfo: "",
+        transactionResult: "",
+        transactionCode:  "",
+        messageInfo: "",
+        messageResult: "",
+        messageCode:  "",
+        reviewInfo: "",
+        reviewResult: "",
+        reviewCode:  "",
+    })
     const [inputField, setInputField] = useState<any>({
         activeShipments: "",
         customersRange: "",
@@ -39,7 +62,7 @@ export default function Context({children}: any){
         dispatchersRange: "",
         administratorsRange: "",
         messagesRange: "",
-        reviewsRange: "",
+        reviewsRange: "", 
     });    
     const [createdAtEnd, setCreatedAtEnd] = useState<any>({
         activeShipments: "",
@@ -107,6 +130,8 @@ export default function Context({children}: any){
         administrator: true,
         scheduledShipment: false,
         createShipment: false,
+        shipmentPreference: true,
+        paymentPreference: true,
         createCustomer: false,
         createDispatcher: false,
         createAdministrator: false,
@@ -128,10 +153,20 @@ export default function Context({children}: any){
         staffAndCustomerChangePassword: false,
         staffAndCustomerLogin: false,
         signOut: false,
+    });
+
+    const [inputData, setInputData] = useState<any>({
+        shipment: "",
+        customer: "",
+        dispatcher: "",
+        administrator: "",
+        transaction: "",
+        message: "",
+        review: ""
     })
 
     return(
-        <State_data.Provider value={{ globaldata, setGlobalData, globalPriceList, deleteWithId, setDeleteWithId, setGlobalPriceList, inputField, setInputField, createdAtStart, setCreatedAtStart, createdAtEnd, setCreatedAtEnd, amountStart, setAmountStart, amountEnd, setAmountEnd, searchFields, setSearchFields, parcelRange, setParcelRange, customersRange, setCustomersRange, dispatchersRange, setDispatchersRange, administratorsRange, setAdministratorsRange, messagesRange, setMessagesRange, reviewsRange, setReviewsRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage, id, setId }}>
+        <State_data.Provider value={{ globaldata, setGlobalData, globalPriceList, inputData, setInputData, deleteWithId, setDeleteWithId, setGlobalPriceList, inputField, setInputField, createdAtStart, setCreatedAtStart, createdAtEnd, setCreatedAtEnd, amountStart, setAmountStart, amountEnd, setAmountEnd, searchFields, setSearchFields, parcelRange, setParcelRange, customersRange, setCustomersRange, dispatchersRange, setDispatchersRange, administratorsRange, setAdministratorsRange, messagesRange, setMessagesRange, reviewsRange, setReviewsRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage, id, setId, setSearchData, searchData }}>
             {children}
         </State_data.Provider>
     )

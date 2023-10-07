@@ -4,7 +4,7 @@ import Heading from "../heading";
 import Holder from "../holder";
 import Input from "../input";
 import Section from "../section";
-import { useState, useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import SearchFilter from "./search";
 import SubHeading from "../preferences/website/subheading";
 import { useFetchStaff } from "../services/swr-functions/staff-swr";
@@ -12,23 +12,17 @@ import SuccessMessage from "../successmessage";
 import SkeletonLoading from "../services/eventhandlers/skeleton-loading";
 import BoxesHolder from "../boxesholder";
 import { State_data } from "../context/context";
-import { useAdministratorsSearchRange } from "../services/swr-functions/customer-swr";
 import Link from "next/link";
 import Popup from "../services/eventhandlers/popup";
 import { useDateHandler } from "../date";
 
 export default function Administrators(){
     const {fetchStaffData, fetchStaffError, fetchStaffIsLoading, fetchStaffIsValidating, fetchStaffMutate} = useFetchStaff();
-    const [inputData, setInputData] = useState('')
-    const {setDeleteWithId, administratorsRange, deleteWithId, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage} = useContext(State_data);
-    const {administratorsRangeData, administratorsRangeError, administratorsRangeIsLoading, administratorsRangeIsValidating, administratorsRangeMutate} = useAdministratorsSearchRange(administratorsRange);
+    const {setDeleteWithId, inputData, administratorsRange, deleteWithId, openUIBoxes, setOpenUIBoxes, successMessage,setSearchData, searchData, setSuccessMessage} = useContext(State_data);
     const handleOpenSearch = () => {
         setOpenUIBoxes((prev: any) => ({...prev, administratorSearch: true, administratorClearData: true}))
     }
-    const handleInputData = (e: any) => {
-        setInputData(e.target.value)
-    }    
-
+    
     const handleClearData = () => {
         setOpenUIBoxes((prev: any) => ({...prev, administratorClearData: false}))
     }
@@ -41,34 +35,29 @@ export default function Administrators(){
         fetchStaffMutate();
     }, [openUIBoxes.administratorClearData !== true]);
 
-    useEffect(() => {
-        administratorsRangeMutate()
-    }, [openUIBoxes.administratorSearch === true]);
-
     return(
     <Holder>
         {
             (fetchStaffIsLoading || fetchStaffIsValidating) && 
-            <SkeletonLoading title="all administrators." />
+            <SkeletonLoading title="all administrators" />
         }
         {
-            (administratorsRangeIsLoading || administratorsRangeIsValidating && openUIBoxes.administratorSearch) &&
-            <SkeletonLoading loadingSearching="Searching" title="administrators." />                
+            ((searchData?.administratorResult === "" && searchData?.administratorCode !== "") && openUIBoxes.administratorSearch) &&
+            <SkeletonLoading loadingSearching="Searching" title="administrators" />                
         }
         <ConstantNav />
         <Section>
             <Heading heading="My Administrators" />
                 {fetchStaffData?.data?.length >= 0 && !openUIBoxes.administratorClearData && <p>You have <span className="font-bold">{fetchStaffData?.data?.length || 0}</span> administrator{fetchStaffData?.data?.length > 1 && "s"}.</p>}
-                {administratorsRangeData !== 'undefined' && openUIBoxes.administratorClearData && <p><span className="font-bold">{administratorsRangeData?.data?.length || 0}</span> administrators match(es) found.</p>}
+                {searchData?.administratorResult !== "" && openUIBoxes.administratorClearData && <p><span className="font-bold">{searchData?.administratorResult?.data?.length || 0}</span> administrators match(es) found.</p>}
                 <Input 
                 link="/dashboard/administrators/create"
-                placeholder="Search Staff" 
-                name="dispatcher" 
+                placeholder="Search Administrator" 
+                name="administrator" 
                 handleClick={handleOpenSearch}
                 phonetext="Add" 
                 laptoptext="New Administrator" 
-                handleChange={handleInputData}
-                searchInput={inputData}
+                searchInput={inputData.administrator}
                 />
 
                 { openUIBoxes.administratorClearData &&
@@ -78,8 +67,8 @@ export default function Administrators(){
                     </span>Clear Filter</button>
                 }
                 
-                {openUIBoxes.administratorSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} /> }   
-                {openUIBoxes.administratorPopup && <Popup text="Administrator" closeFill={handleCloseFill} popupShow={openUIBoxes.administratorPopup} mutateSearch={administratorsRange} mutate={fetchStaffMutate} name="administrators" id={deleteWithId.administrators} />}
+                {openUIBoxes.administratorSearch && <SearchFilter inputData={inputData.administrator} closeFill={setOpenUIBoxes} /> }   
+                {openUIBoxes.administratorPopup && <Popup text="Administrator" closeFill={handleCloseFill} popupShow={openUIBoxes.administratorPopup} mutateSearch={searchData?.administratorResult?.data} mutate={fetchStaffMutate} name="administrators" id={deleteWithId.administrators} />}
 
                 {
                     fetchStaffError && successMessage.administrator &&
@@ -87,16 +76,7 @@ export default function Administrators(){
                     successMessageShow={successMessage.administrator}
                     name="administrator"
                     id="failed"
-                    messageTitle="Dispatchers cannot be fetched. Check network connection!"
-                    />
-                }
-                {
-                    administratorsRangeError && openUIBoxes.administratorSearch && successMessage.administrator &&
-                    <SuccessMessage
-                    successMessageShow={successMessage.administrator}
-                    name="administrator"
-                    id="failed"
-                    messageTitle="Searching failed, check network connection!"
+                    messageTitle="Administrators cannot be fetched. Check network connection!"
                     />
                 }
                 <BoxesHolder>
@@ -169,8 +149,8 @@ export default function Administrators(){
                 {openUIBoxes.administratorClearData && <SubHeading subheading="Search Results" />}
 
                 <BoxesHolder>    
-                    {  administratorsRangeData?.data && openUIBoxes.administratorClearData &&
-                            (administratorsRangeData?.data.map((staff: any) => {
+                    {  searchData?.administratorResult?.data && openUIBoxes.administratorClearData &&
+                            (searchData?.administratorResult?.data.map((staff: any) => {
                                 return(
                                 <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                                         <div>
@@ -223,7 +203,7 @@ export default function Administrators(){
                     )}))}
                     </BoxesHolder>        
     
-                    { (administratorsRangeData?.data?.length === 0 || administratorsRangeData?.data === 'undefined' || administratorsRangeData?.code !== 200 && openUIBoxes.administratorClearData) && (
+                    { (searchData?.administratorResult?.data?.length === 0 || searchData?.administratorResult?.data === 'undefined' || searchData?.administratorResult?.code !== 200 && openUIBoxes.administratorClearData) && (
                         <div className="flex flex-col w-full justify-center items-center">
                             <span className="-mb-16">
                                 <i id="bigger" className="icon ion-md-person"></i>

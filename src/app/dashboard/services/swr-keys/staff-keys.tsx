@@ -28,5 +28,4 @@ export const STAFFSWRKEYS = {
     deleteCustomer: 'DELETE_CUSTOMER',
     deletePreference: 'DELETE_PREFERENCE',
     deleteClassicPricing: 'DELETE_CLASSIC_PRICING'
-
 }

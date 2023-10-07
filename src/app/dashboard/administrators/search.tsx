@@ -1,17 +1,20 @@
 'use client'
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import ToggleButton from "../preferences/shipment/toggleButton";
 import { State_data } from "../context/context";
 import { useAdministratorsSearchRange } from "../services/swr-functions/customer-swr";
+import { customerAPIUrl } from "../services/api-url/customer-api-url";
+import { authorizationKeyCustomer } from "../services/customer-api/api";
+import { Password } from "../formik/password";
 
 export default function SearchFilter({inputData, closeFill}: any){
-    const {inputField, setInputField, searchFields, setSearchFields, createdAtEnd, setCreatedAtEnd, setCreatedAtStart, createdAtStart, administratorsRange, setAdministratorsRange} = useContext<any | string>(State_data);
+    const {inputField, setInputField, searchFields, setSearchFields, createdAtEnd,  setSearchData, searchData, setCreatedAtEnd, setCreatedAtStart, createdAtStart, administratorsRange, setAdministratorsRange} = useContext<any | string>(State_data);
     const {administratorsRangeMutate} = useAdministratorsSearchRange('')
 
     const [searchToggleButtons, setSearchToggleButtons] = useState({
-        fullName: false,
-        email: false,
-        phone: false
+        fullName: true,
+        email: true,
+        phone: true
     })
 
     const [formData, setFormData] =  useState({
@@ -69,18 +72,39 @@ export default function SearchFilter({inputData, closeFill}: any){
         }))
     }
 
+    async function handleSearch(administratorsRangeQuery: any){
+        const response = await fetch(customerAPIUrl.searchAdminisrators(administratorsRangeQuery), {
+            method: 'GET',
+            headers: {
+                'Authorization': authorizationKeyCustomer
+            }
+        });
+        const data = await response.json();
+        setSearchData((prev: any) => ({...prev, administratorResult: data}));
+    }
+
+    useEffect(() => {
+        handleInput();
+    }, [inputData]);
+
+    useEffect(() => {
+        if(administratorsRange !== null){
+            handleSearch(administratorsRange);
+        }
+    }, [searchData?.administratorCode])
+
     function handleSearchSubmit(e: any){
         e.preventDefault();
-        handleInput();
         handleSearchField();
         handleSetCreatedAtEnd();
         handleSetCreatedAtStart();
         administratorsRangeMutate(administratorsRange);
         setAdministratorsRange({inputField, searchFields})
-    // if(parcelRangeData !== 'undefined' && !parcelRangeIsLoading && !parcelRangeIsValidating) closeFill(false)
+        setSearchData((prev: any) => ({...prev, administratorResult: "", administratorCode: Password()}));
+        setTimeout(() => {closeFill((prev: any) => ({...prev, administratorSearch: false}));}, 500)
     }
     return(
-        <>
+        <div>
         <div className="cursor-pointer z-20 bottom-0 fixed h-screen w-screen " onClick={() => closeFill((prev: any) => ({...prev, administratorSearch: false}))}/>
             <div className="flex justify-center items-start laptop:w-3/4 after-tablet:w-10/12 tablet:w-full phone:w-full"> 
             <div className="relative animate__animated animate__headShake z-30 bg-gray-50 p-6 phone:h-4/6 tablet:h-4/6 mt-10 w-3/4 rounded-lg">
@@ -120,6 +144,6 @@ export default function SearchFilter({inputData, closeFill}: any){
             </form>
             </div>
             </div>
-            </>
+            </div>
     )
 }

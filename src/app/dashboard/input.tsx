@@ -8,7 +8,6 @@ type Btn = {
     phonetext?: string;
     laptoptext?:string;
     placeholder?: string;
-    handleChange?: any;
     link?: string;
     searchInput?: string;
     name?: string;
@@ -18,9 +17,9 @@ type Btn = {
     mt?: number;
 }
 
-export default function Input({phonetext, handleClick, mt, justify, laptoptext, placeholder, name, link, message, handleChange, searchInput}: Btn){
+export default function Input({phonetext, handleClick, mt, justify, laptoptext, placeholder, name, link, message, searchInput}: Btn){
     const [windowWidth, setWindowWidth]= useState<number>(0);
-    const {successMessage, setSuccessMessage} = useContext(State_data);
+    const {successMessage, setInputData, inputData, setSuccessMessage} = useContext(State_data);
 
     useEffect(function onFirstMount() {
         function checkWidth(){
@@ -29,9 +28,10 @@ export default function Input({phonetext, handleClick, mt, justify, laptoptext, 
         window.addEventListener("resize", checkWidth);
         return () => window.removeEventListener('resize', checkWidth);
     }, []);
+    console.log(inputData)
 
     return(
-        <>
+        <div>
         {successMessage.input && <SuccessMessage successMessageShow={successMessage.input} name="input" messageTitle={message} />}
 
         <div className={`flex mt-${mt === 0 ?  mt : 5} justify-${justify || 'start'} w-full gap-2 items-center`}>
@@ -51,10 +51,11 @@ export default function Input({phonetext, handleClick, mt, justify, laptoptext, 
             { name &&
                 <div className="flex items-center bg-gray-200 gap-3 rounded-xl w-fit justify-start p-3">
                     <i id="icon" className="icon ion-md-search"></i>
-                    <input name={name} type="text" onClick={handleClick} onChange={handleChange} value={searchInput} className="text-green-700 bg-gray-200 outline-0 h-fit w-full" placeholder={placeholder} />
+                    <input name={name} type="text" onClick={handleClick} onChange={(e: any) => setInputData((prev: any) => ({...prev, [name]: e.target.value}))} value={searchInput} className="text-green-700 bg-gray-200 outline-0 h-fit w-full" placeholder={placeholder} />
+                    {searchInput?.length ? <i onClick={() => setInputData((prev: any) => ({...prev, [name]: ""}))} className="icon ion-md-close bg-gray-50 py-1 px-2 rounded-full text-gray-800 laptop:text-sm phone:text-xs font-bold cursor-pointer"></i> : ""}
                 </div>
             }
         </div>
-        </>
+        </div>
     )
 }

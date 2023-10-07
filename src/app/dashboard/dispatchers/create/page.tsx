@@ -20,6 +20,7 @@ import { staffAPIURL } from "../../services/api-url/staff-api-url";
 import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
 import { authorizationKeyCustomer } from "../../services/customer-api/api";
 import { authorizationKey } from "../../services/staff-api/api";
+export const nameCapitalize = /\b[a-z0-9-_]+#i/;
 
 export default function FormPageDispatcher({handleOpenForm}: any){
     const {successMessage, setSuccessMessage} = useContext(State_data);

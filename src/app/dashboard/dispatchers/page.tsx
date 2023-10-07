@@ -18,16 +18,11 @@ import Popup from "../services/eventhandlers/popup";
 import { useDateHandler } from "../date";
 
 export default function Dispatcher(){
-    const [inputData, setInputData] = useState('');
     const {dispatcherAllData, dispatcherAllError, dispatcherAllIsLoading, dispatcherAllIsValiddating, dispatcherAllMutate} = useAllDispatchersFetcher();
     const [menu, setMenu] = useState<string>('card');
-    const {dispatchersRange, setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage} = useContext<any | string>(State_data);
-    const {dispatchersRangeData, dispatchersRangeError, dispatchersRangeIsLoading, dispatchersRangeIsValidating, dispatchersRangeMutate} = useDispatcherSearchRange(dispatchersRange);
+    const {setDeleteWithId, inputData, setInputData, deleteWithId, openUIBoxes, setOpenUIBoxes, successMessage, searchData} = useContext<any | string>(State_data);
     const handleOpenSearch = () => {
         setOpenUIBoxes((prev: any) => ({...prev, dispatcherSearch: true, dispatcherClearData: true}))
-    }
-    const handleInputData = (e: any) => {
-        setInputData(e.target.value)
     }
     const handleClearData = () => {
         setOpenUIBoxes((prev: any) => ({...prev, dispatcherClearData: false}))
@@ -38,23 +33,22 @@ export default function Dispatcher(){
     }
     useEffect(() => {
         dispatcherAllMutate(dispatcherAllData);
-        console.log(dispatcherAllData);
     }, [openUIBoxes.dispatcherClearData !== true]);
     return(
         <Holder>
             {
                 (dispatcherAllIsLoading || dispatcherAllIsValiddating && !openUIBoxes.dispatcherSearch) &&
-                <SkeletonLoading title="all dispatchers." />
+                <SkeletonLoading title="all dispatchers" />
             }
             {
-                ((dispatchersRangeIsLoading || dispatchersRangeIsValidating) && openUIBoxes.dispatcherSearch) &&
-                <SkeletonLoading loadingSearching="Searching" title="dispatchers." />                
+                ((searchData?.dispatcherResult === "" && searchData?.dispatcherCode !== "") && openUIBoxes.dispatcherSearch) &&
+                <SkeletonLoading loadingSearching="Searching" title="dispatchers" />                
             }
             <ConstantNav />
             <Section>
                     <Heading heading="My Dispatchers" />
-                    {dispatcherAllData?.data?.length >= 0 && !openUIBoxes.dispatcherClearData && dispatchersRangeData?.data !== 'undefined' && <p>You have <span className="font-bold">{dispatcherAllData?.data?.length || 0}</span> dispatcher{dispatcherAllData?.data?.length > 1 && "s"}.</p>}
-                    {dispatchersRangeData !== 'undefined' && openUIBoxes.dispatcherClearData && <p><span className="font-bold">{dispatchersRangeData?.data?.length || 0}</span> dispatcher match(es) found.</p>}              
+                    {dispatcherAllData?.data?.length >= 0 && !openUIBoxes.dispatcherClearData && searchData?.dispatcherResult?.data !== 'undefined' && <p>You have <span className="font-bold">{dispatcherAllData?.data?.length || 0}</span> dispatcher{dispatcherAllData?.data?.length > 1 && "s"}.</p>}
+                    {searchData?.dispatcherResult !== '' && openUIBoxes.dispatcherClearData && <p><span className="font-bold">{searchData?.dispatcherResult?.data?.length || 0}</span> dispatcher match(es) found.</p>}              
                     <Input 
                     link="/dashboard/dispatchers/create" 
                     placeholder="Search Dispatchers" 
@@ -62,8 +56,7 @@ export default function Dispatcher(){
                     phonetext="Add" 
                     laptoptext="New Dispatcher" 
                     handleClick={handleOpenSearch}
-                    handleChange={handleInputData}
-                    searchInput={inputData}
+                    searchInput={inputData.dispatcher}
                     />
                     { openUIBoxes.dispatcherClearData &&
                         <button onClick={handleClearData} className="text-red-500 mt-3 gap-2 flex font-bold text-sm">
@@ -71,8 +64,8 @@ export default function Dispatcher(){
                                 <i className="icon ion-md-close"></i>
                             </span>Clear Filter</button>
                         }
-                    {openUIBoxes.dispatcherSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
-                    {openUIBoxes.dispatcherPopup && <Popup text="Rider" name="dispatchers" closeFill={handleCloseFill} popupShow={openUIBoxes.dispatcherPopup} mutate={dispatcherAllMutate} mutateSearch={dispatchersRangeMutate} id={deleteWithId.dispatchers} />}
+                    {openUIBoxes.dispatcherSearch && <SearchFilter inputData={inputData.dispatcher} closeFill={setOpenUIBoxes} />}
+                    {openUIBoxes.dispatcherPopup && <Popup text="Rider" name="dispatchers" closeFill={handleCloseFill} popupShow={openUIBoxes.dispatcherPopup} mutate={dispatcherAllMutate} mutateSearch={searchData?.dispatcherResult?.data} id={deleteWithId.dispatchers} />}
                     
                     {
                         dispatcherAllError && successMessage.dispatcher &&
@@ -81,15 +74,6 @@ export default function Dispatcher(){
                         name="dispatcher"
                         id="failed"
                         messageTitle="Dispatchers cannot be fetched. Check network connection!"
-                        />
-                    }
-                    {
-                        dispatchersRangeError && openUIBoxes.dispatcherSearch && successMessage.dispatcher &&
-                        <SuccessMessage
-                        successMessageShow={successMessage.dispatcher}
-                        name="dispatcher"
-                        id="failed"
-                        messageTitle="Searching failed, check network connection!"
                         />
                     }
                     <div className="flex mt-5 justify-start gap-10">
@@ -176,8 +160,8 @@ export default function Dispatcher(){
                 {openUIBoxes.dispatcherClearData && <SubHeading subheading="Search Results" />}
 
                 <BoxesHolder>
-                {dispatchersRangeData?.data && openUIBoxes.dispatcherClearData &&
-                    (dispatchersRangeData.data.map((dispatcher: any) => {
+                {searchData?.dispatcherResult?.data && openUIBoxes.dispatcherClearData &&
+                    (searchData?.dispatcherResult.data.map((dispatcher: any) => {
                         return(
                         <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                             <div className="flex justify-between">
@@ -232,7 +216,7 @@ export default function Dispatcher(){
                         </div>
                     )}))}
                         </BoxesHolder>
-                    { (dispatchersRangeData?.data?.length === 0 || dispatchersRangeData?.data === 'undefined' || dispatchersRangeData?.code !== 200 && openUIBoxes.dispatcherClearData) && (
+                    { (searchData?.dispatcherResult?.data?.length === 0 || searchData?.dispatcherResult?.data === '' || searchData?.dispatcherResult?.code !== 200 && openUIBoxes.dispatcherClearData) && (
                         <div className="flex flex-col w-full justify-center items-center">
                         <span className="-mb-16">
                             <i id="bigger" className="icon ion-md-bicycle"></i>

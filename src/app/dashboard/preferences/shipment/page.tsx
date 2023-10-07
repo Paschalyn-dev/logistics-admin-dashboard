@@ -19,6 +19,7 @@ import { staffAPIURL } from "../../services/api-url/staff-api-url";
 import { authorizationKey } from "../../services/staff-api/api";
 import { Password } from "../../formik/password";
 import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
+import SuccessMessage from "../../successmessage";
 
 type CURRENTSTATES = {
     showPriceRange: boolean,
@@ -211,6 +212,15 @@ const reducer = (state: any, action: any) => {
                 error={priceAndLocationsDelete?.priceResult?.code !== 200}
                 loading={priceAndLocationsDelete?.priceResult === "" && priceAndLocationsDelete?.priceInfo !== "" && priceAndLocationsDelete?.priceCode !== ""}
                 data={priceAndLocationsDelete?.priceResult}
+                />
+            }
+            {
+                getBusinessError && (successMessage.shipmentPreference || getDistancePriceError || getLocationsError) &&
+                <SuccessMessage
+                name="shipmentPreference"
+                successMessageShow={successMessage.shipmentPreference}
+                id="failed"
+                messageTitle="Error occured! Check network connection!"
                 />
             }
             <PreferencesNav />

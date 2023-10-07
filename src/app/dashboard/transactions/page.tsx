@@ -19,17 +19,10 @@ import { useDateHandler } from "../date";
 import Link from "next/link";
 
 export default function Transactions(){
-    // const {companyRevenueData} = useCompanyRevenue();
-    const [inputData, setInputData] = useState<string>('');
-    const [id, setId] = useState<number>(0);
     const { fetchTransactionsData, fetchTransactionsError, fetchTransactionsIsLoading, fetchTransactionsIsValidating, fetchTransactionsMutate } = useAllFetchTransactions();
-    const {transactionsRange,setTransactionsRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage} = useContext<any | string>(State_data);
-    const {transactionsRangeData, transactionsRangeError, transactionsRangeIsLoading, transactionsRangeIsValidating, transactionsRangeMutate} = useTransactionsSearchRange(transactionsRange);
+    const {openUIBoxes, setInputData, inputData, setOpenUIBoxes, successMessage, searchData} = useContext<any | string>(State_data);
     const handleOpenSearch = () => {
         setOpenUIBoxes((prev: any) => ({...prev, transactionSearch: true, transactionClearData: true}))
-    }
-    const handleInputData = (e: any) => {
-        setInputData(e.target.value)
     }
     const handleClearData = () => {
         setOpenUIBoxes((prev: any) => ({...prev, transactionClearData: false}))
@@ -43,18 +36,18 @@ export default function Transactions(){
         <Holder>
                {
                    (fetchTransactionsIsLoading || fetchTransactionsIsValidating && !openUIBoxes.transactionSearch) &&
-                   <SkeletonLoading title="all transactions." />
+                   <SkeletonLoading title="all transactions" />
                 }
                {
-                   (transactionsRangeIsLoading || transactionsRangeIsValidating && openUIBoxes.transactionSearch) &&
-                   <SkeletonLoading loadingSearching="Searching" title="transactions." />                
+                    ((searchData?.transactionResult === "" && searchData?.transactionCode !== "") && openUIBoxes.transactionSearch) &&
+                    <SkeletonLoading loadingSearching="Searching" title="transactions" />                
                 }
             <ConstantNav />
             <Section>
               <Heading heading="Transactions" />  
-              {fetchTransactionsData?.data?.length >= 0 && !openUIBoxes.transactionClearData && !transactionsRangeData?.data && <p>You have <span className="font-bold">{fetchTransactionsData?.data?.length || 0}</span> transaction{fetchTransactionsData?.data?.length > 1 && "s"}.</p>}
-               {transactionsRangeData !== 'undefined' && openUIBoxes.transactionClearData && <p><span className="font-bold">{transactionsRangeData?.data?.length || 0}</span> transaction match(es) found.</p>}
-               {
+              {fetchTransactionsData?.data?.length >= 0 && !openUIBoxes.transactionClearData && !searchData?.transactionResult?.data && <p>You have <span className="font-bold">{fetchTransactionsData?.data?.length || 0}</span> transaction{fetchTransactionsData?.data?.length > 1 && "s"}.</p>}
+               {searchData?.transactionResult !== '' && openUIBoxes.transactionClearData && <p><span className="font-bold">{searchData?.transactionResult?.data?.length || 0}</span> transaction match(es) found.</p>}
+                {
                    fetchTransactionsError && successMessage.transaction &&
                    <SuccessMessage
                    successMessageShow={successMessage.transaction}
@@ -63,15 +56,7 @@ export default function Transactions(){
                    messageTitle="Past transactions cannot be fetched. Check network connection!"
                    />
                 }
-               {
-                   transactionsRangeError && !transactionsRangeData?.data && openUIBoxes.transactionSearch && successMessage.transaction &&
-                   <SuccessMessage
-                   successMessageShow={successMessage.transaction}
-                   name="transaction"
-                   id="failed"
-                   messageTitle="Searching failed, check network connection!"
-                   />
-                }
+
                <BoxesHolder>
                     <Boxes
                     icon="icon ion-md-calendar"
@@ -119,8 +104,7 @@ export default function Transactions(){
                  name="transactions"
                  handleClick={handleOpenSearch}
                  placeholder="Search Transactions"
-                 handleChange={handleInputData}
-                 searchInput={inputData}
+                 searchInput={inputData.transaction}
                  />
                  { openUIBoxes.transactionClearData &&
                  <button onClick={handleClearData} className="text-red-500 mt-3 gap-2 flex font-bold text-sm">
@@ -128,7 +112,7 @@ export default function Transactions(){
                          <i className="icon ion-md-close"></i>
                      </span>Clear Filter</button>
                  }
-                 {openUIBoxes.transactionSearch && <SearchFilter inputData={inputData} closeFill={setOpenUIBoxes} />}
+                 {openUIBoxes.transactionSearch && <SearchFilter inputData={inputData.transaction} closeFill={setOpenUIBoxes} />}
                <div className="px-5 mt-10">
                  <div className="font-bold grid grid-cols-6 gap-4">
                     <h3>#</h3>
