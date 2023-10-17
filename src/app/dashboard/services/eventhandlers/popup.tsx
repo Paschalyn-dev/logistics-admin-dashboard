@@ -58,7 +58,6 @@ export default function Popup({closeFill, mutateSearch, mutate, name, popupShow,
         }
         else{
             mutate();
-            mutateSearch();
         }
     }
     

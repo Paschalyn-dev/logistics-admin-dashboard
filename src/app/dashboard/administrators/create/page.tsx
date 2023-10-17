@@ -74,7 +74,7 @@ export default function FormPageAdministrators(){
             </Link>
 
             {
-            staffDetails.result !== "" && staffDetails.info !== "" && 
+            // staffDetails.result !== "" && staffDetails.info !== "" && 
             <ErrorAndSucccessHandlers
             name="createAdministrator"
             successName={successMessage.createAdministrator}

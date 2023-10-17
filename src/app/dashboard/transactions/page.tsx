@@ -86,21 +86,21 @@ export default function Transactions(){
                     <Boxes
                     icon="icon ion-md-cash"
                     title="Today's Revenue"
-                    amount={'₦' + (todayRevenueTotal || '0')}
+                    amount={'₦' + (todayRevenueTotal >= 1000 ? NumberComma(todayRevenueTotal) : todayRevenueTotal || '0')}
                     name="Today"
                     />
 
                     <Boxes
                     icon="icon ion-md-card"
                     title="This Week's Revenue"
-                    amount={'₦' + (weekRevenueTotal || '0')}
+                    amount={'₦' + (weekRevenueTotal >= 1000 ? NumberComma(weekRevenueTotal) : weekRevenueTotal || '0')}
                     name="Calendar"
                     />
 
                     <Boxes
                     icon="icon ion-md-wallet"
                     title="This Month's Revenue"
-                    amount={'₦' + (monthlyRevenueTotal || "0")} 
+                    amount={'₦' + (monthlyRevenueTotal >= 1000 ? NumberComma(monthlyRevenueTotal) : monthlyRevenueTotal || "0")} 
                     name="Calendar Number"
                     />                    
                </BoxesHolder>

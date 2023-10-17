@@ -10,7 +10,6 @@ let Lmonth = `${lastDayOfLMonth.getFullYear()}-${lastDayOfLMonth.getMonth() + 1 
 const lastFriday = new Date().getDate() + (6 - new Date().getDay() - 1) - 7 ;
 today.setDate(lastFriday);
 
-
 export const customerAPIUrl= {
     fetchCustomer: "https://logapi.logistixng.com/api/b2c/user/login",
     forgotCustomerPassword: 'https://logapi.logistixng.com/api/b2c/user/forgotPassword',

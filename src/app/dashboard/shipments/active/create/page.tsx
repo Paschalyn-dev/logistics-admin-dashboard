@@ -20,9 +20,9 @@ import {company, customerAPIUrl, data} from "./../../../services/api-url/custome
 import { State_data, phoneRegExp } from "@/app/dashboard/context/context";
 import { useFetchCustomers } from "@/app/dashboard/services/swr-functions/staff-swr";
 import ShowCustomers from "@/app/dashboard/showCustomers";
-import { authorizationKeyCustomer } from "@/app/dashboard/services/customer-api/api";
 import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
 import { Password } from "@/app/dashboard/formik/password";
+import { authorizationKeyCustomer } from "@/app/dashboard/services/customer-api/api";
 
 export default function FormPageShipments(){
     const {successMessage, setSuccessMessage, id} = useContext(State_data);
@@ -54,18 +54,20 @@ export default function FormPageShipments(){
             body: JSON.stringify(details),
             headers: {
                 "Content-Type": "application/json",
-                // 'Authorization': authorizationKeyCustomer
-                "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTU1MTE2MjJ9.N_IW7YA6Gr7vuXPxZTvQbrRrd1VU2QeohI-DL1NRR_w"
+                'Authorization': authorizationKeyCustomer
+                // "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTU1MTE2MjJ9.N_IW7YA6Gr7vuXPxZTvQbrRrd1VU2QeohI-DL1NRR_w"
 
             },
         })
         const data = await response.json();
+        console.log(data)
         setCreateParcel((prev: any) => ({...prev, result: data}));
     }
-
+    
+    console.log(createParcel)
     useEffect(() => {
         if(createParcel?.info !== ""){
-          handleCreate({...createParcel?.info});
+          handleCreate(createParcel?.info);
         }
       }, [createParcel?.code]);
 
@@ -110,7 +112,7 @@ export default function FormPageShipments(){
         if(!handleToggleParcelButtons.saveAndAddNewCustomer && createParcel?.result?.code === 200){
             setTimeout(() => {
                 router.replace('/dashboard/shipments/active')
-            }, 6000);                        
+            }, 5000);                        
         }
     }, [createParcel?.result])
 
@@ -141,7 +143,7 @@ export default function FormPageShipments(){
 
             <Formik
                   initialValues={{
-                      amount: 0,
+                      amount: '0',
                       card: {
                           authorizationCode: "",
                           email: ""
@@ -196,7 +198,7 @@ export default function FormPageShipments(){
                     },
                     picked: handleToggleParcelButtons.parcelPicked,
                     reference: "",
-                    rider: "",
+                    rider: null,
                     user: null
                 }}
                 validationSchema={Yup.object({
@@ -233,16 +235,15 @@ export default function FormPageShipments(){
                     paymentType: Yup.string().notRequired()
                 })}
                 onSubmit={async (values) => {
+                    setCreateParcel((prev: any) => ({...prev, result: "", info: {...values}, code: Password()}));
                     setSuccessMessage((prev: any) => ({...prev, createShipment: true}));
-                    setCreateParcel((prev: any) => ({...prev, result: "", code: Password(), info: {...values}}));
                 }}
-                enableReinitialize={true}
                 >
                     {
-                        ({ values, getFieldProps, handleSubmit }) => (
+                        ({ values, handleSubmit }) => (
                             <Hero 
                             formHeading={values.name} 
-                            description={values.amount ? `₦${values.amount}` : `₦0`}
+                            description={`₦${values?.amount !=='0' ? values?.amount : '0'}`}
                             heading="Create A Shipment" 
                             icon="icon ion-md-cube">
                             <Form>
@@ -292,25 +293,25 @@ export default function FormPageShipments(){
                                 <TextInput
                                 label="Name"
                                 type="text"
-                                {...getFieldProps('pickUp.name')}
+                                name='pickUp.name'
                                 />
 
                                 <TextInput
                                 label="Email Address"
                                 type="email"
-                                {...getFieldProps('pickUp.email')}
+                                name='pickUp.email'
                                 /> 
 
                                 <TextInput
                                 label="Phone"
                                 type="tel"
-                                {...getFieldProps('pickUp.phone')}
+                                name='pickUp.phone'
                                 /> 
 
                                 <TextInput
                                 label="Address"
                                 type="text"
-                                {...getFieldProps('pickUp.address')}
+                                name='pickUp.address'
                                 /> 
 
                                 <SubHeading subheading="Destination" /> 
@@ -319,25 +320,25 @@ export default function FormPageShipments(){
                                 <TextInput
                                 label="Name"
                                 type="text"
-                                {...getFieldProps('destination.name')}
+                                name='destination.name'
                                 />
 
                                 <TextInput
                                 label="Email Address"
                                 type="email"
-                                {...getFieldProps('destination.email')}
+                                name='destination.email'
                                 /> 
 
                                 <TextInput
                                 label="Phone"
                                 type="tel"
-                                {...getFieldProps('destination.phone')}
+                                name='destination.phone'
                                 /> 
 
                                 <TextInput
                                 label="Address"
                                 type="text"
-                                {...getFieldProps('destination.address')}
+                                name='destination.address'
                                 /> 
 
                                 <SubHeading subheading="Route Estimate" />
@@ -358,7 +359,7 @@ export default function FormPageShipments(){
                                 <TextInput
                                 label="Estimated Amount"
                                 name="amount"
-                                type="number"
+                                type="text"
                                 /> 
 
                                 <SubHeading subheading="Payment" />
