@@ -6,7 +6,7 @@ import ConstantNav from "../constantNav";
 import Heading from "../heading";
 import Holder from "../holder";
 import Section from "../section";
-import { useAllFetchTransactions, useCompanyRevenue, useTransactionsSearchRange } from "../services/swr-functions/customer-swr";
+import { useAllFetchTransactions, useCompanyRevenue, useGetMonthlyRevenue, useTodayRevenue, useTransactionsSearchRange, useWeekRevenue } from "../services/swr-functions/customer-swr";
 import SuccessMessage from "../successmessage";
 import SkeletonLoading from "../services/eventhandlers/skeleton-loading";
 import { UIBOXES } from "../shipments/active/page";
@@ -27,11 +27,15 @@ export default function Transactions(){
     const handleClearData = () => {
         setOpenUIBoxes((prev: any) => ({...prev, transactionClearData: false}))
     }
-    
+    const {fetchMonthlyRevenueData} = useGetMonthlyRevenue();
+    const {weekRevenueData} = useWeekRevenue()
+    const {todayRevenueData} = useTodayRevenue();
     useEffect(() => {
         fetchTransactionsMutate(fetchTransactionsData);
     }, [openUIBoxes.transactionClearData !== true]);
-   
+    const todayRevenueTotal = todayRevenueData?.data?.reduce((prevAmount: any, currAmount: any) => {return prevAmount + currAmount.amount}, 0)
+    const weekRevenueTotal = weekRevenueData?.data?.reduce((prevAmount: any, currAmount: any) => {return prevAmount + currAmount.amount}, 0)
+    const monthlyRevenueTotal = fetchMonthlyRevenueData?.data?.reduce((prevAmount: any, currAmount: any) => {return prevAmount + currAmount.amount}, 0)
     return(
         <Holder>
                {
@@ -82,21 +86,21 @@ export default function Transactions(){
                     <Boxes
                     icon="icon ion-md-cash"
                     title="Today's Revenue"
-                    amount="₦0"
+                    amount={'₦' + (todayRevenueTotal || '0')}
                     name="Today"
                     />
 
                     <Boxes
                     icon="icon ion-md-card"
                     title="This Week's Revenue"
-                    amount="₦0"
+                    amount={'₦' + (weekRevenueTotal || '0')}
                     name="Calendar"
                     />
 
                     <Boxes
                     icon="icon ion-md-wallet"
                     title="This Month's Revenue"
-                    amount="₦0"
+                    amount={'₦' + (monthlyRevenueTotal || "0")} 
                     name="Calendar Number"
                     />                    
                </BoxesHolder>

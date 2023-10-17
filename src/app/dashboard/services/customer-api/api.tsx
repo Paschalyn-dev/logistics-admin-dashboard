@@ -347,3 +347,25 @@ export const deleteReviewFetcher = async(id: number) =>{
     const data = await response.json();
     return data;
 }
+
+export const fetchMonthlyRevenue = async() => {
+    const response = await fetch(customerAPIUrl.monthRevenue, {
+        method: 'GET',
+        headers: {
+            'Authorization': authorizationKeyCustomer
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+
+export const fetchWeeklyRevenue = async() => {
+    const response = await fetch(customerAPIUrl.weekRevenue, {
+        method: 'GET',
+        headers: {
+            'Authorization': authorizationKeyCustomer
+        }
+    });
+    const data = await response.json();
+    return data;
+}

@@ -38,13 +38,6 @@ export const createStaffFetcher = async(staffDetails: any) => {
     return data;
 } 
 
-// export const trackShipment = async() => {
-//     const response = await fetch(staffAPIURL.trackShipment, {
-//         method: 'GET'
-//     });
-//     const data = await response.json();
-//     return data;
-// }
 
 export const createDispatcher = async(dispatcherDetails: any) => {
     const response = await fetch(staffAPIURL.createDispatcher, {

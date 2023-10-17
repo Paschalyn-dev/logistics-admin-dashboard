@@ -35,5 +35,7 @@ export const CUSTOMERSWRKEYS = {
     viewStaff: 'VIEW_STAFF',
     editStaf: 'EDIT_STAFF',
     business: 'BUSINESS',
-    getBusinessDetails: 'GET_BUSINESS_DETAILS'
+    getBusinessDetails: 'GET_BUSINESS_DETAILS',
+    fetchMonthRevenue: 'FETCH_MONTHLY_REVENUE',
+    fetchWeekRevenue: 'FETCH_WEEKLY_REVENUE'
 }

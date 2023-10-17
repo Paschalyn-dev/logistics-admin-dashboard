@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from "next/navigation";
-import { activeShipmentsCountFetcher, administratorsRangeFetcher, billingInvoiceFetcher, businessChangeFetcher, companyRevenueFetcher, countParcelsFetcher, createParcelFetcher, customerRangeFetcher, deleteBusinessFetcher, deleteParcel, deleteReviewFetcher, deleteUserFetcher, dispatchersRangeFetcher, editParcelFetcher, fetchAllDispatchersFetcher, fetchAllParcelsFetcher, fetchAllReviews, fetchTransactionsFetcher, getBusinessDetails, messagesRangeFetcher, parcelLateFetcher, parcelRangeFetcher, parcelsDeliveredFetcher, reviewsRangeFetcher, todayRevenueFetcher, transactionsRangeFetcher, viewCustomerFetcher, viewDispatcherFetcher, viewParcelFetcher, viewStaffFetcher } from "../customer-api/api";
+import { activeShipmentsCountFetcher, administratorsRangeFetcher, billingInvoiceFetcher, businessChangeFetcher, companyRevenueFetcher, countParcelsFetcher, createParcelFetcher, customerRangeFetcher, deleteBusinessFetcher, deleteParcel, deleteReviewFetcher, deleteUserFetcher, dispatchersRangeFetcher, editParcelFetcher, fetchAllDispatchersFetcher, fetchAllParcelsFetcher, fetchAllReviews, fetchMonthlyRevenue, fetchTransactionsFetcher, fetchWeeklyRevenue, getBusinessDetails, messagesRangeFetcher, parcelLateFetcher, parcelRangeFetcher, parcelsDeliveredFetcher, reviewsRangeFetcher, todayRevenueFetcher, transactionsRangeFetcher, viewCustomerFetcher, viewDispatcherFetcher, viewParcelFetcher, viewStaffFetcher } from "../customer-api/api";
 import { CUSTOMERSWRKEYS } from "../swr-keys/customer-keys";
 import useSWR from "swr";
 import { countCustomersFetcher } from "../staff-api/api";
@@ -262,6 +262,18 @@ export function useTodayRevenue(){
     }
 }
 
+export function useWeekRevenue(){
+    const {data, error, mutate, isLoading, isValidating} = useSWR(CUSTOMERSWRKEYS.fetchWeekRevenue, 
+        () => fetchWeeklyRevenue());
+    return{
+        weekRevenueData: data,
+        weekRevenueError: error,
+        weekRevenueMutate: mutate,
+        weekRevenueIsLoading: isLoading,
+        weekRevenueIsValidating: isValidating 
+    }
+}
+
 export function useViewParcels(id: number){
     const {data, error, mutate, isLoading, isValidating} = useSWR(CUSTOMERSWRKEYS.viewParcels, 
         () => viewParcelFetcher(id));
@@ -393,5 +405,17 @@ export function useDeleteReviews(id: number){
         deleteReviewsMutate: mutate,
         deleteReviewsIsLoading: isLoading,
         deleteReviewsIsValidating: isValidating 
+    }
+}
+
+export function useGetMonthlyRevenue(){
+    const {data, error, mutate, isLoading, isValidating} = useSWR(CUSTOMERSWRKEYS.fetchMonthRevenue, 
+        () => fetchMonthlyRevenue());
+    return{
+        fetchMonthlyRevenueData: data,
+        fetchMonthlyRevenueError: error,
+        fetchMonthlyRevenueMutate: mutate,
+        fetchMonthlyRevenueIsLoading: isLoading,
+        fetchMonthlyRevenueIsValidating: isValidating 
     }
 }

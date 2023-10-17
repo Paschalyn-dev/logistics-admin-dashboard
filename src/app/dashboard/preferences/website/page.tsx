@@ -1,5 +1,5 @@
 'use client'
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import Heading from "../../heading";
 import Holder from "../../holder";
 import PreferencesNav from "../../preferences/preferencesnav";
@@ -11,10 +11,17 @@ import ButtonAndMessage from "../shipment/buttonandmessage";
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
 import { State_data } from "../../context/context";
 import SuccessMessage from "../../successmessage";
+import { customerAPIUrl } from "../../services/api-url/customer-api-url";
+import { authorizationKeyCustomer } from "../../services/customer-api/api";
+import { Password } from "../../formik/password";
 
 export default function WebsitePreferences(){
     const {getBusinessData, getBusinessError, getBusinessIsLoading, getBusinessIsValidating, getBusinessMutate} = useGetBusiness();
-    const [uploadFile, setUploadFile] = useState<any>('')
+    const [uploadFile, setUploadFile] = useState<any>({
+        info: "",
+        result: "",
+        code: ""
+    })
     const [formData, setFormData] = useState<any>({
         active: getBusinessData?.data?.active,
         additionalInfo: getBusinessData?.data?.additionalInfo,
@@ -95,17 +102,40 @@ export default function WebsitePreferences(){
             return {...prev, socialAccounts: {...formData.socialAccounts, [name]: value}}
         })
     }
-
+    
     const imageChange = (e: any) => {
         if (e.target.files && e.target.files.length > 0) {
-          setUploadFile(e.target.files[0]);
+            setUploadFile((prev: any) => ({...prev, info: e.target.files[0]}));
         }
-      };
+    };
 
     const removeSelectedImage = () => {
-        setUploadFile('');
-      };
-
+        setUploadFile((prev: any) => ({...prev, info: ''}));
+    };
+    
+    async function handleChangeDP(dpDetails: any){
+        const response = await fetch(customerAPIUrl.changeDp, {
+            method: 'POST',
+            body: JSON.stringify(dpDetails),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": authorizationKeyCustomer
+            },
+        });
+        console.log(dpDetails)
+        const data = await response.json();
+        setUploadFile((prev: any) => ({...prev, result: data}));
+    }
+    
+    useEffect(() => {
+        if(uploadFile?.info !== ""){
+            const reader = new FileReader();
+            handleChangeDP({name: 'business-cakenus', file: reader.readAsDataURL(uploadFile?.info)});
+        }
+    }, [uploadFile?.code]);
+    
+    console.log(uploadFile, 'dfguiuytfdfgh');
+    
     const {businessChangeData, businessChangeError, businessChangeIsLoading,businessChangeIsValidating, businessChangeMutate} = useBusiness(formData)
     
     return(
@@ -133,17 +163,17 @@ export default function WebsitePreferences(){
                   <div className="flex phone:flex-col laptop:gap-10 phone:text-center phone:justify-center laptop:justify-start laptop:flex-row phone:items-center laptop:items-center w-full h-fit">
                     <div>
                         <span className="rounded-full relative flex justify-center items-center p-1">
-                            <img className={uploadFile ? "rounded-full brightness-50 bg-gray-200/40 p-1 shadow h-15 w-40" : "rounded-full bg-gray-200/40 p-1 shadow"} title={uploadFile} src={uploadFile ? URL.createObjectURL(uploadFile) : "https://cakenus.logistix.africa/logo-icon.svg"} alt="logo" />
-                            {uploadFile && <button className='absolute bg-green-700 p-1 rounded-xl text-gray-50 hover:bg-green-800 left-14'>Upload</button>}
+                            <img className={uploadFile?.info ? "rounded-full brightness-50 bg-gray-200/40 p-1 shadow h-15 w-40" : "rounded-full bg-gray-200/40 p-1 shadow"} title={uploadFile?.info} src={uploadFile?.info ? URL.createObjectURL(uploadFile?.info) : "https://cakenus.logistix.africa/logo-icon.svg"} alt="logo" />
+                            {uploadFile?.info && <button onClick={() => setUploadFile((prev: any) => ({...prev, code: Password()}))} className='absolute bg-green-700 p-1 rounded-xl text-gray-50 hover:bg-green-800 left-14'>Upload</button>}
                         </span>
                     <span className="relative w-full flex justify-center gap-20 items-center bottom-10">             
-                       <span title={uploadFile} className="relative rounded-full shadow h-fit cursor-pointer bg-gray-50 w-6">
-                            <label title={uploadFile} className=" cursor-pointer rounded-full" htmlFor="upload">
+                       <span title={uploadFile?.info} className="relative rounded-full shadow h-fit cursor-pointer bg-gray-50 w-6">
+                            <label title={uploadFile?.info} className=" cursor-pointer rounded-full" htmlFor="upload">
                                 <i className="icon ion-md-camera"></i>
                             </label>
                             <input id='upload' name='upload'  onChange={imageChange}  accept="image/*" type="file" className="absolute w-0 z-1 top-10 left-10 text-sm text-gray-50" />
                         </span> 
-                        <button onClick={() => setUploadFile('')} className="rounded-full shadow h-fit bg-gray-50 w-6">
+                        <button onClick={removeSelectedImage} className="rounded-full shadow h-fit bg-gray-50 w-6">
                             <i className="icon ion-md-close"></i>
                         </button>
                     </span>

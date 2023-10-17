@@ -20,23 +20,17 @@ export default function RecoverPassword(){
         result: ""
      });
      const router = useRouter();
-     const {successMessage} = useContext(State_data);
-
+     const {successMessage} = useContext(State_data)
      async function handleRecoverPassword(val: any){
-        try{
-            const response = await fetch(staffAPIURL.forgetStaffPassword,{
-                method: 'PUT',
-                body: JSON.stringify(val),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-            const data = await response.json();
-            setForgotPassword((prev: any) => ({...prev, result: data}));
-        }
-        catch(err){
-            setForgotPassword((prev: any) => ({...prev, result: ''}));
-        }
+        const response = await fetch(staffAPIURL.forgetStaffPassword,{
+            method: 'PUT',
+            body: JSON.stringify(val),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        const data = await response.json();
+        setForgotPassword((prev: any) => ({...prev, result: data}));
      }
 
      useEffect(() => {
@@ -71,7 +65,7 @@ export default function RecoverPassword(){
                         <h5 className="text-sm text-gray-800">CakenUs Services</h5>
                     </div>
                     {
-                        forgotPassword.info !== "" && 
+                        forgotPassword.result !== "" && forgotPassword.info !== "" && 
                         <ErrorAndSucccessHandlers
                         name="staffAndCustomerForgotPassword"
                         successName={successMessage.staffAndCustomerForgotPassword}

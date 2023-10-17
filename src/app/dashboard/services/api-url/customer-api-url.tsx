@@ -1,8 +1,14 @@
 export const data = 'cakenus';
 export const company: number = 18;
 const today = new Date();
-var yesterday = new Date(today.getTime());
+let yesterday = new Date(today.getTime());
 yesterday.setDate(today.getDate() - 1);
+let lastDayOfLMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+let lastDayOfCMonth = new Date(today.getFullYear(), today.getMonth()+1, 0);
+let Cmonth = `${lastDayOfCMonth.getFullYear()}-${lastDayOfCMonth.getMonth() + 1 < 10 ? '0' : ""}${lastDayOfCMonth.getMonth() + 1}-${lastDayOfCMonth.getDate()}`
+let Lmonth = `${lastDayOfLMonth.getFullYear()}-${lastDayOfLMonth.getMonth() + 1 < 10 ? '0' : ''}${lastDayOfLMonth.getMonth() + 1}-${lastDayOfLMonth.getDate()}`
+const lastFriday = new Date().getDate() + (6 - new Date().getDay() - 1) - 7 ;
+today.setDate(lastFriday);
 
 
 export const customerAPIUrl= {
@@ -22,7 +28,10 @@ export const customerAPIUrl= {
     billingInvoice: `https://logapi.logistixng.com/api/lgx/billing/invoice/${company}`,
     activeShipmentsCount: `https://logapi.logistixng.com/api/b2c/parcels/count?query={%22company%22:${company},%22completed%22:false}`,
     business: `https://logapi.logistixng.com/api/b2c/business/${company}`,
-    todayRevenue: `https://logapi.logistixng.com/api/b2c/parcels/range?range=[{%22field%22:%22createdAt%22,%22start%22:%22${yesterday}%22,%22end%22:%22${today}%22}]&query={%22company%22:18}`,
+    todayRevenue: `https://logapi.logistixng.com/api/b2c/parcels/range?range=[{%22field%22:%22createdAt%22,%22start%22:%22${yesterday}%22,%22end%22:%22${today}%22}]&query={%22company%22:${company}}`,
+    weekRevenue: `https://logapi.logistixng.com/api/b2c/parcels/range?range=[{%22field%22:%22createdAt%22,%22start%22:%22${lastFriday}T23:00:00.000Z%22,%22end%22:%22${today}T22:59:59.999Z%22}]&query={%22company%22:${company}}`,
+    monthRevenue:  `https://logapi.logistixng.com/api/b2c/parcels/range?range=[{%22field%22:%22createdAt%22,%22start%22:%22${Lmonth}T23:00:00.000Z%22,%22end%22:%22${Cmonth}T22:59:59.999Z%22}]&query={%22company%22:${company}}`,
+    changeDp: `https://logapi.logistixng.com/api/b2c/business/dp/${company}`,
     searchParcels: ({inputField, searchFields, createdAtStart, createdAtEnd, amountStart, amountEnd}: any) => `https://logapi.logistixng.com/api/b2c/parcels/range?search=${inputField.activeShipments}&searchFields=${searchFields.activeShipments}&query={%22company%22:${company}}&range=[]`,
     searchCustomers: ({inputField, searchFields}: any) => `https://logapi.logistixng.com/api/b2c/search/subscribers?search=${inputField.customersRange}&searchFields=${searchFields.customersRange}`,
     searchDispatchers: ({inputField, searchFields}: any) => `https://logapi.logistixng.com/api/b2b/cakenus/riders?search=${inputField.dispatchersRange}&searchFields=${searchFields.dispatchersRange}`,

@@ -27,31 +27,23 @@ export default function Staff(){
     const {successMessage} = useContext(State_data)
 
     async function handleLogin(val: any){
-        try{
-
-            const response = await fetch(staffAPIURL.stafflogin, {
-                method: "POST",
-                body: JSON.stringify(val),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-            const data = await response.json();
-            console.log('sdfghjk',data)
-            setStaff((prev: any) => ({...prev, result: data}));
-        }
-        catch(err){
-            setStaff((prev: any) => ({...prev, result: ''}));
-        }
+        const response = await fetch(staffAPIURL.stafflogin, {
+            method: "POST",
+            body: JSON.stringify(val),
+            headers: {
+            "Content-Type": "application/json",
+        },
+    })
+    const data = await response.json();
+    setStaff((prev: any) => ({...prev, result: data}));
     }
-
-    console.log(staff)
 
 useEffect(() => {
     if(staff?.result !== ""){
     const user = staff?.result?.data;
     if(staff?.result?.code === 200 && staff?.result?.data?.isDefaultPassword === false) {
         login(user.authToken)
+        // staffStore.push(user);
         let timer = setTimeout(() => {
             router.replace('/dashboard/welcome');
         }, 5000);
@@ -59,6 +51,7 @@ useEffect(() => {
     }
     if(staff?.result?.code === 200 && staff?.result?.data?.isDefaultPassword === true){
         router.replace('/staff/web/changepassword')
+        // staffStore.push(user);
     }  
 }
 },[staff?.result])
@@ -84,7 +77,7 @@ return(
                         <h5 className="text-sm text-gray-800">CakenUs Services</h5>
                     </div>
                     {
-                        staff.info && 
+                        staff.result !== "" && staff.info !== "" && 
                         <ErrorAndSucccessHandlers 
                         name="staffAndCustomerLogin"
                         successName={successMessage.staffAndCustomerLogin}

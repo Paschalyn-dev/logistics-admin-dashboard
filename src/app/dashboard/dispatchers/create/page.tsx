@@ -67,7 +67,7 @@ export default function FormPageDispatcher({handleOpenForm}: any){
                 router.replace('/dashboard/dispatchers')
             }, 6000);
         }
-    }, [dispatcherDetails?.result])
+    }, [dispatcherDetails?.result]);
 
     return(
         <Holder>
