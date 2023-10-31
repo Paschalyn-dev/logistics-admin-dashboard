@@ -9,7 +9,6 @@ import Section from "../section";
 import { useAllFetchTransactions, useCompanyRevenue, useGetMonthlyRevenue, useTodayRevenue, useTransactionsSearchRange, useWeekRevenue } from "../services/swr-functions/customer-swr";
 import SuccessMessage from "../successmessage";
 import SkeletonLoading from "../services/eventhandlers/skeleton-loading";
-import { UIBOXES } from "../shipments/active/page";
 import { State_data } from "../context/context";
 import SearchFilter from "./search";
 import Popup from "../services/eventhandlers/popup";
@@ -49,37 +48,35 @@ export default function Transactions(){
             <ConstantNav />
             <Section>
               <Heading heading="Transactions" />  
-              {fetchTransactionsData?.data?.length >= 0 && !openUIBoxes.transactionClearData && !searchData?.transactionResult?.data && <p>You have <span className="font-bold">{fetchTransactionsData?.data?.length || 0}</span> transaction{fetchTransactionsData?.data?.length > 1 && "s"}.</p>}
-               {searchData?.transactionResult !== '' && openUIBoxes.transactionClearData && <p><span className="font-bold">{searchData?.transactionResult?.data?.length || 0}</span> transaction match(es) found.</p>}
                 {
-                   fetchTransactionsError && successMessage.transaction &&
-                   <SuccessMessage
-                   successMessageShow={successMessage.transaction}
-                   name="transaction"
-                   id="failed"
-                   messageTitle="Past transactions cannot be fetched. Check network connection!"
-                   />
+                    fetchTransactionsError && successMessage.transaction &&
+                    <SuccessMessage
+                    successMessageShow={successMessage.transaction}
+                    name="transaction"
+                    id="failed"
+                    messageTitle="Past transactions cannot be fetched. Check network connection!"
+                    />
                 }
 
                <BoxesHolder>
                     <Boxes
                     icon="icon ion-md-calendar"
                     title="Today"
-                    amount={0}
+                    amount={NumberComma(todayRevenueData?.data?.length || '0')}
                     name="Today"
                     />
 
                     <Boxes
                     icon="icon ion-md-browsers"
                     title="This Week"
-                    amount={0}
+                    amount={NumberComma(weekRevenueData?.data?.length || '0')}
                     name="Calendar"
                     />
 
                     <Boxes
                     icon="icon ion-md-square-outline"
                     title="This Month"
-                    amount={0}
+                    amount={ NumberComma(fetchMonthlyRevenueData?.data?.length) || "0"} 
                     name="Calendar Number"
                     />
 
@@ -117,6 +114,8 @@ export default function Transactions(){
                      </span>Clear Filter</button>
                  }
                  {openUIBoxes.transactionSearch && <SearchFilter inputData={inputData.transaction} closeFill={setOpenUIBoxes} />}
+                 {fetchTransactionsData?.data?.length >= 0 && !openUIBoxes.transactionClearData && !searchData?.transactionResult?.data && <p>You have <span className="font-bold">{fetchTransactionsData?.data?.length || 0}</span> transaction{fetchTransactionsData?.data?.length > 1 && "s"}.</p>}
+                  {searchData?.transactionResult !== '' && openUIBoxes.transactionClearData && <p><span className="font-bold">{searchData?.transactionResult?.data?.length || 0}</span> transaction match(es) found.</p>}
                <div className="px-5 mt-10">
                  <div className="font-bold grid grid-cols-6 gap-4">
                     <h3>#</h3>
@@ -132,7 +131,7 @@ export default function Transactions(){
                      fetchTransactionsData?.data &&
                      fetchTransactionsData?.data?.map((record: any, index: any) => {
                          return (
-                            <div>
+                             <div>
                                 <Link href={`/dashboard/shipments/${record.id}`} key={index} className="grid grid-cols-6 gap-4">
                                     <p className="col-span-1 text-left">{index + 1}</p>
                                     <p className="col-span-1 text-left">{record.trackId.slice(12)}</p>
@@ -145,7 +144,7 @@ export default function Transactions(){
                             </div>
                          )
                         })
-                }
+                    }
                  {
                     fetchTransactionsData?.data?.length === 0 &&
                     <p className="text-center text-gray-500 mt-8">No data to show.</p>
