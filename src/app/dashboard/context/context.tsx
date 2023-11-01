@@ -1,4 +1,5 @@
 'use client'
+import { parsedUrlQueryToParams } from "next/dist/server/future/route-matches/route-match";
 import {createContext, useState} from "react";
 export const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 
@@ -17,6 +18,12 @@ export default function Context({children}: any){
         customer: 0,
         destination: 0
     });
+    const [loading, setLoading] = useState({
+        parcel: false,
+        customer: false,
+        dispatcher: false,
+        administrator: false
+    })
     const [searchData, setSearchData] = useState<any>({
         parcelInfo: "",
         parcelResult: "",
@@ -166,7 +173,7 @@ export default function Context({children}: any){
     })
 
     return(
-        <State_data.Provider value={{ globaldata, setGlobalData, globalPriceList, inputData, setInputData, deleteWithId, setDeleteWithId, setGlobalPriceList, inputField, setInputField, createdAtStart, setCreatedAtStart, createdAtEnd, setCreatedAtEnd, amountStart, setAmountStart, amountEnd, setAmountEnd, searchFields, setSearchFields, parcelRange, setParcelRange, customersRange, setCustomersRange, dispatchersRange, setDispatchersRange, administratorsRange, setAdministratorsRange, messagesRange, setMessagesRange, reviewsRange, setReviewsRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage, id, setId, setSearchData, searchData }}>
+        <State_data.Provider value={{ globaldata, loading, setLoading, setGlobalData, globalPriceList, inputData, setInputData, deleteWithId, setDeleteWithId, setGlobalPriceList, inputField, setInputField, createdAtStart, setCreatedAtStart, createdAtEnd, setCreatedAtEnd, amountStart, setAmountStart, amountEnd, setAmountEnd, searchFields, setSearchFields, parcelRange, setParcelRange, customersRange, setCustomersRange, dispatchersRange, setDispatchersRange, administratorsRange, setAdministratorsRange, messagesRange, setMessagesRange, reviewsRange, setReviewsRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage, id, setId, setSearchData, searchData }}>
             {children}
         </State_data.Provider>
     )

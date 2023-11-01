@@ -192,7 +192,7 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
 
                                 <SubHeading subheading="Documents" /> 
 
-                                <div className="flex justify-between items-center flex-wrap">
+                                {/* <div className="flex justify-between items-center flex-wrap">
                                     <UploadFile
                                     label = "License"
                                     type="file"
@@ -216,7 +216,7 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                                     type="file"
                                     {...getFieldProps('roadWorthiness')}
                                     />
-                                </div>
+                                </div> */}
 
                                 <ToggleButton 
                                 title="Save & Update Customer."

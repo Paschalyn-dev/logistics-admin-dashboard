@@ -23,12 +23,13 @@ import ShowCustomers from "@/app/dashboard/showCustomers";
 import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
 import { Password } from "@/app/dashboard/formik/password";
 import { authorizationKeyCustomer } from "@/app/dashboard/services/customer-api/api";
+import Loader from "@/app/dashboard/services/Loader/spinner";
 
 export default function FormPageShipments(){
-    const {successMessage, setSuccessMessage, id} = useContext(State_data);
+    const {successMessage, loading, setLoading, setSuccessMessage, id} = useContext(State_data);
     const [windowDetails, setWindowDetails] = useState<any>('')
     const [handleToggleParcelButtons, setHandleToggleParcelButtons] = useState<any>({
-        saveAndAddNewRider: false,
+        saveAndAddNewParcel: false,
         parcelFragility: false,
         parcelPicked: false,
         parcelDelivered: false,
@@ -37,8 +38,10 @@ export default function FormPageShipments(){
     const [showCustomer, setShowCustomer] = useState({
         customer: false,
         destination: false,
-        text: ""
-    })
+        text: "",
+        creatingCustomer: false,
+        creatingDestination: false
+    });
     const {fetchCustomersData} = useFetchCustomers();
     const {dispatcherAllData} = useAllDispatchersFetcher();
     const router = useRouter();
@@ -46,7 +49,9 @@ export default function FormPageShipments(){
         info: "",
         result: "",
         code: ""
-    })
+    });
+
+    console.log(showCustomer.text)
     
     async function handleCreate(details: any){
         const response = await fetch(customerAPIUrl.createParcel, {
@@ -60,23 +65,32 @@ export default function FormPageShipments(){
             },
         })
         const data = await response.json();
-        console.log(data)
         setCreateParcel((prev: any) => ({...prev, result: data}));
+        setLoading((prev: any) => ({...prev, parcel: false}))
     }
     
-    console.log(createParcel)
+    function handleSaveAndAddNewParcel() {
+        setHandleToggleParcelButtons((prev: any) => ({
+            ...prev, saveAndAddNewParcel: !handleToggleParcelButtons.saveAndAddNewParcel
+        }))
+    }
     useEffect(() => {
+        if(createParcel?.result === "" && createParcel?.info !== ""){
+            setLoading((prev: any) => ({...prev, parcel: true}))
+        }
         if(createParcel?.info !== ""){
           handleCreate(createParcel?.info);
         }
-      }, [createParcel?.code]);
+    }, [createParcel?.code]);
 
-    function handleSaveAndAddNewRider() {
-        setHandleToggleParcelButtons((prev: any) => ({
-            ...prev, saveAndAddNewRider: !handleToggleParcelButtons.saveAndAddNewRider
-        }))
-    }
-    
+    useEffect(() => {
+        if(!handleToggleParcelButtons.saveAndAddNewParcel && createParcel?.result?.code === 200){
+            setTimeout(() => {
+                router.replace('/dashboard/shipments/active')
+            }, 5000);                        
+        }
+    }, [createParcel?.result]);
+
     function handleParcelFragility() {
         setHandleToggleParcelButtons((prev: any) => ({
             ...prev, parcelFragility: !handleToggleParcelButtons.parcelFragility
@@ -108,34 +122,26 @@ export default function FormPageShipments(){
         setWindowDetails(window)
     }, [typeof window !== 'undefined']);
 
-    useEffect(() => {
-        if(!handleToggleParcelButtons.saveAndAddNewCustomer && createParcel?.result?.code === 200){
-            setTimeout(() => {
-                router.replace('/dashboard/shipments/active')
-            }, 5000);                        
-        }
-    }, [createParcel?.result])
-
     return(
         <Holder>
             <OrdersNav />
             <Section>
+                {loading.parcel && <Loader />}
 
             {
-            createParcel.result !== "" && createParcel.info !== "" && 
-            <ErrorAndSucccessHandlers
-            name="createShipment"
-            successName={successMessage.createShipment}
-            message={createParcel?.result?.code} 
-            code={createParcel?.info?.code}
-            successmessage="Shipment successfully added to the list!"
-            failedmessage="Sorry, shipment cannot be added to the list!"
-            staffAndCustomer={createParcel?.result}
-            error={createParcel?.result?.code !== 200}
-            loading={createParcel?.result === "undefined" && createParcel?.info !== ""}
-            data={createParcel?.result}
-            />
-          }
+                createParcel.result !== "" && createParcel.info !== "" && 
+                <ErrorAndSucccessHandlers
+                name="createShipment"
+                successName={successMessage.createShipment}
+                message={createParcel?.result?.code} 
+                code={createParcel?.info?.code}
+                error={createParcel?.result?.code !== 200}
+                successmessage="Shipment successfully added to the list!"
+                failedmessage="Sorry, shipment cannot be added to the list!"
+                staffAndCustomer={createParcel?.result}
+                data={createParcel?.result}
+                />
+            }
           
             <Link href="/dashboard/shipments/active" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                 <i className="icon ion-md-arrow-back"></i>
@@ -152,10 +158,10 @@ export default function FormPageShipments(){
                         description: "",
                         completed: handleToggleParcelButtons.parcelDelivered,
                         destination:{
-                            address: fetchCustomersData?.data[findDestinationIndex]?.user?.address || "",
-                            email: fetchCustomersData?.data[findDestinationIndex]?.user?.email || "",
-                            name: fetchCustomersData?.data[findDestinationIndex]?.user?.name || "",
-                            phone: fetchCustomersData?.data[findDestinationIndex]?.user?.phone || "",
+                            address: showCustomer?.creatingDestination ? fetchCustomersData?.data[findDestinationIndex]?.user?.address : "",
+                            email: showCustomer?.creatingDestination ? fetchCustomersData?.data[findDestinationIndex]?.user?.email : "",
+                            name: showCustomer?.creatingDestination ? fetchCustomersData?.data[findDestinationIndex]?.user?.name : "",
+                            phone: showCustomer?.creatingDestination ? fetchCustomersData?.data[findDestinationIndex]?.user?.phone : "",
                     },
                     fragile: handleToggleParcelButtons.parcelFragility,
                     meta: {
@@ -191,10 +197,10 @@ export default function FormPageShipments(){
                     paid: handleToggleParcelButtons.customerPaid,
                     paymentType: "",
                     pickUp: {
-                        address: fetchCustomersData?.data[findCustomerIndex]?.user?.address || "",
-                        email: fetchCustomersData?.data[findCustomerIndex]?.user?.email || "",
-                        name: fetchCustomersData?.data[findCustomerIndex]?.user?.name || "",
-                        phone: fetchCustomersData?.data[findCustomerIndex]?.user?.phone || "",
+                        address: showCustomer?.creatingCustomer ? fetchCustomersData?.data[findCustomerIndex]?.user?.address : "",
+                        email:  showCustomer?.creatingCustomer ?  fetchCustomersData?.data[findCustomerIndex]?.user?.email : "",
+                        name:  showCustomer?.creatingCustomer ?  fetchCustomersData?.data[findCustomerIndex]?.user?.name : "",
+                        phone:  showCustomer?.creatingCustomer ?  fetchCustomersData?.data[findCustomerIndex]?.user?.phone : "",
                     },
                     picked: handleToggleParcelButtons.parcelPicked,
                     reference: "",
@@ -203,22 +209,22 @@ export default function FormPageShipments(){
                 }}
                 validationSchema={Yup.object({
                     pickUp: Yup.object({
-                        name: Yup.string().notRequired(),
+                        name: Yup.string().required('Please provide name for pickup.'),
                         phone: Yup.string()
                         .matches(phoneRegExp, 'Phone number is not valid')
                         .min(1, 'Must be 1 character or more.')
-                        .notRequired(),                        
-                        email: Yup.string().email('This email seems invalid!').notRequired(),
-                        address: Yup.string().notRequired(),
+                        .required('Please provide phone number'),   
+                        email: Yup.string().email('This email seems invalid!').required('Please provide email'),
+                        address: Yup.string().required('Please provide the pick up address'),
                     }),
                     destination: Yup.object({
-                        name: Yup.string().notRequired(),
+                        name: Yup.string().required('Please provide name for destination.'),
                         phone: Yup.string()
                         .matches(phoneRegExp, 'Phone number is not valid')
                         .min(1, 'Must be 1 character or more.')
-                        .notRequired(),   
-                        email: Yup.string().email('This email seems invalid!').notRequired(),
-                        address: Yup.string().notRequired(),
+                        .required('Please provide phone number'),   
+                        email: Yup.string().email('This email seems invalid!').required('Please provide email'),
+                        address: Yup.string().required('Please provide the destination address'),
                     }),
                     estimatedDistance: Yup.object({
                         text: Yup.string().notRequired(),
@@ -228,7 +234,7 @@ export default function FormPageShipments(){
                     }),
                     name: Yup.string()
                     .min(5, 'Name must be five characters or more.')
-                    .notRequired(),
+                    .required('Please provide name for shipment.'),
                     description: Yup.string().notRequired(),
                     rider: Yup.string().notRequired(),
                     amount: Yup.string().notRequired(),
@@ -238,6 +244,7 @@ export default function FormPageShipments(){
                     setCreateParcel((prev: any) => ({...prev, result: "", info: {...values}, code: Password()}));
                     setSuccessMessage((prev: any) => ({...prev, createShipment: true}));
                 }}
+                enableReinitialize={true}
                 >
                     {
                         ({ values, handleSubmit }) => (
@@ -288,7 +295,7 @@ export default function FormPageShipments(){
                                 </Select> 
 
                                 <SubHeading subheading="Pickup" />
-                                <div onClick={() => setShowCustomer((prev: any) => ({...prev, customer: true, text: "customer"}))} className="my-4 cursor-pointer text-green-500">Select Customer</div>
+                                <div onClick={() => setShowCustomer((prev: any) => ({...prev, customer: true, text: "customer", creatingCustomer: true}))} className="my-4 cursor-pointer text-green-500">Select Customer</div>
 
                                 <TextInput
                                 label="Name"
@@ -315,7 +322,7 @@ export default function FormPageShipments(){
                                 /> 
 
                                 <SubHeading subheading="Destination" /> 
-                                <div onClick={() => setShowCustomer((prev: any) => ({...prev, destination: true, text: "destination"}))} className="my-4 cursor-pointer text-green-500">Select Customer</div>
+                                <div onClick={() => setShowCustomer((prev: any) => ({...prev, destination: true, text: "destination", creatingDestination: true}))} className="my-4 cursor-pointer text-green-500">Select Customer</div>
 
                                 <TextInput
                                 label="Name"
@@ -378,8 +385,8 @@ export default function FormPageShipments(){
                                 <ToggleButton 
                                 title="Save & Add New Customer."
                                 icon="icon ion-md-information-circle-outline"
-                                handleOnOff={handleSaveAndAddNewRider}
-                                onOff={handleToggleParcelButtons.saveAndAddNewRider}
+                                handleOnOff={handleSaveAndAddNewParcel}
+                                onOff={handleToggleParcelButtons.saveAndAddNewParcel}
                                 description="Enable this if you want to create a new rider immediately after creating this rider."
                                 />  
 
