@@ -120,6 +120,12 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
         }))
     }
 
+    const handleFetchDispatcher = (name: string) => {
+        const newId = dispatcherAllData?.data?.filter((dispatcher: any) => dispatcher?.fullName === name);
+        console.log(newId[0]?.id)
+        return newId[0]?.id;
+    }
+
     return(
         <Holder>
             {
@@ -251,7 +257,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                         setEditParcelDetails((prev: any) => ({...prev, info:{...values}, code: Password(), result: ""}));
                     }}
                     enableReinitialize={true}
-                    >
+                >
                     {
                         ({ values, getFieldProps, handleSubmit }) => (
                             <Hero 
@@ -295,7 +301,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                                 <Select label="Dispatcher" name="rider">
                                     {
                                         dispatcherAllData?.data?.map((dispatcher: any) => (
-                                            <option value={dispatcher.fullName}>{dispatcher.fullName}</option>
+                                            <option value={handleFetchDispatcher(dispatcher.fullName) || null}>{dispatcher.fullName}</option>
                                         ))
                                     }
                                 </Select> 

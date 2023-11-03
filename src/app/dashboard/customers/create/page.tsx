@@ -16,9 +16,10 @@ import { staffAPIURL } from "../../services/api-url/staff-api-url";
 import { authorizationKey } from "../../services/staff-api/api";
 import { Password } from "../../formik/password";
 import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
+import Loader from "../../services/Loader/spinner";
 
 export default function FormPageCustomers(){
-    const {successMessage, setSuccessMessage} = useContext(State_data);
+    const {successMessage, setSuccessMessage, loading, setLoading} = useContext(State_data);
     const [saveAndAddNewCustomer, setSaveAndAddNewCustomer] = useState<boolean>(false);
     const [customerDetails, setCustomerDetails] = useState<any>({
       info: "",
@@ -42,9 +43,13 @@ export default function FormPageCustomers(){
       });
       const data = await response.json();
       setCustomerDetails((prev: any) => ({...prev, result: data}));
+      setLoading((prev: any) => ({...prev, customer: false}))
     }
     
     useEffect(() => {
+      if(customerDetails?.result === "" && customerDetails?.info !== ""){
+        setLoading((prev: any) => ({...prev, customer: true}))
+    }  
       if(customerDetails?.info !== ""){
         handleCreate(customerDetails?.info);
       }
@@ -60,6 +65,9 @@ export default function FormPageCustomers(){
 
     return(
         <Holder>
+          {
+            loading.customer && <Loader />
+          }
           <ConstantNav />
           <Section>
           {
@@ -73,7 +81,6 @@ export default function FormPageCustomers(){
             failedmessage="Sorry, customer cannot be added to the list!"
             staffAndCustomer={customerDetails?.result}
             error={customerDetails?.result?.code !== 200}
-            loading={customerDetails?.result === "undefined" && customerDetails?.info !== ""}
             data={customerDetails?.result}
             />
           }

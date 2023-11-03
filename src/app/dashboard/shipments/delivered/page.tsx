@@ -5,7 +5,7 @@ import Holder from "../../holder";
 import OrdersNav from "../../orders";
 import SubHeading from "../../preferences/website/subheading";
 import Section from "../../section";
-import { useDeliveredParcels } from "../../services/swr-functions/customer-swr";
+import { useAllDispatchersFetcher, useDeliveredParcels } from "../../services/swr-functions/customer-swr";
 import SuccessMessage from "../../successmessage";
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
 import BoxesHolder from "../../boxesholder";
@@ -16,6 +16,7 @@ import { useDateHandler } from "../../date";
 
 export default function Delivered(){
     const {setDeleteWithId, deleteWithId, openUIBoxes, successMessage, setSuccessMessage, setOpenUIBoxes} = useContext(State_data);
+    const {dispatcherAllData} = useAllDispatchersFetcher()
     const {deliveredParcelsData, 
         deliveredParcelsError, 
         deliveredParcelsIsLoading, 
@@ -23,6 +24,10 @@ export default function Delivered(){
         deliveredParcelsMutate} = useDeliveredParcels();
     const handleCloseFill = () => {
         setOpenUIBoxes((prev: any) => ({...prev, shipmentPopup: false}))
+    }
+    const handleFetchDispatcher = (id: any) => {
+        const newId = dispatcherAllData?.data?.filter((dispatcher: any) => dispatcher?.id === id);
+        return newId[0]?.fullName;
     }
     return(
         <Holder>
@@ -92,7 +97,7 @@ export default function Delivered(){
                                 <span className="px-2 border-2 border-gray-200 rounded-full">
                                     <i id="icon" className="icon ion-md-person"></i>
                                 </span>
-                                <p>{parcel.rider ? parcel.rider : "No Dispatcher"}</p>
+                                <p className="-mb-1">{ handleFetchDispatcher(parcel?.rider) || "No Dispatcher"}</p>
                             </div>
                         </div>
                     )}))}
@@ -103,7 +108,6 @@ export default function Delivered(){
                             </span>
                             <br/>
                             <SubHeading subheading="No delivered parcel yet."/>
-                            {/* <p className="w-5/12 mt-1 text-sm text-center">You have no delivered parcel yet.</p> */}
                         </div>
                     )}
                </BoxesHolder>

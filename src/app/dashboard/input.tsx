@@ -28,7 +28,6 @@ export default function Input({phonetext, handleClick, mt, justify, laptoptext, 
         window.addEventListener("resize", checkWidth);
         return () => window.removeEventListener('resize', checkWidth);
     }, []);
-    console.log(inputData)
 
     return(
         <div>

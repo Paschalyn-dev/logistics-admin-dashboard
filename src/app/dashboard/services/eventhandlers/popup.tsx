@@ -22,15 +22,8 @@ export default function Popup({closeFill, mutateSearch, mutate, name, popupShow,
         text: "",
         isShow: false,
     });
-
-    const [haveClicked, setHaveClicked] = useState<any>({
-        parcels: false,
-        customers: false,
-        dispatchers: false, 
-        administrators: false,
-        messages: false
-    });
-
+    const router = useRouter();
+    const [serviceName, setServiceName] = useState<string | undefined>('')
     const [servicesId, setServicesId] = useState<any>({
         parcelsId: 0,
         parcelsResult: "",
@@ -43,13 +36,7 @@ export default function Popup({closeFill, mutateSearch, mutate, name, popupShow,
         messagesId: 0,
         messagesResult: "",
     });
-
-    const router = useRouter();
-    
-    const handleDelete = (serviceName: any) => {
-        setHaveClicked((prev: any) => ({...prev, [serviceName]: true}));
-    }   
-    
+        
     const handleClose = () => {
         setDetails((prev: any) => ({...prev, isShow: false}));
         closeFill();
@@ -118,28 +105,38 @@ export default function Popup({closeFill, mutateSearch, mutate, name, popupShow,
 
     useEffect(() => {
         setServicesId((prev: any) => ({...prev, parcelsId: id}));
-        handleDeleteParcel(servicesId.parcelsId);
-    }, [haveClicked.parcels === true]);
+        if(servicesId.parcelsId !== 0){
+            handleDeleteParcel(servicesId.parcelsId);
+        }
+    }, [serviceName === 'parcels']);
     
     useEffect(() => {
         setServicesId((prev: any) => ({...prev, customersId: id}));
-        handleDeleteCustomers(servicesId.customersId);
-    }, [haveClicked.customers === true]);
+        if(servicesId.customersId !== 0){
+            handleDeleteCustomers(servicesId.customersId);
+        }
+    }, [serviceName === 'customers']);
     
     useEffect(() => {
         setServicesId((prev: any) => ({...prev, dispatchersId: id}));
-        handleDeleteDispatchers(servicesId.dispatchersId);
-    }, [haveClicked.dispatchers === true]);
+        if(servicesId.dispatchersId !== 0){
+            handleDeleteDispatchers(servicesId.dispatchersId);
+        }
+    }, [serviceName === 'dispatchers']);
     
     useEffect(() => {
         setServicesId((prev: any) => ({...prev, administratorsId: id}));
-        handleDeleteAdministrators(servicesId.administratorsId);
-    }, [haveClicked.administrators === true]);
+        if(servicesId.administratorsId !== 0){
+            handleDeleteAdministrators(servicesId.administratorsId);
+        }
+    }, [serviceName === 'administrators']);
 
     useEffect(() => {
-        setServicesId((prev: any) => ({...prev, messagesId: id}));
-        handleDeleteMessages(servicesId.messagesId)
-    }, [haveClicked.messages === true]);
+        if(servicesId.messagesId !== 0){
+            setServicesId((prev: any) => ({...prev, messagesId: id}));
+            handleDeleteMessages(servicesId.messagesId)
+        }
+    }, [serviceName === 'messages']);
 
     useEffect(() => {
         if(servicesId.parcelsResult !== ""){
@@ -195,7 +192,7 @@ export default function Popup({closeFill, mutateSearch, mutate, name, popupShow,
                             <h1 className="laptop:text-4xl phone:text-2xl font-bold pt-5">Delete {text}?</h1>
                             <p>This action cannot be undone. Do you still wish to continue?</p>
                             <div className="flex justify-center gap-2 items-center w-full my-4">
-                                <button onClick={() => handleDelete(name)} className="bg-green-500 border-4 hover:bg-green-600 py-2 text-gray-50 px-3 text-lg rounded-lg">Yes</button>
+                                <button onClick={() => setServiceName(name)} className="bg-green-500 border-4 hover:bg-green-600 py-2 text-gray-50 px-3 text-lg rounded-lg">Yes</button>
                                 <button onClick={closeFill} className="bg-red-500 border-4 hover:bg-red-600 py-2 text-gray-50 px-3 rounded-lg text-lg">No</button>
                             </div>
                         </div>   

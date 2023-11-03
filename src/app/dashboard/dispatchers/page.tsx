@@ -122,7 +122,7 @@ export default function Dispatcher(){
                             </div>
                             <hr className="my-4" />
                             <p className="text-xs p-2 rounded-xl text-amber-600 bg-amber-200/30 w-fit">CURRENT LOCATON</p>
-                            <p>{}</p>
+                            <p className="px-3 py-1">N/A</p>
                             <hr className="my-4" />
                             <div className="flex text-gray-500 justify-start gap-3 items-center">
                                 <span>

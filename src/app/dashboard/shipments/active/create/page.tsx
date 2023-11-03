@@ -50,8 +50,6 @@ export default function FormPageShipments(){
         result: "",
         code: ""
     });
-
-    console.log(showCustomer.text)
     
     async function handleCreate(details: any){
         const response = await fetch(customerAPIUrl.createParcel, {
@@ -67,6 +65,11 @@ export default function FormPageShipments(){
         const data = await response.json();
         setCreateParcel((prev: any) => ({...prev, result: data}));
         setLoading((prev: any) => ({...prev, parcel: false}))
+    }
+
+    const handleFetchDispatcher = (name: string) => {
+        const newId = dispatcherAllData?.data?.filter((dispatcher: any) => dispatcher?.fullName === name);
+        return newId[0]?.id;
     }
     
     function handleSaveAndAddNewParcel() {
@@ -91,7 +94,8 @@ export default function FormPageShipments(){
         }
     }, [createParcel?.result]);
 
-    function handleParcelFragility() {
+    function handleParcelFragility(e: any) {
+        e.preventDefault();
         setHandleToggleParcelButtons((prev: any) => ({
             ...prev, parcelFragility: !handleToggleParcelButtons.parcelFragility
         }))
@@ -121,6 +125,8 @@ export default function FormPageShipments(){
     useEffect(() => {
         setWindowDetails(window)
     }, [typeof window !== 'undefined']);
+    
+    console.log('Rendered!');
 
     return(
         <Holder>
@@ -155,7 +161,7 @@ export default function FormPageShipments(){
                           email: ""
                         },
                         company: company,
-                        description: "",
+                        description: null,
                         completed: handleToggleParcelButtons.parcelDelivered,
                         destination:{
                             address: showCustomer?.creatingDestination ? fetchCustomersData?.data[findDestinationIndex]?.user?.address : "",
@@ -193,7 +199,7 @@ export default function FormPageShipments(){
                             value: null
                         },
                     },
-                    name: "",
+                    name: null,
                     paid: handleToggleParcelButtons.customerPaid,
                     paymentType: "",
                     pickUp: {
@@ -204,7 +210,7 @@ export default function FormPageShipments(){
                     },
                     picked: handleToggleParcelButtons.parcelPicked,
                     reference: "",
-                    rider: null,
+                    rider: '' || null,
                     user: null
                 }}
                 validationSchema={Yup.object({
@@ -233,23 +239,23 @@ export default function FormPageShipments(){
                         text: Yup.string().notRequired(),
                     }),
                     name: Yup.string()
-                    .min(5, 'Name must be five characters or more.')
-                    .required('Please provide name for shipment.'),
+                    .min(5, 'Name must be five characters or more.'),
+                    // .required('Please provide name for shipment.'),
                     description: Yup.string().notRequired(),
                     rider: Yup.string().notRequired(),
                     amount: Yup.string().notRequired(),
                     paymentType: Yup.string().notRequired()
                 })}
                 onSubmit={async (values) => {
-                    setCreateParcel((prev: any) => ({...prev, result: "", info: {...values}, code: Password()}));
-                    setSuccessMessage((prev: any) => ({...prev, createShipment: true}));
+                   setCreateParcel((prev: any) => ({...prev, result: "", info: {...values}, code: Password()}));
+                   setSuccessMessage((prev: any) => ({...prev, createShipment: true}));
                 }}
                 enableReinitialize={true}
                 >
                     {
                         ({ values, handleSubmit }) => (
                             <Hero 
-                            formHeading={values.name} 
+                            formHeading={values?.name || ""} 
                             description={`₦${values?.amount !=='0' ? values?.amount : '0'}`}
                             heading="Create A Shipment" 
                             icon="icon ion-md-cube">
@@ -260,6 +266,7 @@ export default function FormPageShipments(){
                                 label="Name"
                                 name="name"
                                 type="text"
+                                id="chosenDetails"
                                 />
 
                                 <TextArea 
@@ -287,15 +294,16 @@ export default function FormPageShipments(){
                                 />
 
                                 <Select label="Dispatcher" name="rider">
+                                    <option>Please choose a dispatcher from the list</option>
                                     {
                                         dispatcherAllData?.data?.map((dispatcher: any) => (
-                                            <option value={dispatcher.fullName}>{dispatcher.fullName}</option>
+                                            <option value={handleFetchDispatcher(dispatcher?.fullName) || null}>{dispatcher.fullName}</option>
                                         ))
                                     }
                                 </Select> 
 
                                 <SubHeading subheading="Pickup" />
-                                <div onClick={() => setShowCustomer((prev: any) => ({...prev, customer: true, text: "customer", creatingCustomer: true}))} className="my-4 cursor-pointer text-green-500">Select Customer</div>
+                                <div onClick={() => {setShowCustomer((prev: any) => ({...prev, customer: true, text: "customer", creatingCustomer: true}))}} className="my-4 cursor-pointer text-green-500">Select Customer</div>
 
                                 <TextInput
                                 label="Name"

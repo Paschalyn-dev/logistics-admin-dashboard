@@ -6,7 +6,7 @@ import OrdersNav from "../../orders";
 import SubHeading from "../../preferences/website/subheading";
 import Section from "../../section";
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
-import { useLateParcels } from "../../services/swr-functions/customer-swr";
+import { useAllDispatchersFetcher, useLateParcels } from "../../services/swr-functions/customer-swr";
 import SuccessMessage from "../../successmessage";
 import { State_data } from "../../context/context";
 import BoxesHolder from "../../boxesholder";
@@ -17,9 +17,13 @@ import { useDateHandler } from "../../date";
 export default function Late(){
     const {parcelLatesData, parcelLatesError, parcelLatesIsLoading, parcelLatesIsValiddating} = useLateParcels();
     const {successMessage, setSuccessMessage, openUIBoxes, setOpenUIBoxes, setDeleteWithId, deleteWithId} = useContext(State_data);
-    console.log(parcelLatesData, "asdioiuygfrewedrt")
     const handleCloseFill = () => {
         setOpenUIBoxes((prev: any) => ({...prev, shipmentPopup: false}))
+    }
+    const {dispatcherAllData} = useAllDispatchersFetcher();
+    const handleFetchDispatcher = (id: any) => {
+        const newId = dispatcherAllData?.data?.filter((dispatcher: any) => dispatcher?.id === id);
+        return newId[0]?.fullName;
     }
     return(
         <Holder>
@@ -87,7 +91,7 @@ export default function Late(){
                                 <span className="px-2 border-2 border-gray-200 rounded-full">
                                     <i id="icon" className="icon ion-md-person"></i>
                                 </span>
-                                <p>{parcel.rider ? parcel.rider : "No Dispatcher"}</p>
+                                <p className="-mb-1">{ handleFetchDispatcher(parcel?.rider) || "No Dispatcher"}</p>
                             </div>
                         </div>
                     )}))}

@@ -24,7 +24,7 @@ import { authorizationKey } from "@/app/dashboard/services/staff-api/api";
 import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
 
 export default function EditDispatchers({ params }: { params: {id: number}}){
-    const {successMessage, setSuccessMessage} = useContext(State_data);
+    const {successMessage, loading, setLoading, setSuccessMessage} = useContext(State_data);
     const [saveAndAddNewRider, setSaveAndAddNewRider] = useState<boolean>(false);
     const [passwordString, setPasswordString] = useState<boolean>(true)
     const [generatePassword, setGeneratePassword] = useState<boolean>(true);
@@ -37,15 +37,15 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
         viewDispatcherError, 
         viewDispatcherIsLoading, 
         viewDispatcherIsValidating, 
-        viewDispatcherMutate} = useViewDispatcher(params.id)
-    
-    const router = useRouter();
-    const handleSaveAndAddNewRider = (e: any) => {
-        e.preventDefault();
-        setSaveAndAddNewRider(!saveAndAddNewRider)
-    }
-    
-    async function handleEdit(details: any, id: any){
+        viewDispatcherMutate} = useViewDispatcher(params.id);
+
+        const router = useRouter();
+        const handleSaveAndAddNewRider = (e: any) => {
+            e.preventDefault();
+            setSaveAndAddNewRider(!saveAndAddNewRider)
+        }
+        
+        async function handleEdit(details: any, id: any){
         const response = await fetch(staffAPIURL.editDispatcher(id), {
             method: 'PUT',
             body: JSON.stringify(details),
@@ -56,11 +56,15 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
         });
         const data = await response.json();
         setDispatcherDetails((prev: any) => ({...prev, result: data}));
+        setLoading((prev: any) => ({...prev, dispatcher: false}))
     }
-
+    
     useEffect(() => {
+        if(dispatcherDetails?.result === "" && dispatcherDetails?.info !== ""){
+            setLoading((prev: any) => ({...prev, dispatcher: true}))
+        }
         if(dispatcherDetails?.info !== ""){
-          handleEdit({...dispatcherDetails?.info}, viewDispatcherData?.data?.id);
+            handleEdit({...dispatcherDetails?.info}, viewDispatcherData?.data?.id);
         }
     }, [dispatcherDetails?.code]);
 
@@ -70,15 +74,15 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                 router.replace('/dashboard/dispatchers')
             }, 5000);
         }
-    }, [dispatcherDetails?.result])
-
+    }, [dispatcherDetails?.result]);
+    
     return(
         <Holder>
             <ConstantNav />
             <Section>
 
             {
-                (viewDispatcherIsLoading || viewDispatcherIsValidating) &&
+                (viewDispatcherIsLoading || viewDispatcherIsValidating  || loading.dispatcher) &&
                 <Loader />
             }     
             {
@@ -92,7 +96,6 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                 failedmessage="Sorry, dispatcher details cannot be updated!"
                 staffAndCustomer={dispatcherDetails?.result}
                 error={dispatcherDetails?.result?.code !== 200}
-                loading={dispatcherDetails?.result === "undefined" && dispatcherDetails?.info !== ""}
                 data={dispatcherDetails?.result}
                 />
             }

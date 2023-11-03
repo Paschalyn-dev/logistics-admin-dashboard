@@ -96,6 +96,8 @@ export default function Context({children}: any){
         reviewsRange: ""
     });
 
+    const [showDispatchers, setShowDispatcher] = useState<any>(false)
+
     const [deleteWithId, setDeleteWithId] = useState<any>({
         parcels: 0,
         customers: 0,
@@ -173,7 +175,7 @@ export default function Context({children}: any){
     })
 
     return(
-        <State_data.Provider value={{ globaldata, loading, setLoading, setGlobalData, globalPriceList, inputData, setInputData, deleteWithId, setDeleteWithId, setGlobalPriceList, inputField, setInputField, createdAtStart, setCreatedAtStart, createdAtEnd, setCreatedAtEnd, amountStart, setAmountStart, amountEnd, setAmountEnd, searchFields, setSearchFields, parcelRange, setParcelRange, customersRange, setCustomersRange, dispatchersRange, setDispatchersRange, administratorsRange, setAdministratorsRange, messagesRange, setMessagesRange, reviewsRange, setReviewsRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage, id, setId, setSearchData, searchData }}>
+        <State_data.Provider value={{ globaldata, showDispatchers, setShowDispatcher, loading, setLoading, setGlobalData, globalPriceList, inputData, setInputData, deleteWithId, setDeleteWithId, setGlobalPriceList, inputField, setInputField, createdAtStart, setCreatedAtStart, createdAtEnd, setCreatedAtEnd, amountStart, setAmountStart, amountEnd, setAmountEnd, searchFields, setSearchFields, parcelRange, setParcelRange, customersRange, setCustomersRange, dispatchersRange, setDispatchersRange, administratorsRange, setAdministratorsRange, messagesRange, setMessagesRange, reviewsRange, setReviewsRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage, id, setId, setSearchData, searchData }}>
             {children}
         </State_data.Provider>
     )
