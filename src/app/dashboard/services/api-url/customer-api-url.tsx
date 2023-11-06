@@ -26,6 +26,7 @@ export const customerAPIUrl= {
     forgotCustomerPassword: 'https://logapi.logistixng.com/api/b2c/user/forgotPassword',
     changePassword: 'https://logapi.logistixng.com/api/b2c/user/changePassword',
     createParcel: 'https://logapi.logistixng.com/api/b2c/parcel',
+    putParcel: `https://logapi.logistixng.com/api/b2c/parcel/:id`,
     companyRevenue: `https://logapi.logistixng.com/api/b2c/parcels/revenue/${company}`,
     parcelsRange: `https://logapi.logistixng.com/api/b2c/parcels/range`,
     countParcels: `https://logapi.logistixng.com/api/b2c/parcels/count?query={%22company%22:${company}}`,

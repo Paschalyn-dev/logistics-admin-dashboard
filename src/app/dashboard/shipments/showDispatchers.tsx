@@ -1,21 +1,20 @@
 import { useContext, useEffect, useState } from "react";
 import DarkFill from "../darkfill";
-import { useFetchCustomers } from "../services/swr-functions/staff-swr";
-import { State_data } from "../context/context";
 import Button from "../button";
-import { useAllDispatchersFetcher } from "../services/swr-functions/customer-swr";
+import { useAllDispatchersFetcher, useAllParcelsFetcher } from "../services/swr-functions/customer-swr";
+import { State_data } from "../context/context";
 type SEARCH = {
     text: string;
     objects: any;
 }
 export default function ShowDispatchers ({show, setShow}: any){
     const {dispatcherAllData} = useAllDispatchersFetcher()
-    const {setId, id} = useContext(State_data);
     const [search, setSearch] = useState<SEARCH>({
         text: "",
         objects: []
     });
-    
+    const {dispatcher, setDispatcher} = useContext(State_data);
+    const [fullName, setFullName] = useState<string>()    
     function handleSearch(event: any){
         const searched = dispatcherAllData?.data?.filter((customer: any) => {
             return customer.user.name.toString().toLowerCase().includes(search.text.toString().toLowerCase());
@@ -23,23 +22,20 @@ export default function ShowDispatchers ({show, setShow}: any){
         setSearch((prev: any) => ({...prev, text: event.target.value, objects: searched}));
     }
 
-    function handleClick(number: any){
-        setId((prev: any) => ({...prev, [show]: number}))
+    function handleClick(name: string){
+        setFullName(name);
     }
-
+    
     function handleDone(){
-        setShow((prev: any) => ({...prev, [show]: false}));
+        setDispatcher((prev: any) => ({...prev, name: fullName}))
+        setShow(false);
     }
 
-    useEffect(() => {
-        if(show === 'customer'){
-            setId((prev: any) => ({...prev, customer: 0}) )
-        }
-        else{
-            setId((prev: any) => ({...prev, destination: 0}) )
-        }
-    }, [show])
-
+    function handleCancel(){
+        setDispatcher({})
+        setShow(false)
+    }
+    
     return(
         <div>
             <DarkFill />
@@ -53,15 +49,15 @@ export default function ShowDispatchers ({show, setShow}: any){
                     </div>
                     <div className="overflow-y-auto overflow-x-hidden h-3/5">
                         {  search.text === "" ?
-                            dispatcherAllData?.data?.map((customer: any, i: number) => (
-                                <div  onClick={() => handleClick(customer.id)} className={customer.id === id.customer || customer.id === id.destination ? "p-2 rounded-lg flex gap-3 bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex gap-3 mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
+                            dispatcherAllData?.data?.map((dispatcher: any, i: number) => (
+                                <div  onClick={() => handleClick(dispatcher.fullName)} className={fullName === dispatcher?.fullName  ? "p-2 rounded-lg flex gap-3 bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex gap-3 mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
                                     <p>{i + 1}</p>
-                                    <p>{customer.fullName}</p>
+                                    <p>{dispatcher.fullName}</p>
                                 </div>
                             ))
                             :
                             search.objects.map((searches: any, i: number) => (
-                                <div  onClick={() => handleClick(searches.id)} className={searches.id === id.customer || searches.id === id.destination ? "p-2 rounded-lg flex gap-3 bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex gap-3 mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
+                                <div  onClick={() => handleClick(searches.fullName)} className={searches.fullName === fullName ? "p-2 rounded-lg flex gap-3 bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex gap-3 mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
                                     <p>{i + 1}</p>
                                     <p>{searches.fullName}</p>
                                 </div>
@@ -71,7 +67,7 @@ export default function ShowDispatchers ({show, setShow}: any){
 
                     <span className="font-bold mt-3 w-full laptop:text-base desktop:text-lg phone:text-sm w-fit flex justify-between items-center relative">
                         <Button buttonName="Done" handleClick={handleDone}/>
-                        <button onClick={handleDone} className="font-bold mt-2 text-red-600">Cancel</button>
+                        <button onClick={handleCancel} className="font-bold mt-2 text-red-600">Cancel</button>
                     </span>
 
                 </div>

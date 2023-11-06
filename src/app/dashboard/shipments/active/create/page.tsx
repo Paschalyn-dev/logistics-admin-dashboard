@@ -266,7 +266,7 @@ export default function FormPageShipments(){
                                 label="Name"
                                 name="name"
                                 type="text"
-                                id="chosenDetails"
+                                // id="chosenDetails"
                                 />
 
                                 <TextArea 

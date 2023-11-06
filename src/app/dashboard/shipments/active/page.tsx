@@ -4,9 +4,9 @@ import Holder from "../../holder";
 import Input from "../../input";
 import OrdersNav from "../../orders";
 import Section from "../../section";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import SearchFilter from "./search";
-import { useAllDispatchersFetcher, useAllParcelsFetcher } from "../../services/swr-functions/customer-swr";
+import { useAllDispatchersFetcher, useAllParcelsFetcher, useEditParcels } from "../../services/swr-functions/customer-swr";
 import SubHeading from "../../preferences/website/subheading";
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
 import BoxesHolder from "../../boxesholder";
@@ -16,6 +16,8 @@ import Popup from "../../services/eventhandlers/popup";
 import Link from "next/link";
 import SuccessMessage from "../../successmessage";
 import ShowCustomers from "../showDispatchers";
+import ShowDispatchers from "../showDispatchers";
+import { customerAPIUrl } from "../../services/api-url/customer-api-url";
 
 export type UIBOXES = {
     shipmentSearch: boolean;
@@ -26,6 +28,7 @@ export type UIBOXES = {
 export default function Shipments(){
     const {setDeleteWithId, searchData, setShowDispatcher, showDispatchers, successMessage,  inputData, setInputData, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
     const {parcelAllData, parcelAllError, parcelAllIsLoading, parcelAllIsValiddating, parcelAllMutate} = useAllParcelsFetcher();
+    const {dispatcher, setDispatcher} = useContext(State_data)
     const {dispatcherAllData} = useAllDispatchersFetcher()
     const handleOpenSearch = () => {
         setOpenUIBoxes((prev: any) => ({...prev, shipmentSearch: true, shipmentClearData: true}))
@@ -45,6 +48,45 @@ export default function Shipments(){
         return newId[0]?.fullName;
     }
     
+    const [filter, setFiltered] = useState({});
+    
+    const handleChange = (parcelId: number) => {
+        setShowDispatcher(true);
+        setDispatcher((prev: any) => ({...prev, id: parcelId}));
+        if(parcelId === dispatcher.id){
+            const filterId = parcelAllData?.data?.filter((parcel: any) => parcel?.id === dispatcher?.id);
+            setFiltered(filterId[0]);
+            setIOII(parcelId)
+            console.log( filter, 'hgfdfghj')
+        }
+
+    }
+    const newId = dispatcherAllData?.data?.filter((rider: any) => rider?.fullName === dispatcher.name);
+    const [iiii, setIOII] = useState(0);
+    const [text, setTest] = useState('');
+    
+    async function handlePutDispatcher(id: any){
+        const response = await fetch(customerAPIUrl.editParcels(id), {
+            method: 'PUT', 
+            body: JSON.stringify(filter),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTExODgzNDZ9.73G4_gAI_mexLVUYQOkaJN7XCaIj0iHqj5b2g9yYIa8"
+            },
+        });
+        const data = await response.json();
+        setTest(data);
+        console.log(text)
+        parcelAllMutate();
+    }
+   
+    useEffect(() => {
+        if(iiii !== 0){
+            setFiltered((prev: any) => ({...prev, rider: newId[0]?.id ? newId[0]?.id : null}))
+            handlePutDispatcher(iiii)
+        }
+    },[iiii]);
+
     return(
         <Holder>
             {
@@ -76,7 +118,7 @@ export default function Shipments(){
                     </span>Clear Filter</button>
                 }
                {openUIBoxes?.shipmentSearch && <SearchFilter inputData={inputData.shipment} closeFill={setOpenUIBoxes} />}
-               {showDispatchers && <ShowCustomers />}
+               {showDispatchers && <ShowDispatchers show={showDispatchers} setShow={setShowDispatcher} />}
                {openUIBoxes?.shipmentPopup && <Popup text="Shipment" closeFill={handleCloseFill} mutate={parcelAllMutate} mutateSearch={searchData?.parcelResult} name='parcels' popupShow={openUIBoxes.shipmentPopup} id={deleteWithId.parcels} />}
                {
                    parcelAllError && successMessage.activeShipment &&
@@ -137,8 +179,9 @@ export default function Shipments(){
                             <div className="flex items-center justify-start gap-5">
                                 <i className="icon ion-md-person text-gray-300 px-5 py-3 bg-gray-100 rounded-full text-3xl"></i>
                                 <div>
-                                    <p className="-mb-1">{ handleFetchDispatcher(parcel?.rider) || "No Dispatcher"}</p>
-                                    <button onClick={() => setShowDispatcher(true)} className="text-blue-600 text-sm">Change</button>
+                                    <p className="-mb-1">{ handleFetchDispatcher(parcel?.rider)  || "No Dispatcher"}</p>
+                                    {/* <p className="-mb-1">{ handleFetchDispatcher(parcel?.rider) || (dispatcher.id === parcel.id) ?  dispatcher.name : "No Dispatcher"}</p> */}
+                                    <button onClick={() => handleChange(parcel?.id)} className="text-blue-600 text-sm">Change</button>
                                 </div>
                             </div>
                             <button>
@@ -211,8 +254,8 @@ export default function Shipments(){
                             <div className="flex items-center justify-start gap-5">
                                 <i className="icon ion-md-person text-gray-300 px-5 py-3 bg-gray-100 rounded-full text-3xl"></i>
                                 <div>
-                                <p className="-mb-1">{ handleFetchDispatcher(parcelRange?.rider) || "No Dispatcher"}</p>
-                                <button className="text-blue-600 text-sm">Change</button>
+                                <p className="-mb-1">{ parcelRange?.rider ? handleFetchDispatcher(parcelRange?.rider) : "No Dispatcher"}</p>
+                                <button onClick={() => handleChange(parcelRange?.id)} className="text-blue-600 text-sm">Change</button>
                                 </div>
                             </div>
                             <button>
