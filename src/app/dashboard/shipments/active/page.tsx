@@ -6,7 +6,7 @@ import OrdersNav from "../../orders";
 import Section from "../../section";
 import { useContext, useEffect, useState } from "react";
 import SearchFilter from "./search";
-import { useAllDispatchersFetcher, useAllParcelsFetcher, useEditParcels } from "../../services/swr-functions/customer-swr";
+import { useAllDispatchersFetcher, useAllParcelsFetcher, useAllParcelsRangeFetcher, useSearchParcelRange } from "../../services/swr-functions/customer-swr";
 import SubHeading from "../../preferences/website/subheading";
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
 import BoxesHolder from "../../boxesholder";
@@ -15,9 +15,9 @@ import { State_data } from "../../context/context";
 import Popup from "../../services/eventhandlers/popup";
 import Link from "next/link";
 import SuccessMessage from "../../successmessage";
-import ShowCustomers from "../showDispatchers";
 import ShowDispatchers from "../showDispatchers";
 import { customerAPIUrl } from "../../services/api-url/customer-api-url";
+import { Password } from "../../formik/password";
 
 export type UIBOXES = {
     shipmentSearch: boolean;
@@ -26,9 +26,13 @@ export type UIBOXES = {
 }
 
 export default function Shipments(){
-    const {setDeleteWithId, searchData, setShowDispatcher, showDispatchers, successMessage,  inputData, setInputData, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
+    const [code, setCode] = useState<number>(0)
+    const [filter, setFiltered] = useState({});
+    const [pass, setPass] = useState<string>('')
+    const {setDeleteWithId, parcelRange, searchData, setSearchData, setShowDispatcher, showDispatchers, successMessage,  inputData, setInputData, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
     const {parcelAllData, parcelAllError, parcelAllIsLoading, parcelAllIsValiddating, parcelAllMutate} = useAllParcelsFetcher();
-    const {dispatcher, setDispatcher} = useContext(State_data)
+    const {parcelRData, parcelRMutate} = useAllParcelsRangeFetcher(parcelRange)
+    const {dispatcher, setDispatcher, setSuccessMessage} = useContext(State_data)
     const {dispatcherAllData} = useAllDispatchersFetcher()
     const handleOpenSearch = () => {
         setOpenUIBoxes((prev: any) => ({...prev, shipmentSearch: true, shipmentClearData: true}))
@@ -45,25 +49,24 @@ export default function Shipments(){
     
     const handleFetchDispatcher = (id: any) => {
         const newId = dispatcherAllData?.data?.filter((dispatcher: any) => dispatcher?.id === id);
-        return newId[0]?.fullName;
-    }
-    
-    const [filter, setFiltered] = useState({});
-    
-    const handleChange = (parcelId: number) => {
-        setShowDispatcher(true);
-        setDispatcher((prev: any) => ({...prev, id: parcelId}));
-        if(parcelId === dispatcher.id){
-            const filterId = parcelAllData?.data?.filter((parcel: any) => parcel?.id === dispatcher?.id);
-            setFiltered(filterId[0]);
-            setIOII(parcelId)
-            console.log( filter, 'hgfdfghj')
+        if(newId && id){
+            return newId[0]?.fullName;
         }
-
-    }
-    const newId = dispatcherAllData?.data?.filter((rider: any) => rider?.fullName === dispatcher.name);
-    const [iiii, setIOII] = useState(0);
-    const [text, setTest] = useState('');
+    }   
+    
+    useEffect(() => {
+        setSuccessMessage((prev: any) => ({...prev, changeDispatcher: false}))
+        if(pass !== ''){
+            setShowDispatcher(true);
+            setDispatcher((prev: any) => ({...prev, id: code}));
+            if(code === dispatcher.id){
+                const filterId = parcelAllData?.data?.filter((parcel: any) => parcel?.id === dispatcher?.id);
+                if(filterId){   
+                    setFiltered(filterId);
+                }
+            }   
+        }
+    }, [pass]);
     
     async function handlePutDispatcher(id: any){
         const response = await fetch(customerAPIUrl.editParcels(id), {
@@ -75,23 +78,86 @@ export default function Shipments(){
             },
         });
         const data = await response.json();
-        setTest(data);
-        console.log(text)
-        parcelAllMutate();
-    }
-   
-    useEffect(() => {
-        if(iiii !== 0){
-            setFiltered((prev: any) => ({...prev, rider: newId[0]?.id ? newId[0]?.id : null}))
-            handlePutDispatcher(iiii)
+        handleFetchDispatcher(data?.data?.id);
+        if(dispatcher.name !== '' && code !== 0 && pass !== ''){
+            setSuccessMessage((prev: any) => ({...prev, changeDispatcher: true}))
         }
-    },[iiii]);
+        parcelAllMutate(parcelAllData);
+        parcelRMutate(parcelRData);
+    }
 
+    const handleDispatcherNumber = (riderId: number) => {
+       const id = dispatcherAllData?.data?.filter((rider: any) => riderId === rider?.id)
+       if(id){
+            const checkPlus = id[0]?.phone.slice(0, 1);
+            if(checkPlus === '+'){
+                return id[0]?.phone;
+            }
+            else{
+                return '+' + id[0]?.phone;
+            }
+       }
+    }
+
+    function sendEmailDefault(email: string, name: string, dispatcher: string){
+        var email = email;
+        var subject = "PARCEL SHIPMENT ON LOGISTIX AFRICA";
+        var msgBody = `Hello ${dispatcher}, ${name.slice(0, 1).toUpperCase() + name.slice(1).toLowerCase()} wants to ship a parcel on Logistix Africa. Confirm your availability and send a mail to this email with the same subject.`;
+        window.open(`mailto:${email}?subject=${subject}&body=${msgBody}`);
+      }
+
+    const handleDispatcherEmail = (riderId: number, name: string, dispatcher: string) => {
+        const dispatcherName = handleFetchDispatcher(dispatcher)
+        const id = dispatcherAllData?.data?.filter((rider: any) => riderId === rider?.id)
+        if(id){
+            sendEmailDefault(id[0]?.email, name, dispatcherName);
+        }
+     }
+    
+    useEffect(() => {
+        const newId = dispatcherAllData?.data?.filter((rider: any) => rider?.fullName === dispatcher.name);
+        if(newId?.length){
+            setFiltered((prev: any) => ({...prev, rider: newId[0]?.id}))
+        }
+    },[dispatcher.name]);
+    
+    useEffect(() => {
+        setSearchData((prev: any) => ({...prev, parcelResult: parcelRData}));
+    }, [parcelRData])
+    
+    useEffect(() => {
+        if(filter !== '' && dispatcher.name !== ''){
+            handlePutDispatcher(code)
+        }
+    }, [filter])
+
+    const handleParcelOwner = () => {
+        const parcelOwner = parcelAllData?.data?.filter((parcel: any) => parcel.id === code)
+        return parcelOwner[0]?.name
+    }
+    
+    useEffect(() => {
+        setPass('')
+        setShowDispatcher(false)
+        setDispatcher((prev: any) => ({...prev, name: "", id: ""}))
+        setSuccessMessage((prev: any) => ({...prev, changeDispatcher: false}))
+    },[])
+
+
+    
     return(
         <Holder>
             {
                 (parcelAllIsLoading || parcelAllIsValiddating && !openUIBoxes?.shipmentSearch) &&
                 <SkeletonLoading title="all active shipments." />
+            }
+            {
+                successMessage.changeDispatcher && 
+                <SuccessMessage 
+                name="changeDispatcher"
+                successMessageShow={successMessage.changeDispatcher}
+                messageTitle={`Dispatcher  on ${handleParcelOwner() ? `Parcel '${handleParcelOwner()}'` : `empty parcel`} has been changed to '${dispatcher.name}'.`}
+                />
             }
             {
                 ((searchData?.parcelResult === "" && searchData?.parcelCode !== "") && openUIBoxes.shipmentSearch) &&
@@ -118,7 +184,7 @@ export default function Shipments(){
                     </span>Clear Filter</button>
                 }
                {openUIBoxes?.shipmentSearch && <SearchFilter inputData={inputData.shipment} closeFill={setOpenUIBoxes} />}
-               {showDispatchers && <ShowDispatchers show={showDispatchers} setShow={setShowDispatcher} />}
+               {showDispatchers && <ShowDispatchers show={showDispatchers} setShow={setShowDispatcher} mutate={parcelAllMutate} />}
                {openUIBoxes?.shipmentPopup && <Popup text="Shipment" closeFill={handleCloseFill} mutate={parcelAllMutate} mutateSearch={searchData?.parcelResult} name='parcels' popupShow={openUIBoxes.shipmentPopup} id={deleteWithId.parcels} />}
                {
                    parcelAllError && successMessage.activeShipment &&
@@ -179,14 +245,18 @@ export default function Shipments(){
                             <div className="flex items-center justify-start gap-5">
                                 <i className="icon ion-md-person text-gray-300 px-5 py-3 bg-gray-100 rounded-full text-3xl"></i>
                                 <div>
-                                    <p className="-mb-1">{ handleFetchDispatcher(parcel?.rider)  || "No Dispatcher"}</p>
-                                    {/* <p className="-mb-1">{ handleFetchDispatcher(parcel?.rider) || (dispatcher.id === parcel.id) ?  dispatcher.name : "No Dispatcher"}</p> */}
-                                    <button onClick={() => handleChange(parcel?.id)} className="text-blue-600 text-sm">Change</button>
+                                    <p className="-mb-1">{ handleFetchDispatcher(parcel?.rider) || 'No Dispatcher'}</p>
+                                    <button onClick={() => {setCode(parcel?.id); setPass(Password())}} className="text-blue-600 text-sm">Change</button>
                                 </div>
                             </div>
-                            <button>
-                                <i className="icon ion-md-call text-green-300 px-5 py-3 bg-green-100 rounded-full text-3xl"></i>
-                            </button>
+                            <div className="flex gap-2">
+                                <a href={handleDispatcherNumber(parcel?.rider) ? `https://api.whatsapp.com/send?phone=${handleDispatcherNumber(parcel?.rider)}&text=Hello%20${handleFetchDispatcher(parcel?.rider)}%2C%20I%20got%20your%20contact%20from%20Logistix%20Africa%20website.%20I%20want%20to%20ship%20a%20parcel.%20My%20name%20is%20${parcel?.pickUp?.name}.` : ""} target="_blank">
+                                    <i className="icon ion-md-call text-green-300 px-5 py-3 bg-green-100 rounded-full text-3xl"></i>
+                                </a>
+                                <button onClick={() => handleDispatcherEmail(parcel?.rider, parcel?.name, parcel?.rider)}>
+                                    <i className="icon ion-md-mail text-blue-300 px-5 py-3 bg-blue-100 rounded-full text-3xl"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}))} 
@@ -254,13 +324,18 @@ export default function Shipments(){
                             <div className="flex items-center justify-start gap-5">
                                 <i className="icon ion-md-person text-gray-300 px-5 py-3 bg-gray-100 rounded-full text-3xl"></i>
                                 <div>
-                                <p className="-mb-1">{ parcelRange?.rider ? handleFetchDispatcher(parcelRange?.rider) : "No Dispatcher"}</p>
-                                <button onClick={() => handleChange(parcelRange?.id)} className="text-blue-600 text-sm">Change</button>
+                                <p className="-mb-1">{ handleFetchDispatcher(parcelRange?.rider) || 'No Dispatcher'}</p>
+                                <button onClick={() => {setCode(parcelRange?.id); setPass(Password())}} className="text-blue-600 text-sm">Change</button>
                                 </div>
                             </div>
-                            <button>
-                            <i className="icon ion-md-call text-green-300 px-5 py-3 bg-green-100 rounded-full text-3xl"></i>
-                            </button>
+                            <div className="flex gap-2">
+                                <a href={handleDispatcherNumber(parcelRange?.rider) ? `https://api.whatsapp.com/send?phone=${handleDispatcherNumber(parcelRange?.rider)}&text=Hello%20${handleFetchDispatcher(parcelRange?.rider)}%2C%20I%20got%20your%20contact%20from%20Logistix%20Africa%20website.%20I%20want%20to%20ship%20a%20parcel.%20My%20name%20is%20${parcelRange?.pickUp?.name}.` : ""} target="_blank">
+                                    <i className="icon ion-md-call text-green-300 px-5 py-3 bg-green-100 rounded-full text-3xl"></i>
+                                </a>
+                                <button onClick={() => handleDispatcherEmail(parcelRange?.rider, parcelRange?.name, parcelRange?.rider)}>
+                                    <i className="icon ion-md-mail text-blue-300 px-5 py-3 bg-blue-100 rounded-full text-3xl"></i>
+                                </button>
+                            </div>
                             </div>
                             </div>
                         )}))}

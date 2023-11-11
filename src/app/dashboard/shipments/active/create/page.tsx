@@ -24,6 +24,7 @@ import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/err
 import { Password } from "@/app/dashboard/formik/password";
 import { authorizationKeyCustomer } from "@/app/dashboard/services/customer-api/api";
 import Loader from "@/app/dashboard/services/Loader/spinner";
+import CustomInput from "@/app/dashboard/customInput";
 
 export default function FormPageShipments(){
     const {successMessage, loading, setLoading, setSuccessMessage, id} = useContext(State_data);
@@ -126,7 +127,6 @@ export default function FormPageShipments(){
         setWindowDetails(window)
     }, [typeof window !== 'undefined']);
     
-    console.log('Rendered!');
 
     return(
         <Holder>
@@ -161,7 +161,7 @@ export default function FormPageShipments(){
                           email: ""
                         },
                         company: company,
-                        description: null,
+                        description: '',
                         completed: handleToggleParcelButtons.parcelDelivered,
                         destination:{
                             address: showCustomer?.creatingDestination ? fetchCustomersData?.data[findDestinationIndex]?.user?.address : "",
@@ -199,13 +199,13 @@ export default function FormPageShipments(){
                             value: null
                         },
                     },
-                    name: null,
+                    name: '',
                     paid: handleToggleParcelButtons.customerPaid,
                     paymentType: "",
                     pickUp: {
                         address: showCustomer?.creatingCustomer ? fetchCustomersData?.data[findCustomerIndex]?.user?.address : "",
                         email:  showCustomer?.creatingCustomer ?  fetchCustomersData?.data[findCustomerIndex]?.user?.email : "",
-                        name:  showCustomer?.creatingCustomer ?  fetchCustomersData?.data[findCustomerIndex]?.user?.name : "",
+                        name:   "",
                         phone:  showCustomer?.creatingCustomer ?  fetchCustomersData?.data[findCustomerIndex]?.user?.phone : "",
                     },
                     picked: handleToggleParcelButtons.parcelPicked,
@@ -250,10 +250,10 @@ export default function FormPageShipments(){
                    setCreateParcel((prev: any) => ({...prev, result: "", info: {...values}, code: Password()}));
                    setSuccessMessage((prev: any) => ({...prev, createShipment: true}));
                 }}
-                enableReinitialize={true}
+                // enableReinitialize={true}
                 >
                     {
-                        ({ values, handleSubmit }) => (
+                        ({ values, handleSubmit, handleChange }) => (
                             <Hero 
                             formHeading={values?.name || ""} 
                             description={`₦${values?.amount !=='0' ? values?.amount : '0'}`}
@@ -266,8 +266,8 @@ export default function FormPageShipments(){
                                 label="Name"
                                 name="name"
                                 type="text"
-                                // id="chosenDetails"
                                 />
+                                <button onClick={() => console.log(values)}>Values</button>
 
                                 <TextArea 
                                 label="Description (optional)"
@@ -304,12 +304,30 @@ export default function FormPageShipments(){
 
                                 <SubHeading subheading="Pickup" />
                                 <div onClick={() => {setShowCustomer((prev: any) => ({...prev, customer: true, text: "customer", creatingCustomer: true}))}} className="my-4 cursor-pointer text-green-500">Select Customer</div>
-
+{/* 
                                 <TextInput
                                 label="Name"
                                 type="text"
                                 name='pickUp.name'
-                                />
+                                /> */}
+
+                                <CustomInput
+                                 name="pickUp.name"
+                                 id="pickUp.name"
+                                 type="text"
+                                 label="Name"
+                                 handleChange={handleChange}
+                                 value={showCustomer?.creatingCustomer ?  fetchCustomersData?.data[findCustomerIndex]?.user?.name : values.pickUp.name}
+                                 />
+
+<CustomInput
+                                 name="name"
+                                 id="name"
+                                 type="text"
+                                 label="Name"
+                                 handleChange={handleChange}
+                                 value={values.name}
+                                 />
 
                                 <TextInput
                                 label="Email Address"

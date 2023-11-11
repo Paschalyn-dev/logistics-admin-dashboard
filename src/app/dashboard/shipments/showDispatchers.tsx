@@ -3,36 +3,43 @@ import DarkFill from "../darkfill";
 import Button from "../button";
 import { useAllDispatchersFetcher, useAllParcelsFetcher } from "../services/swr-functions/customer-swr";
 import { State_data } from "../context/context";
+import { mutate } from "swr";
+import { useRouter } from "next/navigation";
 type SEARCH = {
     text: string;
     objects: any;
 }
-export default function ShowDispatchers ({show, setShow}: any){
+export default function ShowDispatchers ({show, mutate, setShow}: any){
     const {dispatcherAllData} = useAllDispatchersFetcher()
     const [search, setSearch] = useState<SEARCH>({
         text: "",
         objects: []
     });
-    const {dispatcher, setDispatcher} = useContext(State_data);
-    const [fullName, setFullName] = useState<string>()    
+    const {setDispatcher} = useContext(State_data);
+    const [fullName, setFullName] = useState<string>('');
+
     function handleSearch(event: any){
-        const searched = dispatcherAllData?.data?.filter((customer: any) => {
-            return customer.user.name.toString().toLowerCase().includes(search.text.toString().toLowerCase());
-        })
-        setSearch((prev: any) => ({...prev, text: event.target.value, objects: searched}));
+        setSearch((prev: any) => ({...prev, text: event.target.value}));
     }
+    
+    useEffect(() => {
+        const searched = dispatcherAllData?.data?.filter((dispatcher: any) => {
+            return dispatcher.fullName.toString().toLowerCase().includes(search.text.toString().toLowerCase());
+        });
+        setSearch((prev: any) => ({...prev, objects: searched}))
+    },[search.text])
 
     function handleClick(name: string){
         setFullName(name);
     }
     
     function handleDone(){
-        setDispatcher((prev: any) => ({...prev, name: fullName}))
+        setDispatcher((prev: any) => ({...prev, name: fullName}));
         setShow(false);
     }
-
+    
     function handleCancel(){
-        setDispatcher({})
+        setDispatcher((prev: any) => ({...prev, name: ""}))
         setShow(false)
     }
     
@@ -41,11 +48,11 @@ export default function ShowDispatchers ({show, setShow}: any){
             <DarkFill />
             <div className="fixed z-30 animate__animated animate__zoomIn flex justify-center items-center phone:h-screen laptop:h-screen top-0 bottom-0 phone:-ml-10  laptop:w-3/4 after-tablet:w-10/12 after-tablet:ml-5 laptop:ml-0 tablet:w-full phone:w-full">
                 <div className="relative bg-gray-50 p-6 phone:h-4/6 mt-10 w-2/4 rounded-lg">
-                    <h1 className="font-bold relative text-center text-lg">Select Customer</h1>
+                    <h1 className="font-bold relative text-center text-lg">Select Dispatcher</h1>
 
                     <div className="flex items-center bg-gray-200 gap-3 rounded-xl w-full justify-start p-4 my-5">
                         <i id="search-box" className="icon ion-md-search"></i>
-                        <input type="text" className="text-gray-500 bg-gray-200 outline-0 h-fit w-full" placeholder="Search State" value={search.text} onChange={handleSearch} />
+                        <input type="text" className="text-gray-500 bg-gray-200 outline-0 h-fit w-full" placeholder="Search Dispatcher" value={search.text} onChange={handleSearch} />
                     </div>
                     <div className="overflow-y-auto overflow-x-hidden h-3/5">
                         {  search.text === "" ?

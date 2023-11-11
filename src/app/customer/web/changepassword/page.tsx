@@ -13,6 +13,7 @@ import { State_data } from "@/app/dashboard/context/context";
 import { customerAPIUrl } from "@/app/dashboard/services/api-url/customer-api-url";
 import { authorizationKeyCustomer } from "@/app/dashboard/services/customer-api/api";
 import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
+import Loader from "@/app/dashboard/services/Loader/spinner";
 
 export default function     CustomerChangePassword(){
     const [passwordString, setPasswordString] = useState<boolean>(true);
@@ -21,7 +22,7 @@ export default function     CustomerChangePassword(){
         result: ""
     });
     const router =   useRouter();
-    const {successMessage} = useContext(State_data)
+    const {successMessage, loading, setLoading} = useContext(State_data)
 
     async function handleChangePassword(passwordDetails: any){
         const response = await fetch(customerAPIUrl.changePassword,{
@@ -34,6 +35,7 @@ export default function     CustomerChangePassword(){
         })
         const data = await response.json();
         setChangePassword((prev: any) => ({...prev, result: data}));
+        setLoading((prev: any) => ({...prev, customerL: false}))
     }
 
     useEffect(() => {
@@ -48,6 +50,9 @@ export default function     CustomerChangePassword(){
    }, [changePassword?.result])
 
      useEffect(() => {
+        if(changePassword?.result === "" && changePassword?.info !== ""){
+            setLoading((prev: any) => ({...prev, customerL: true}))
+        }
         if(changePassword?.info !== ""){
             handleChangePassword(changePassword?.info)
         }
@@ -55,6 +60,7 @@ export default function     CustomerChangePassword(){
 
     return(
         <div className="w-screen relative h-screen overflow-x-hidden">
+            {loading.customerL && <Loader />}
         <Image  
         alt="background" 
         src={image} 
@@ -78,7 +84,6 @@ export default function     CustomerChangePassword(){
                     failedmessage="Sorry, password cannot be changed!"
                     staffAndCustomer={changePassword?.result}
                     error={changePassword?.result?.code !== 200}
-                    loading={changePassword?.result === "undefined" && changePassword?.info !== ""}
                     data={changePassword?.result}
                     />
                 }
@@ -106,7 +111,8 @@ export default function     CustomerChangePassword(){
                                 info: {
                                     code: Password(),
                                     ...values
-                                }
+                                }, 
+                                result: ""
                             }))
                         }}  
                     >

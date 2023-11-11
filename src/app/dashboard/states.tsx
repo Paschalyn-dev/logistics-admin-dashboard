@@ -42,10 +42,13 @@ function handleStateChange(event:any, state:string){
 
 function handleSearch(event: any){
     setSearch(event.target.value);
-    return (setSearched(statesInNig.filter((states:string) => {
-        return states.toString().toLowerCase().includes(search.toString().toLowerCase());
-    })))
 }
+
+useEffect(() => {
+    setSearched(statesInNig.filter((states:string) => {
+        return states.toString().toLowerCase().includes(search.toString().toLowerCase())
+    }))
+}, [search])
 
 const handleDone = () => {
     if(locationsData?.data?.length === 0){

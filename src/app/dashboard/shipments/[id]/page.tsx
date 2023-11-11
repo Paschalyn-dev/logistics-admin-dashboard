@@ -5,7 +5,7 @@ import OrdersNav from "../../orders"
 import Hero from "../../preferences/hero"
 import Section from "../../section"
 import Link from "next/link";
-import { useViewParcels } from "../../services/swr-functions/customer-swr";
+import { useAllDispatchersFetcher, useViewParcels } from "../../services/swr-functions/customer-swr";
 import MiniText from "../../minitext"
 import {useDateHandler} from "../../date"
 import { NumberComma } from "../../numberComma"
@@ -16,9 +16,16 @@ import { State_data } from "../../context/context"
 
 export default function EditParcel({ params }: { params: {id: number}}){
   const [openUIBoxes, setOpenUIBoxes] = useState(false);
+  const {dispatcherAllData} = useAllDispatchersFetcher()
   const handleCloseFill = () => {
     setOpenUIBoxes(false)
 } 
+const handleFetchDispatcher = (id: any) => {
+  const newId = dispatcherAllData?.data?.filter((dispatcher: any) => dispatcher?.id === id);
+  if(newId && id){
+      return newId[0]?.fullName;
+  }
+}   
  const {viewParcelData} = useViewParcels(params.id)
  const {setDeleteWithId, deleteWithId} = useContext(State_data);
     return(
@@ -66,7 +73,7 @@ export default function EditParcel({ params }: { params: {id: number}}){
             <MiniText minitext={viewParcelData?.data?.paymentType.replace(viewParcelData?.data?.paymentType[0], (letter: any) => letter.toUpperCase()).replace(/_/g, " ")} />
 
             <EditHeading subheading="Dispatcher"/>
-            <MiniText minitext={viewParcelData?.data?.rider || 'N/A'} />
+            <MiniText minitext={handleFetchDispatcher(viewParcelData?.data?.rider) || 'N/A'} />
 
             <EditHeading subheading="Pickup"/>
             <MiniText minitext={viewParcelData?.data?.pickUp?.name || 'N/A'} />

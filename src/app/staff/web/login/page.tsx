@@ -15,6 +15,7 @@ import { Password } from "@/app/dashboard/formik/password";
 import { login } from "@/app/dashboard/services/libs/staff-auth";
 import { staffAPIURL } from "@/app/dashboard/services/api-url/staff-api-url";
 import { State_data } from "@/app/dashboard/context/context";
+import Loader from "@/app/dashboard/services/Loader/spinner";
 
 
 export default function Staff(){
@@ -24,7 +25,7 @@ export default function Staff(){
         info: '',
         result: '',
     });
-    const {successMessage} = useContext(State_data)
+    const {successMessage, loading, setLoading} = useContext(State_data)
 
     async function handleLogin(val: any){
         const response = await fetch(staffAPIURL.stafflogin, {
@@ -35,7 +36,8 @@ export default function Staff(){
         },
     })
     const data = await response.json();
-    setStaff((prev: any) => ({...prev, result: data}));
+    setStaff((prev: any) => ({...prev, result: data || ''}));
+    setLoading((prev: any) => ({...prev, staffL: false}))
     }
 
 useEffect(() => {
@@ -57,6 +59,9 @@ useEffect(() => {
 },[staff?.result])
 
 useEffect(() => {
+    if(staff?.result === "" && staff?.info !== ""){
+        setLoading((prev: any) => ({...prev, staffL: true}))
+    }
     if(staff?.info !== ""){
         handleLogin(staff.info);
     }
@@ -64,6 +69,7 @@ useEffect(() => {
 
 return(
         <div className="w-screen relative h-screen overflow-x-hidden">
+                {loading.staffL && <Loader />}
             <Image  
             alt="background" 
             src={image} 
@@ -86,8 +92,7 @@ return(
                         successmessage="Login successful!"
                         failedmessage="Login parameters are incorrect"
                         staffAndCustomer={staff?.result}
-                        error={staff?.result?.code !== 200}
-                        loading={staff?.result === "undefined" && staff?.info !== ""}
+                        error={staff?.result?.code}
                         data={staff?.result}
                         />
                     }

@@ -23,6 +23,8 @@ export default function Context({children}: any){
         id: 0
     })
     const [loading, setLoading] = useState({
+        staffL: false,
+        customerL: false,
         parcel: false,
         customer: false,
         dispatcher: false,
@@ -133,6 +135,7 @@ export default function Context({children}: any){
 
     const [successMessage, setSuccessMessage] = useState({
         input: false,
+        changeDispatcher: false,
         saveLocations: false,
         activeShipment: true,
         deliveredShipment: true,

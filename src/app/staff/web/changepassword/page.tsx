@@ -14,6 +14,7 @@ import { staffAPIURL } from "@/app/dashboard/services/api-url/staff-api-url";
 import { authorizationKey } from "@/app/dashboard/services/staff-api/api";
 import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
 import { State_data } from "@/app/dashboard/context/context";
+import Loader from "@/app/dashboard/services/Loader/spinner";
 
 export default function StaffChangePassword(){
     const [passwordString, setPasswordString] = useState<boolean>(true);
@@ -22,7 +23,7 @@ export default function StaffChangePassword(){
         result: ""
     });
     const router = useRouter();
-    const {successMessage} = useContext(State_data)
+    const {successMessage, loading, setLoading} = useContext(State_data)
     async function handleChangePassword(values: any){
         const response = await fetch(staffAPIURL.changeStaffPassword, {
             method: 'PUT',
@@ -34,6 +35,7 @@ export default function StaffChangePassword(){
         })
         const data = await response.json();
         setChangeStaffPassword((prev: any) => ({...prev, result: data}));
+        setLoading((prev: any) => ({...prev, staffL: false}));
     }
 
     useEffect(() => {
@@ -48,6 +50,9 @@ export default function StaffChangePassword(){
    }, [changeStaffPassword?.result])
 
      useEffect(() => {
+        if(changeStaffPassword?.result === "" && changeStaffPassword?.info !== ""){
+            setLoading((prev: any) => ({...prev, staffL: true}))
+        }
         if(changeStaffPassword?.info !== ""){
             handleChangePassword(changeStaffPassword?.info)
         }
@@ -55,6 +60,7 @@ export default function StaffChangePassword(){
 
     return(
         <div className="w-screen relative h-screen overflow-x-hidden">
+            {loading.staffL && <Loader />}
         <Image  
         alt="background" 
         src={image} 
@@ -78,7 +84,6 @@ export default function StaffChangePassword(){
                     failedmessage="Sorry, password cannot be changed!"
                     staffAndCustomer={changeStaffPassword?.result}
                     error={changeStaffPassword?.result?.code !== 200}
-                    loading={changeStaffPassword?.result === "undefined" && changeStaffPassword?.info !== ""}
                     data={changeStaffPassword?.result}
                     />
                 }
@@ -105,7 +110,8 @@ export default function StaffChangePassword(){
 
                                     code: Password(),
                                     ...values
-                                }
+                                },
+                                result: ""
                             }))
                         }}  
                     >

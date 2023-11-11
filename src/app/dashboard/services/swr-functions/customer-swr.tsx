@@ -152,6 +152,19 @@ export function useAllParcelsFetcher(){
         }
 }
 
+export function useAllParcelsRangeFetcher(parcelRange: any){
+    const{data, error, mutate, isLoading, isValidating} = useSWR(CUSTOMERSWRKEYS.parcelRange,
+        () => parcelRangeFetcher(parcelRange));
+
+        return{
+            parcelRData: data,
+            parcelRError: error,
+            parcelRMutate: mutate,
+            parcelRIsLoading: isLoading,
+            parcelRIsValiddating: isValidating,
+        }
+}
+
 export function useAllDispatchersFetcher(){
     const{data, error, mutate, isLoading, isValidating} = useSWR(CUSTOMERSWRKEYS.dispatchersAll,
         () => fetchAllDispatchersFetcher());

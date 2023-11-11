@@ -3,7 +3,6 @@ import { customerAPIUrl } from "../api-url/customer-api-url";
 // const authorizationKeyCustomer = staffStore[staffStore.length - 1]?.authToken;
 export const authorizationKeyCustomer = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTU1MTE2MjJ9.N_IW7YA6Gr7vuXPxZTvQbrRrd1VU2QeohI-DL1NRR_w";
 
-
 export const createParcelFetcher = async(parcelDetails: any) => {
     const response = await fetch(customerAPIUrl.createParcel, {
         method: 'POST',
@@ -25,7 +24,7 @@ export const countParcelsFetcher = async() => {
             'Authorization': authorizationKeyCustomer
         },
     })
-
+    
     const data = await response.json();
     return data;
 }
@@ -61,7 +60,7 @@ export const parcelRangeFetcher = async (parcelRangeQuery: any) => {
     const data = await response.json();
     return data;
 }
-
+  
 
 // search customers
 export const customerRangeFetcher = async (customersRangeQuery: any) => {

@@ -16,6 +16,7 @@ import { customerAPIUrl } from "@/app/dashboard/services/api-url/customer-api-ur
 import { login } from "@/app/dashboard/services/libs/staff-auth";
 import { customerLogin } from "@/app/dashboard/services/libs/customer-auth";
 import { State_data } from "@/app/dashboard/context/context";
+import Loader from "@/app/dashboard/services/Loader/spinner";
 
 export default function Customer(){
     const [passwordString, setPasswordString] = useState<boolean>(true)
@@ -24,7 +25,7 @@ export default function Customer(){
         info: "",
         result: ""
     });
-    const {successMessage} = useContext(State_data)
+    const {successMessage, loading, setLoading} = useContext(State_data)
     async function handleLogin(val: any){
         const response = await fetch(customerAPIUrl.fetchCustomer, {
             method: "POST",
@@ -35,6 +36,7 @@ export default function Customer(){
     })
     const data = await response.json();
     setCustomer((prev: any) => ({...prev, result: data}));
+    setLoading((prev: any) => ({...prev, customerL: false}));
     }
 
     useEffect(() => {
@@ -56,6 +58,9 @@ export default function Customer(){
     },[customer?.result])
     
     useEffect(() => {
+        if(customer?.result === "" && customer?.info !== ""){
+            setLoading((prev: any) => ({...prev, customerL: true}))
+        }
         if(customer?.info !== ""){
             handleLogin(customer.info);
         }
@@ -63,6 +68,7 @@ export default function Customer(){
      
     return(
         <div className="w-screen relative h-screen overflow-x-hidden">
+                {loading.customerL && <Loader />}
             <Image  
             alt="background" 
             src={image} 
@@ -86,7 +92,6 @@ export default function Customer(){
                         failedmessage="Login parameters are incorrect"
                         staffAndCustomer={customer?.result}
                         error={customer?.result?.code !== 200}
-                        loading={customer?.result === "undefined" && customer?.info !== ""}
                         data={customer?.result}
                         />
                     }

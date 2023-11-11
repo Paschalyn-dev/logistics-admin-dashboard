@@ -14,8 +14,8 @@ export default function ErrorAndSucccessHandlers({staffAndCustomer, successmessa
 
     return(
         <div>
-            {(loading) && <Loader />}
-                {((!data || data === "")  && successName) &&
+            {(loading === true) && <Loader />}
+                {((!data || data === '')  && successName) &&
                     (
                     <div>
                             <SuccessMessage 
@@ -39,7 +39,7 @@ export default function ErrorAndSucccessHandlers({staffAndCustomer, successmessa
                 }
 
                 {
-                    (staffAndCustomer && data?.code && data?.code !== 200 && data?.name?.includes('error') && successName) &&
+                    (staffAndCustomer && data?.code && data?.code !== 200 && successName) &&
                         <div>
                             <SuccessMessage 
                             messageTitle={failedmessage}

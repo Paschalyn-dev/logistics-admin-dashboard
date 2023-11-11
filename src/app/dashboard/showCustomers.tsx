@@ -19,11 +19,15 @@ export default function ShowCustomers({show, setShow}: any){
     });
     
     function handleSearch(event: any){
+        setSearch((prev: any) => ({...prev, text: event.target.value}));
+    }
+
+    useEffect(() => {
         const searched = fetchCustomersData?.data?.filter((customer: any) => {
             return customer.user.name.toString().toLowerCase().includes(search.text.toString().toLowerCase());
         })
-        setSearch((prev: any) => ({...prev, text: event.target.value, objects: searched}));
-    }
+        setSearch((prev: any) => ({...prev, objects: searched}));  
+    }, [search.text])
 
     function handleClick(number: any){
         setId((prev: any) => ({...prev, [show]: number}))
@@ -51,7 +55,7 @@ export default function ShowCustomers({show, setShow}: any){
 
                     <div className="flex items-center bg-gray-200 gap-3 rounded-xl w-full justify-start p-4 my-5">
                         <i id="search-box" className="icon ion-md-search"></i>
-                        <input type="text" className="text-gray-500 bg-gray-200 outline-0 h-fit w-full" placeholder="Search State" value={search.text} onChange={handleSearch} />
+                        <input type="text" className="text-gray-500 bg-gray-200 outline-0 h-fit w-full" placeholder="Search Customers" value={search.text} onChange={handleSearch} />
                     </div>
                     <div className="overflow-y-auto overflow-x-hidden h-3/5">
                         {  search.text === "" ?

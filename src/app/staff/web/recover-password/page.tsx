@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { State_data } from "@/app/dashboard/context/context";
 import { staffAPIURL } from "@/app/dashboard/services/api-url/staff-api-url";
 import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
+import Loader from "@/app/dashboard/services/Loader/spinner";
 
 export default function RecoverPassword(){
      const [forgotPassword, setForgotPassword] = useState<any>({
@@ -20,7 +21,7 @@ export default function RecoverPassword(){
         result: ""
      });
      const router = useRouter();
-     const {successMessage} = useContext(State_data)
+     const {successMessage, loading, setLoading} = useContext(State_data)
      async function handleRecoverPassword(val: any){
         const response = await fetch(staffAPIURL.forgetStaffPassword,{
             method: 'PUT',
@@ -31,6 +32,7 @@ export default function RecoverPassword(){
         })
         const data = await response.json();
         setForgotPassword((prev: any) => ({...prev, result: data}));
+        setLoading((prev: any) => ({...prev, staffL: false}));
      }
 
      useEffect(() => {
@@ -45,6 +47,9 @@ export default function RecoverPassword(){
    }, [forgotPassword?.result])
 
      useEffect(() => {
+        if(forgotPassword?.result === "" && forgotPassword?.info !== ""){
+            setLoading((prev: any) => ({...prev, staffL: true}))
+        }
         if(forgotPassword?.info !== ""){
             handleRecoverPassword(forgotPassword?.info)
         }
@@ -52,6 +57,7 @@ export default function RecoverPassword(){
 
     return(
         <div className="w-screen relative h-screen overflow-x-hidden">
+            {loading.staffL && <Loader />}
             <Image  
             alt="background" 
             src={image} 
@@ -71,7 +77,6 @@ export default function RecoverPassword(){
                         successName={successMessage.staffAndCustomerForgotPassword}
                         staffAndCustomer={forgotPassword?.result} 
                         error={forgotPassword?.result?.code !== 200}
-                        loading={forgotPassword?.result === "undefined" && forgotPassword?.info !== ""}
                         data={forgotPassword?.result}
                         code={forgotPassword?.info?.code}
                         failedmessage ="This email is not registered."
@@ -95,7 +100,8 @@ export default function RecoverPassword(){
                                     info: {
                                         code: Password(),
                                         ...values
-                                    }
+                                    },
+                                    result: ""
                                 }))
                             }}  
                         >
