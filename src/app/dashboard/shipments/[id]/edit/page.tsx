@@ -1,5 +1,5 @@
 'use client'
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef, useCallback } from "react";
 import { Formik, Form } from 'formik';
 import Hero from "../../../preferences/hero";
 import SubHeading from "../../../preferences/website/subheading";
@@ -26,6 +26,7 @@ import ShowCustomers from "@/app/dashboard/showCustomers";
 import { useFetchCustomers } from "@/app/dashboard/services/swr-functions/staff-swr";
 
 export default function FormPageShipments({ params }: { params: {id: number}}){
+    const formikRef = useRef<any>(null);
     const {viewParcelData, viewParcelIsLoading, viewParcelIsValidating} = useViewParcels(params.id);
     const {successMessage, setSuccessMessage, setLoading, loading, id} = useContext(State_data);
     const [handleToggleParcelButtons, setHandleToggleParcelButtons] = useState<any>({
@@ -99,8 +100,6 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
     
     const {fetchCustomersData} = useFetchCustomers();
     const {dispatcherAllData} = useAllDispatchersFetcher();
-    const findCustomerIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.customer)
-    const findDestinationIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.destination)
 
     function handleParcelPicked() {
         setHandleToggleParcelButtons((prev: any) => ({
@@ -125,6 +124,26 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
         console.log(newId[0]?.id)
         return newId[0]?.id;
     }
+
+    const updateCustomerInformation = useCallback((key: string, index: number) => {
+        const { user } = fetchCustomersData?.data[index] ?? {};
+        if (user) {
+            formikRef.current?.setFieldValue(`${key}.name`, user.name);
+            formikRef.current?.setFieldValue(`${key}.email`, user.email);
+            formikRef.current?.setFieldValue(`${key}.phone`, user.phone);
+            formikRef.current?.setFieldValue(`${key}.address`, user.address);
+        }
+    }, [ fetchCustomersData?.data, formikRef.current ]);
+
+    const findCustomerIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.customer)
+    useEffect(() => {
+        updateCustomerInformation('pickUp', findCustomerIndex)
+    }, [fetchCustomersData?.data, findCustomerIndex])
+
+    const findDestinationIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.destination)
+    useEffect(() => {
+        updateCustomerInformation('destination', findDestinationIndex)
+    }, [fetchCustomersData?.data, findDestinationIndex])
 
     return(
         <Holder>
@@ -168,10 +187,10 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                     completed: handleToggleParcelButtons.parcelDelivered,
                     description: viewParcelData?.data?.description,
                     destination:{
-                        address: showCustomer?.editingDestination !== true ? viewParcelData?.data?.destination?.address : fetchCustomersData?.data[findDestinationIndex]?.user?.address,
-                        email: showCustomer?.editingDestination !== true ? viewParcelData?.data?.destination?.email : fetchCustomersData?.data[findDestinationIndex]?.user?.email,
-                        name: showCustomer?.editingDestination !== true  ?  viewParcelData?.data?.destination?.name : fetchCustomersData?.data[findDestinationIndex]?.user?.name,
-                        phone: showCustomer?.editingDestination !== true ? viewParcelData?.data?.destination?.phone : fetchCustomersData?.data[findDestinationIndex]?.user?.phone
+                        address: viewParcelData?.data?.destination?.address,
+                        email: viewParcelData?.data?.destination?.email,
+                        name: viewParcelData?.data?.destination?.name,
+                        phone: viewParcelData?.data?.destination?.phone,
                     },
                     fragile: handleToggleParcelButtons.parcelFragility,
                     meta: {
@@ -207,10 +226,10 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                         paid: handleToggleParcelButtons.customerPaid,
                         paymentType:  viewParcelData?.data?.paymentType,
                         pickUp: {
-                            address: showCustomer?.editingCustomer !== true ? viewParcelData?.data?.pickUp?.address : fetchCustomersData?.data[findCustomerIndex]?.user?.address,
-                            email: showCustomer?.editingCustomer !== true ? viewParcelData?.data?.pickUp?.email : fetchCustomersData?.data[findCustomerIndex]?.user?.email,
-                            name: showCustomer?.editingCustomer !== true ? viewParcelData?.data?.pickUp?.name : fetchCustomersData?.data[findCustomerIndex]?.user?.name,
-                            phone: showCustomer?.editingCustomer !== true ? viewParcelData?.data?.pickUp?.phone : fetchCustomersData?.data[findCustomerIndex]?.user?.phone,
+                            address: viewParcelData?.data?.pickUp?.address,
+                            email: viewParcelData?.data?.pickUp?.email,
+                            name:  viewParcelData?.data?.pickUp?.name,
+                            phone: viewParcelData?.data?.pickUp?.phone,
                         },
                         picked: handleToggleParcelButtons.parcelPicked,
                         rider: viewParcelData?.data?.rider,
@@ -256,10 +275,9 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                         setSuccessMessage((prev:any) => ({...prev, editShipment: true}));
                         setEditParcelDetails((prev: any) => ({...prev, info:{...values}, code: Password(), result: ""}));
                     }}
-                    enableReinitialize={true}
                 >
                     {
-                        ({ values, getFieldProps, handleSubmit }) => (
+                        ({ values, handleChange, handleSubmit }) => (
                             <Hero 
                             formHeading={values.name} 
                             description={values.amount ? `₦${values.amount}` : `₦0`}
@@ -267,18 +285,17 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                             icon="icon ion-md-cube">
                             <Form onSubmit={handleSubmit}>
                                 <SubHeading subheading="Parcel" />
-
+                                <button onClick={() => console.log(values)}>Click</button>
                                 <TextInput
-                                    label="Name"
-                                    type="text"
-                                    {...getFieldProps('name')}
+                                label="Name"
+                                name="name"
+                                type="text"
                                 />
 
                                 <TextArea 
                                 label="Description (optional)"
-                                {...getFieldProps('description')}
-                                />
-                               
+                                name="description"
+                                />                               
 
                                 <ToggleButton
                                 onOff={handleToggleParcelButtons.parcelFragility}
@@ -307,58 +324,73 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                                 </Select> 
 
                                 <SubHeading subheading="Pickup" />
-                                <div onClick={() => setShowCustomer((prev: any) => ({...prev, customer: true, text: "customer", editingCustomer: true}))} className="my-4 cursor-pointer text-green-500">Select Customer</div>
+                                <div onClick={() => {setShowCustomer((prev: any) => ({...prev, customer: true, text: "customer", creatingCustomer: true}))}} className="my-4 cursor-pointer text-green-500">Select Customer</div>
 
                                 <TextInput
-                                label="Name"
-                                type="text"
-                                {...getFieldProps('pickUp.name')}
-
-                                />
+                                 name="pickUp.name"
+                                 type="text"
+                                 label="Name"
+                                 handleChange={handleChange}
+                                 value={values?.pickUp?.name || viewParcelData?.data?.pickUp?.name}
+                                 />
 
                                 <TextInput
-                                label="Email Address"
-                                {...getFieldProps('pickUp.email')}
-                                type="email"
+                                    label="Email Address"
+                                    type="email"
+                                    name='pickUp.email'
+                                    handleChange={handleChange}
+                                    value={values?.pickUp?.email}
                                 /> 
 
                                 <TextInput
                                 label="Phone"
-                                {...getFieldProps('pickUp.phone')}
                                 type="tel"
+                                name='pickUp.phone'
+                                handleChange={handleChange}
+                                value={values?.pickUp?.phone}
                                 /> 
 
                                 <TextInput
                                 label="Address"
-                                {...getFieldProps('pickUp.address')}
                                 type="text"
+                                name='pickUp.address'
+                                handleChange={handleChange}
+                                value={values?.pickUp?.address}
                                 /> 
 
                                 <SubHeading subheading="Destination" /> 
-                                <div onClick={() => setShowCustomer((prev: any) => ({...prev, destination: true, text: "destination", editingDestination: true}))} className="my-4 cursor-pointer text-green-500">Select Customer</div>
+                                <div onClick={() => setShowCustomer((prev: any) => ({...prev, destination: true, text: "destination", creatingDestination: true}))} className="my-4 cursor-pointer text-green-500">Select Customer</div>
 
                                 <TextInput
                                 label="Name"
-                                {...getFieldProps('destination.name')}
                                 type="text"
+                                name='destination.name'
+                                handleChange={handleChange}
+                                value={values?.destination?.name}
                                 />
 
                                 <TextInput
                                 label="Email Address"
-                                {...getFieldProps('destination.email')}
                                 type="email"
+                                name='destination.email'
+                                handleChange={handleChange}
+                                value={values?.destination?.email}
                                 /> 
 
                                 <TextInput
                                 label="Phone"
-                                {...getFieldProps('destination.phone')}
                                 type="tel"
+                                name='destination.phone'
+                                handleChange={handleChange}
+                                value={values?.destination?.phone}
                                 /> 
 
                                 <TextInput
                                 label="Address"
-                                {...getFieldProps('destination.address')}
                                 type="text"
+                                name='destination.address'
+                                handleChange={handleChange}
+                                value={values?.destination?.address}
                                 /> 
 
                                 <SubHeading subheading="Route Estimate" />
@@ -366,7 +398,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
 
                                 <TextInput
                                 label="Estimated Time"
-                                {...getFieldProps('estimatedTime.text')}
+                                name="estimatedTime.text"
                                 type="number"
                                 /> 
 
@@ -378,13 +410,13 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
 
                                 <TextInput
                                 label="Estimated Amount"
-                                {...getFieldProps('amount')}
-                                type="number"
+                                name="amount"
+                                type="text"
                                 /> 
 
                                 <SubHeading subheading="Payment" />
 
-                                <Select label="Payment Option" {...getFieldProps('paymentType')}>
+                                <Select label="Payment Option" name="paymentType">
                                     <option value="PAY_ON_DELIVERY">Pay On Delivery</option>
                                     <option value="PAY_ON_PICKUP">Pay On Pickup</option>
                                 </Select>
@@ -405,6 +437,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
 
                                 <Button 
                                 type="submit" 
+                                handleClick={handleSubmit}
                                 buttonName="Save" 
                                 />
                             </Form>

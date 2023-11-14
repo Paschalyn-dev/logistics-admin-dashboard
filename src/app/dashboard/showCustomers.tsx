@@ -29,12 +29,19 @@ export default function ShowCustomers({show, setShow}: any){
         setSearch((prev: any) => ({...prev, objects: searched}));  
     }, [search.text])
 
-    function handleClick(number: any){
-        setId((prev: any) => ({...prev, [show]: number}))
-    }
+    const [myId, setMyId] = useState<number>(0)
 
+    function handleClick(number: number){
+        setMyId(number)
+    }
+    
     function handleDone(){
+        setId((prev: any) => ({...prev, [show]: myId}))
         setShow((prev: any) => ({...prev, [show]: false}));
+    }
+    
+    function handleCancel(){
+        setShow((prev: any) => ({...prev, [show]: false}))
     }
 
     useEffect(() => {
@@ -45,6 +52,7 @@ export default function ShowCustomers({show, setShow}: any){
             setId((prev: any) => ({...prev, destination: 0}) )
         }
     }, [show])
+
 
     return(
         <div>
@@ -60,14 +68,15 @@ export default function ShowCustomers({show, setShow}: any){
                     <div className="overflow-y-auto overflow-x-hidden h-3/5">
                         {  search.text === "" ?
                             fetchCustomersData?.data?.map((customer: any, i: number) => (
-                                <div  onClick={() => handleClick(customer.id)} className={customer.id === id.customer || customer.id === id.destination ? "p-2 rounded-lg flex gap-3 bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex gap-3 mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
+                                <div  onClick={() => handleClick(customer.id)} className={customer.id === myId || customer.id === id.customer || customer.id === id.destination ? "p-2 rounded-lg flex gap-3 bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex gap-3 mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
                                     <p>{i + 1}</p>
                                     <p>{customer.user.name}</p>
+                                    {/* <p>{fetchCustomersData?.data?.indexOf(myId) === i ? show.toString()  : "" }</p> */}
                                 </div>
                             ))
                             :
                             search.objects.map((searches: any, i: number) => (
-                                <div  onClick={() => handleClick(searches.id)} className={searches.id === id.customer || searches.id === id.destination ? "p-2 rounded-lg flex gap-3 bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex gap-3 mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
+                                <div  onClick={() => handleClick(searches.id)} className={searches.id === id.customer || searches.id === myId  || searches.id === id.destination ? "p-2 rounded-lg flex gap-3 bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex gap-3 mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
                                     <p>{i + 1}</p>
                                     <p>{searches.user.name}</p>
                                 </div>
@@ -77,7 +86,7 @@ export default function ShowCustomers({show, setShow}: any){
 
                     <span className="font-bold mt-3 w-full laptop:text-base desktop:text-lg phone:text-sm w-fit flex justify-between items-center relative">
                         <Button buttonName="Done" handleClick={handleDone}/>
-                        <button onClick={handleDone} className="font-bold mt-2 text-red-600">Cancel</button>
+                        <button onClick={handleCancel} className="font-bold mt-2 text-red-600">Cancel</button>
                     </span>
 
                 </div>

@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Formik, Form } from 'formik';
 import Hero from "../../../preferences/hero";
 import SubHeading from "../../../preferences/website/subheading";
@@ -27,6 +27,7 @@ import Loader from "@/app/dashboard/services/Loader/spinner";
 import CustomInput from "@/app/dashboard/customInput";
 
 export default function FormPageShipments(){
+    const formikRef = useRef<any>(null);
     const {successMessage, loading, setLoading, setSuccessMessage, id} = useContext(State_data);
     const [windowDetails, setWindowDetails] = useState<any>('')
     const [handleToggleParcelButtons, setHandleToggleParcelButtons] = useState<any>({
@@ -120,8 +121,26 @@ export default function FormPageShipments(){
         }))
     }
 
+    const updateCustomerInformation = useCallback((key: string, index: number) => {
+        const { user } = fetchCustomersData?.data[index] ?? {};
+        if (user) {
+            formikRef.current?.setFieldValue(`${key}.name`, user.name);
+            formikRef.current?.setFieldValue(`${key}.email`, user.email);
+            formikRef.current?.setFieldValue(`${key}.phone`, user.phone);
+            formikRef.current?.setFieldValue(`${key}.address`, user.address);
+        }
+    }, [ fetchCustomersData?.data, formikRef.current ]);
+
     const findCustomerIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.customer)
+    useEffect(() => {
+        updateCustomerInformation('pickUp', findCustomerIndex)
+    }, [fetchCustomersData?.data, findCustomerIndex])
+
     const findDestinationIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.destination)
+    useEffect(() => {
+        updateCustomerInformation('destination', findDestinationIndex)
+    }, [fetchCustomersData?.data, findDestinationIndex])
+
     
     useEffect(() => {
         setWindowDetails(window)
@@ -134,27 +153,28 @@ export default function FormPageShipments(){
             <Section>
                 {loading.parcel && <Loader />}
 
-            {
-                createParcel.result !== "" && createParcel.info !== "" && 
-                <ErrorAndSucccessHandlers
-                name="createShipment"
-                successName={successMessage.createShipment}
-                message={createParcel?.result?.code} 
-                code={createParcel?.info?.code}
-                error={createParcel?.result?.code !== 200}
-                successmessage="Shipment successfully added to the list!"
-                failedmessage="Sorry, shipment cannot be added to the list!"
-                staffAndCustomer={createParcel?.result}
-                data={createParcel?.result}
-                />
-            }
-          
-            <Link href="/dashboard/shipments/active" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
-                <i className="icon ion-md-arrow-back"></i>
-            </Link>
+                {
+                    createParcel.result !== "" && createParcel.info !== "" && 
+                    <ErrorAndSucccessHandlers
+                    name="createShipment"
+                    successName={successMessage.createShipment}
+                    message={createParcel?.result?.code} 
+                    code={createParcel?.info?.code}
+                    error={createParcel?.result?.code !== 200}
+                    successmessage="Shipment successfully added to the list!"
+                    failedmessage="Sorry, shipment cannot be added to the list!"
+                    staffAndCustomer={createParcel?.result}
+                    data={createParcel?.result}
+                    />
+                }
+            
+                <Link href="/dashboard/shipments/active" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
+                    <i className="icon ion-md-arrow-back"></i>
+                </Link>
 
-            <Formik
-                  initialValues={{
+                <Formik
+                    innerRef={(ref) => formikRef.current = ref}
+                    initialValues={{
                       amount: '0',
                       card: {
                           authorizationCode: "",
@@ -164,10 +184,10 @@ export default function FormPageShipments(){
                         description: '',
                         completed: handleToggleParcelButtons.parcelDelivered,
                         destination:{
-                            address: showCustomer?.creatingDestination ? fetchCustomersData?.data[findDestinationIndex]?.user?.address : "",
-                            email: showCustomer?.creatingDestination ? fetchCustomersData?.data[findDestinationIndex]?.user?.email : "",
-                            name: showCustomer?.creatingDestination ? fetchCustomersData?.data[findDestinationIndex]?.user?.name : "",
-                            phone: showCustomer?.creatingDestination ? fetchCustomersData?.data[findDestinationIndex]?.user?.phone : "",
+                            address: "",
+                            email: "",
+                            name: "",
+                            phone: "",
                     },
                     fragile: handleToggleParcelButtons.parcelFragility,
                     meta: {
@@ -203,10 +223,10 @@ export default function FormPageShipments(){
                     paid: handleToggleParcelButtons.customerPaid,
                     paymentType: "",
                     pickUp: {
-                        address: showCustomer?.creatingCustomer ? fetchCustomersData?.data[findCustomerIndex]?.user?.address : "",
-                        email:  showCustomer?.creatingCustomer ?  fetchCustomersData?.data[findCustomerIndex]?.user?.email : "",
+                        address: "",
+                        email:  "",
                         name:   "",
-                        phone:  showCustomer?.creatingCustomer ?  fetchCustomersData?.data[findCustomerIndex]?.user?.phone : "",
+                        phone:  "",
                     },
                     picked: handleToggleParcelButtons.parcelPicked,
                     reference: "",
@@ -249,14 +269,13 @@ export default function FormPageShipments(){
                 onSubmit={async (values) => {
                    setCreateParcel((prev: any) => ({...prev, result: "", info: {...values}, code: Password()}));
                    setSuccessMessage((prev: any) => ({...prev, createShipment: true}));
-                }}
-                // enableReinitialize={true}
+                    }}
                 >
                     {
                         ({ values, handleSubmit, handleChange }) => (
                             <Hero 
                             formHeading={values?.name || ""} 
-                            description={`₦${values?.amount !=='0' ? values?.amount : '0'}`}
+                            description={`₦${values?.amount !== '0' || values?.amount !== null ? values?.amount : '0'}`}
                             heading="Create A Shipment" 
                             icon="icon ion-md-cube">
                             <Form>
@@ -267,7 +286,6 @@ export default function FormPageShipments(){
                                 name="name"
                                 type="text"
                                 />
-                                <button onClick={() => console.log(values)}>Values</button>
 
                                 <TextArea 
                                 label="Description (optional)"
@@ -304,47 +322,37 @@ export default function FormPageShipments(){
 
                                 <SubHeading subheading="Pickup" />
                                 <div onClick={() => {setShowCustomer((prev: any) => ({...prev, customer: true, text: "customer", creatingCustomer: true}))}} className="my-4 cursor-pointer text-green-500">Select Customer</div>
-{/* 
-                                <TextInput
-                                label="Name"
-                                type="text"
-                                name='pickUp.name'
-                                /> */}
 
-                                <CustomInput
+                                <TextInput
                                  name="pickUp.name"
-                                 id="pickUp.name"
                                  type="text"
                                  label="Name"
                                  handleChange={handleChange}
-                                 value={showCustomer?.creatingCustomer ?  fetchCustomersData?.data[findCustomerIndex]?.user?.name : values.pickUp.name}
-                                 />
-
-<CustomInput
-                                 name="name"
-                                 id="name"
-                                 type="text"
-                                 label="Name"
-                                 handleChange={handleChange}
-                                 value={values.name}
+                                 value={values?.pickUp?.name}
                                  />
 
                                 <TextInput
-                                label="Email Address"
-                                type="email"
-                                name='pickUp.email'
+                                    label="Email Address"
+                                    type="email"
+                                    name='pickUp.email'
+                                    handleChange={handleChange}
+                                    value={values?.pickUp?.email}
                                 /> 
 
                                 <TextInput
                                 label="Phone"
                                 type="tel"
                                 name='pickUp.phone'
+                                handleChange={handleChange}
+                                value={values?.pickUp?.phone}
                                 /> 
 
                                 <TextInput
                                 label="Address"
                                 type="text"
                                 name='pickUp.address'
+                                handleChange={handleChange}
+                                value={values?.pickUp?.address}
                                 /> 
 
                                 <SubHeading subheading="Destination" /> 
@@ -354,24 +362,32 @@ export default function FormPageShipments(){
                                 label="Name"
                                 type="text"
                                 name='destination.name'
+                                handleChange={handleChange}
+                                value={values?.destination?.name}
                                 />
 
                                 <TextInput
                                 label="Email Address"
                                 type="email"
                                 name='destination.email'
+                                handleChange={handleChange}
+                                value={values?.destination?.email}
                                 /> 
 
                                 <TextInput
                                 label="Phone"
                                 type="tel"
                                 name='destination.phone'
+                                handleChange={handleChange}
+                                value={values?.destination?.phone}
                                 /> 
 
                                 <TextInput
                                 label="Address"
                                 type="text"
                                 name='destination.address'
+                                handleChange={handleChange}
+                                value={values?.destination?.address}
                                 /> 
 
                                 <SubHeading subheading="Route Estimate" />
@@ -426,8 +442,9 @@ export default function FormPageShipments(){
                         )
                     }
                 </Formik>
+
                 {(showCustomer.customer || showCustomer.destination) && <ShowCustomers setShow={setShowCustomer} show={showCustomer.text} />}
-                </Section>
+            </Section>
         </Holder>
     )
 }
