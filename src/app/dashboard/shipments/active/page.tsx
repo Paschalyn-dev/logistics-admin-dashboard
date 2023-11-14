@@ -53,6 +53,17 @@ export default function Shipments(){
             return newId[0]?.fullName;
         }
     }   
+    const [windowDetails, setWindowWidth] = useState<any>(0)
+    useEffect(function onFirstMount() {
+        function checkWidth(){
+          setWindowWidth(window.innerWidth);
+        }
+        window.addEventListener("resize", checkWidth);
+        return () => window.removeEventListener('resize', checkWidth);
+      });
+    useEffect(() => {
+        setWindowWidth(window.innerWidth);
+    }, []);
     
     useEffect(() => {
         setSuccessMessage((prev: any) => ({...prev, changeDispatcher: false}))
@@ -208,13 +219,13 @@ export default function Shipments(){
                                 <p className="text-xs">{useDateHandler(parcel?.createdAt)}</p>
                             </div>
 
-                            <div>
+                            <div className="flex phone:gap-2 items-start justify-start w-fit tablet:gap-1 flex-wrap h-fit">
                                 <Link href={`/dashboard/shipments/${parcel.id}`} 
                                 className="hover:text-gray-600 cursor-pointer rounded-full bg-gray-200 px-3 py-2">
                                     <i className="icon ion-md-open"></i>
                                 </Link>
                                 <Link href={`/dashboard/shipments/${parcel.id}/edit`} 
-                                className="hover:text-gray-600 mx-2 cursor-pointer rounded-full bg-gray-200 px-3 py-2">
+                                className="hover:text-gray-600 cursor-pointer rounded-full bg-gray-200 px-3 py-2">
                                     <i className="icon ion-md-create"></i>
                                 </Link>
                                 <span onClick={() => {
@@ -245,16 +256,17 @@ export default function Shipments(){
                             <div className="flex items-center justify-start gap-5">
                                 <i className="icon ion-md-person text-gray-300 px-5 py-3 bg-gray-100 rounded-full text-3xl"></i>
                                 <div>
-                                    <p className="-mb-1">{ handleFetchDispatcher(parcel?.rider) || 'No Dispatcher'}</p>
+                                <p className="-mb-1">{ windowDetails < 700 && handleFetchDispatcher(parcel?.rider)?.length > 4 ? handleFetchDispatcher(parcel?.rider)?.slice(0, 4) + '...' : handleFetchDispatcher(parcel?.rider) || 'None'}</p>
+                                {/* <p className="-mb-1">{ windowDetails < 700 && !handleFetchDispatcher(parcel?.rider).length ? 'None' : 'No Dispatcher'}</p> */}
                                     <button onClick={() => {setCode(parcel?.id); setPass(Password())}} className="text-blue-600 text-sm">Change</button>
                                 </div>
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex phone:gap-4 laptop:gap-2 phone:flex-col laptop:flex-row">
                                 <a href={handleDispatcherNumber(parcel?.rider) ? `https://api.whatsapp.com/send?phone=${handleDispatcherNumber(parcel?.rider)}&text=Hello%20${handleFetchDispatcher(parcel?.rider)}%2C%20I%20got%20your%20contact%20from%20Logistix%20Africa%20website.%20I%20want%20to%20ship%20a%20parcel.%20My%20name%20is%20${parcel?.pickUp?.name}.` : ""} target="_blank">
-                                    <i className="icon ion-md-call text-green-300 px-5 py-3 bg-green-100 rounded-full text-3xl"></i>
+                                    <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
                                 </a>
                                 <button onClick={() => handleDispatcherEmail(parcel?.rider, parcel?.name, parcel?.rider)}>
-                                    <i className="icon ion-md-mail text-blue-300 px-5 py-3 bg-blue-100 rounded-full text-3xl"></i>
+                                    <i className="icon ion-md-mail text-blue-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-blue-100 rounded-full laptop:text-3xl"></i>
                                 </button>
                             </div>
                         </div>
@@ -268,7 +280,6 @@ export default function Shipments(){
                 </span>
                 <br/>
                 <SubHeading subheading=" You don't have any active shipment."/>
-                {/* <p className="w-5/12 mt-1 text-sm text-center">You don't have any active Shipment.</p> */}
             </div>
             )}
                 
@@ -287,13 +298,13 @@ export default function Shipments(){
                                 <p className="text-xs">{useDateHandler(parcelRange?.createdAt)}</p>
                             </div>
                             
-                            <div>
-                            <Link href={`/dashboard/shipments/${parcelRange.trackId}`} 
-                            className="hover:text-gray-600 cursor-pointer rounded-full bg-gray-200 px-3 py-2">
+                            <div className="flex phone:gap-2 items-start justify-start w-fit tablet:gap-1 flex-wrap h-fit">
+                                <Link href={`/dashboard/shipments/${parcelRange.id}`} 
+                                className="hover:text-gray-600 cursor-pointer rounded-full bg-gray-200 px-3 py-2">
                                     <i className="icon ion-md-open"></i>
                                 </Link>
-                                <Link href={`/dashboard/shipments/${parcelRange.trackId}/edit`} 
-                                className="hover:text-gray-600 mx-2 cursor-pointer rounded-full bg-gray-200 px-3 py-2">
+                                <Link href={`/dashboard/shipments/${parcelRange.id}/edit`} 
+                                className="hover:text-gray-600 cursor-pointer rounded-full bg-gray-200 px-3 py-2">
                                     <i className="icon ion-md-create"></i>
                                 </Link>
                                 <span onClick={() => {
@@ -324,16 +335,16 @@ export default function Shipments(){
                             <div className="flex items-center justify-start gap-5">
                                 <i className="icon ion-md-person text-gray-300 px-5 py-3 bg-gray-100 rounded-full text-3xl"></i>
                                 <div>
-                                <p className="-mb-1">{ handleFetchDispatcher(parcelRange?.rider) || 'No Dispatcher'}</p>
+                                <p className="-mb-1">{ windowDetails < 700 && handleFetchDispatcher(parcelRange?.rider)?.length > 4 ? handleFetchDispatcher(parcelRange?.rider)?.slice(0, 4) + '...' : handleFetchDispatcher(parcelRange?.rider) || 'None'}</p>
                                 <button onClick={() => {setCode(parcelRange?.id); setPass(Password())}} className="text-blue-600 text-sm">Change</button>
                                 </div>
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex phone:gap-4 laptop:gap-2 phone:flex-col laptop:flex-row">
                                 <a href={handleDispatcherNumber(parcelRange?.rider) ? `https://api.whatsapp.com/send?phone=${handleDispatcherNumber(parcelRange?.rider)}&text=Hello%20${handleFetchDispatcher(parcelRange?.rider)}%2C%20I%20got%20your%20contact%20from%20Logistix%20Africa%20website.%20I%20want%20to%20ship%20a%20parcel.%20My%20name%20is%20${parcelRange?.pickUp?.name}.` : ""} target="_blank">
-                                    <i className="icon ion-md-call text-green-300 px-5 py-3 bg-green-100 rounded-full text-3xl"></i>
+                                    <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
                                 </a>
                                 <button onClick={() => handleDispatcherEmail(parcelRange?.rider, parcelRange?.name, parcelRange?.rider)}>
-                                    <i className="icon ion-md-mail text-blue-300 px-5 py-3 bg-blue-100 rounded-full text-3xl"></i>
+                                    <i className="icon ion-md-mail text-blue-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-blue-100 rounded-full laptop:text-3xl"></i>
                                 </button>
                             </div>
                             </div>

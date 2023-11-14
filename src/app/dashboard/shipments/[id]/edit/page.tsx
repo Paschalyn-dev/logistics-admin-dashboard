@@ -27,7 +27,72 @@ import { useFetchCustomers } from "@/app/dashboard/services/swr-functions/staff-
 
 export default function FormPageShipments({ params }: { params: {id: number}}){
     const formikRef = useRef<any>(null);
+    const [initialValues, setInitialValues] = useState<any>({});
     const {viewParcelData, viewParcelIsLoading, viewParcelIsValidating} = useViewParcels(params.id);
+    useEffect(() => {
+        setInitialValues({
+            amount: viewParcelData?.data?.amount,
+            card: {
+                authorizationCode: "",
+                email: ""
+            },
+            company: viewParcelData?.data?.company,
+            completed: handleToggleParcelButtons.parcelDelivered,
+            description: viewParcelData?.data?.description,
+            destination: {
+                address: viewParcelData?.data?.destination?.address,
+                email: viewParcelData?.data?.destination?.email,
+                name:  viewParcelData?.data?.destination?.name,
+                phone: viewParcelData?.data?.destination?.phone
+            },
+            fragile: handleToggleParcelButtons.parcelFragility,
+            meta: {
+                by: {
+                    entity: viewParcelData?.data?.meta?.by?.entity,
+                    id: viewParcelData?.data?.meta?.by?.id
+                },
+                company: {
+                    alias: viewParcelData?.data?.meta?.company?.alias
+                },
+                device: {
+                    appBuild: viewParcelData?.data?.meta?.device?.appBuild,
+                    appId: viewParcelData?.data?.meta?.device?.appId,
+                    appName: viewParcelData?.data?.meta?.device?.appName,
+                    appVersion: viewParcelData?.data?.meta?.device?.appVersion,
+                    isVirtual: viewParcelData?.data?.meta?.device?.isVirtual,
+                    manufacturer: viewParcelData?.data?.meta?.device?.manufacturer,
+                    model: viewParcelData?.data?.meta?.device?.model,
+                    name: viewParcelData?.data?.meta?.device?.name,
+                    operatingSystem: viewParcelData?.data?.meta?.device?.operatingSystem,
+                    platform: viewParcelData?.data?.meta?.device?.platform
+                },
+                estimatedDistance: {
+                    text: viewParcelData?.data?.meta?.estimatedDistance?.text,
+                    value:  viewParcelData?.data?.meta?.estimatedDistance?.value
+                },
+                estimatedTime: {
+                    text:  viewParcelData?.data?.meta?.estimatedTime?.text,
+                    value:  viewParcelData?.data?.meta?.estimatedTime?.value
+                },
+            },
+            name: viewParcelData?.data?.name,
+            paid: handleToggleParcelButtons.customerPaid,
+            paymentType:  viewParcelData?.data?.paymentType,
+            pickUp: {
+                address: viewParcelData?.data?.pickUp?.address,
+                email: viewParcelData?.data?.pickUp?.email,
+                name: viewParcelData?.data?.pickUp?.name,
+                phone: viewParcelData?.data?.pickUp?.phone,
+            },
+            picked: handleToggleParcelButtons.parcelPicked,
+            rider: viewParcelData?.data?.rider,
+            size: viewParcelData?.data?.size,
+            trackId: viewParcelData?.data?.trackId,
+            updatedAt: viewParcelData?.data?.updatedAt,
+            userId: viewParcelData?.data?.userId,
+        })
+    }, [viewParcelData]);
+
     const {successMessage, setSuccessMessage, setLoading, loading, id} = useContext(State_data);
     const [handleToggleParcelButtons, setHandleToggleParcelButtons] = useState<any>({
         saveAndAddNewParcel: false,
@@ -36,7 +101,6 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
         parcelDelivered: viewParcelData?.data?.completed,
         customerPaid: viewParcelData?.data?.paid
     });
-    const {parcelAllMutate} = useAllParcelsFetcher();
     const router = useRouter();
     const [editParcelDetails, setEditParcelDetails] = useState<any>({
         info: "",
@@ -138,6 +202,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
     const findCustomerIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.customer)
     useEffect(() => {
         updateCustomerInformation('pickUp', findCustomerIndex)
+        console.log('pickUp',findCustomerIndex)
     }, [fetchCustomersData?.data, findCustomerIndex])
 
     const findDestinationIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.destination)
@@ -177,67 +242,8 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
             </Link>
 
             <Formik
-                  initialValues={{
-                    amount: viewParcelData?.data?.amount,
-                    card: {
-                        authorizationCode: "",
-                        email: ""
-                    },
-                    company: viewParcelData?.data?.company,
-                    completed: handleToggleParcelButtons.parcelDelivered,
-                    description: viewParcelData?.data?.description,
-                    destination:{
-                        address: viewParcelData?.data?.destination?.address,
-                        email: viewParcelData?.data?.destination?.email,
-                        name: viewParcelData?.data?.destination?.name,
-                        phone: viewParcelData?.data?.destination?.phone,
-                    },
-                    fragile: handleToggleParcelButtons.parcelFragility,
-                    meta: {
-                        by: {
-                            entity: viewParcelData?.data?.meta?.by?.entity,
-                            id: viewParcelData?.data?.meta?.by?.id
-                        },
-                        company:{
-                            alias: viewParcelData?.data?.meta?.company?.alias
-                        },
-                        device:{
-                            appBuild: viewParcelData?.data?.meta?.device?.appBuild,
-                            appId: viewParcelData?.data?.meta?.device?.appId,
-                            appName: viewParcelData?.data?.meta?.device?.appName,
-                            appVersion: viewParcelData?.data?.meta?.device?.appVersion,
-                            isVirtual: viewParcelData?.data?.meta?.device?.isVirtual,
-                            manufacturer: viewParcelData?.data?.meta?.device?.manufacturer,
-                            model: viewParcelData?.data?.meta?.device?.model,
-                            name: viewParcelData?.data?.meta?.device?.name,
-                            operatingSystem: viewParcelData?.data?.meta?.device?.operatingSystem,
-                            platform: viewParcelData?.data?.meta?.device?.platform
-                        },
-                        estimatedDistance: {
-                            text: viewParcelData?.data?.meta?.estimatedDistance?.text,
-                            value:  viewParcelData?.data?.meta?.estimatedDistance?.value
-                        },
-                        estimatedTime: {
-                            text:  viewParcelData?.data?.meta?.estimatedTime?.text,
-                            value:  viewParcelData?.data?.meta?.estimatedTime?.value
-                        },
-                    },
-                        name: viewParcelData?.data?.name,
-                        paid: handleToggleParcelButtons.customerPaid,
-                        paymentType:  viewParcelData?.data?.paymentType,
-                        pickUp: {
-                            address: viewParcelData?.data?.pickUp?.address,
-                            email: viewParcelData?.data?.pickUp?.email,
-                            name:  viewParcelData?.data?.pickUp?.name,
-                            phone: viewParcelData?.data?.pickUp?.phone,
-                        },
-                        picked: handleToggleParcelButtons.parcelPicked,
-                        rider: viewParcelData?.data?.rider,
-                        size: viewParcelData?.data?.size,
-                        trackId: viewParcelData?.data?.trackId,
-                        updatedAt: viewParcelData?.data?.updatedAt,
-                        userId: viewParcelData?.data?.userId,
-                  }}
+                  innerRef={(ref) => formikRef.current = ref}
+                  initialValues={initialValues}
                   validationSchema={Yup.object({
                     pickUp: Yup.object({
                         name: Yup.string().required('Please provide name for pickup.'),
@@ -275,9 +281,10 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                         setSuccessMessage((prev:any) => ({...prev, editShipment: true}));
                         setEditParcelDetails((prev: any) => ({...prev, info:{...values}, code: Password(), result: ""}));
                     }}
+                    enableReinitialize={true}
                 >
                     {
-                        ({ values, handleChange, handleSubmit }) => (
+                        ({ values, getFieldProps, handleChange, handleSubmit }) => (
                             <Hero 
                             formHeading={values.name} 
                             description={values.amount ? `₦${values.amount}` : `₦0`}
@@ -285,17 +292,18 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                             icon="icon ion-md-cube">
                             <Form onSubmit={handleSubmit}>
                                 <SubHeading subheading="Parcel" />
-                                <button onClick={() => console.log(values)}>Click</button>
+
                                 <TextInput
-                                label="Name"
-                                name="name"
-                                type="text"
+                                    label="Name"
+                                    type="text"
+                                    {...getFieldProps('name')}
                                 />
 
                                 <TextArea 
                                 label="Description (optional)"
-                                name="description"
-                                />                               
+                                {...getFieldProps('description')}
+                                />
+                               
 
                                 <ToggleButton
                                 onOff={handleToggleParcelButtons.parcelFragility}
@@ -324,73 +332,59 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                                 </Select> 
 
                                 <SubHeading subheading="Pickup" />
-                                <div onClick={() => {setShowCustomer((prev: any) => ({...prev, customer: true, text: "customer", creatingCustomer: true}))}} className="my-4 cursor-pointer text-green-500">Select Customer</div>
+                                <div onClick={() => setShowCustomer((prev: any) => ({...prev, customer: true, text: "customer", editingCustomer: true}))} className="my-4 cursor-pointer text-green-500">Select Customer</div>
 
                                 <TextInput
-                                 name="pickUp.name"
                                  type="text"
                                  label="Name"
-                                 handleChange={handleChange}
-                                 value={values?.pickUp?.name || viewParcelData?.data?.pickUp?.name}
+                                 {...getFieldProps('pickUp.name')}
                                  />
 
                                 <TextInput
                                     label="Email Address"
                                     type="email"
-                                    name='pickUp.email'
-                                    handleChange={handleChange}
-                                    value={values?.pickUp?.email}
+                                    {...getFieldProps('pickUp.email')}
+
                                 /> 
 
                                 <TextInput
                                 label="Phone"
                                 type="tel"
-                                name='pickUp.phone'
-                                handleChange={handleChange}
-                                value={values?.pickUp?.phone}
+                                {...getFieldProps('pickUp.phone')}
                                 /> 
 
                                 <TextInput
                                 label="Address"
                                 type="text"
-                                name='pickUp.address'
-                                handleChange={handleChange}
-                                value={values?.pickUp?.address}
+                                {...getFieldProps('pickUp.address')}
+
                                 /> 
 
                                 <SubHeading subheading="Destination" /> 
-                                <div onClick={() => setShowCustomer((prev: any) => ({...prev, destination: true, text: "destination", creatingDestination: true}))} className="my-4 cursor-pointer text-green-500">Select Customer</div>
+                                <div onClick={() => setShowCustomer((prev: any) => ({...prev, destination: true, text: "destination", editingDestination: true}))} className="my-4 cursor-pointer text-green-500">Select Customer</div>
 
                                 <TextInput
                                 label="Name"
+                                {...getFieldProps('destination.name')}
                                 type="text"
-                                name='destination.name'
-                                handleChange={handleChange}
-                                value={values?.destination?.name}
                                 />
 
                                 <TextInput
                                 label="Email Address"
+                                {...getFieldProps('destination.email')}
                                 type="email"
-                                name='destination.email'
-                                handleChange={handleChange}
-                                value={values?.destination?.email}
                                 /> 
 
                                 <TextInput
                                 label="Phone"
+                                {...getFieldProps('destination.phone')}
                                 type="tel"
-                                name='destination.phone'
-                                handleChange={handleChange}
-                                value={values?.destination?.phone}
                                 /> 
 
                                 <TextInput
                                 label="Address"
+                                {...getFieldProps('destination.address')}
                                 type="text"
-                                name='destination.address'
-                                handleChange={handleChange}
-                                value={values?.destination?.address}
                                 /> 
 
                                 <SubHeading subheading="Route Estimate" />
@@ -398,7 +392,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
 
                                 <TextInput
                                 label="Estimated Time"
-                                name="estimatedTime.text"
+                                {...getFieldProps('estimatedTime.text')}
                                 type="number"
                                 /> 
 
@@ -410,13 +404,13 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
 
                                 <TextInput
                                 label="Estimated Amount"
-                                name="amount"
-                                type="text"
+                                {...getFieldProps('amount')}
+                                type="number"
                                 /> 
 
                                 <SubHeading subheading="Payment" />
 
-                                <Select label="Payment Option" name="paymentType">
+                                <Select label="Payment Option" {...getFieldProps('paymentType')}>
                                     <option value="PAY_ON_DELIVERY">Pay On Delivery</option>
                                     <option value="PAY_ON_PICKUP">Pay On Pickup</option>
                                 </Select>
@@ -437,7 +431,6 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
 
                                 <Button 
                                 type="submit" 
-                                handleClick={handleSubmit}
                                 buttonName="Save" 
                                 />
                             </Form>

@@ -68,10 +68,15 @@ export default function ShowCustomers({show, setShow}: any){
                     <div className="overflow-y-auto overflow-x-hidden h-3/5">
                         {  search.text === "" ?
                             fetchCustomersData?.data?.map((customer: any, i: number) => (
-                                <div  onClick={() => handleClick(customer.id)} className={customer.id === myId || customer.id === id.customer || customer.id === id.destination ? "p-2 rounded-lg flex gap-3 bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex gap-3 mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
-                                    <p>{i + 1}</p>
-                                    <p>{customer.user.name}</p>
-                                    {/* <p>{fetchCustomersData?.data?.indexOf(myId) === i ? show.toString()  : "" }</p> */}
+                                <div  onClick={() => handleClick(customer.id)} className={customer.id === myId || customer.id === id.customer || customer.id === id.destination ? "p-2 rounded-lg flex justify-between bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex justify-between mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
+                                    <div className="flex gap-3">
+                                        <p>{i + 1}</p>
+                                        <p>{customer.user.name}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-red-500">{id.customer === customer.id || (myId === customer?.id && show === 'customer') ? 'Pickup'  : "" }</p>
+                                        <p className="text-blue-500">{id.destination === customer.id || (myId === customer?.id  && show === 'destination') ? 'Destination' : "" }</p>
+                                    </div>
                                 </div>
                             ))
                             :

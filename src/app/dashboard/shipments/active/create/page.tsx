@@ -60,8 +60,6 @@ export default function FormPageShipments(){
             headers: {
                 "Content-Type": "application/json",
                 'Authorization': authorizationKeyCustomer
-                // "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTU1MTE2MjJ9.N_IW7YA6Gr7vuXPxZTvQbrRrd1VU2QeohI-DL1NRR_w"
-
             },
         })
         const data = await response.json();
