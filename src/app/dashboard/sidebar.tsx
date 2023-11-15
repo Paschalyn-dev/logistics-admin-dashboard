@@ -57,9 +57,9 @@ export default function Sidebar() {
          
           <div onClick={() => setClicked('/dashboard/home/overview')}>
             <Link href="/dashboard/home/overview" 
-              className={clicked === "/dashboard/home/overview" ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
-                <i id={clicked === "/dashboard/home/overview" ? "yellow-color" : "white-color"} className="icon ion-md-home" title="Home"></i>
-                <h1 className={clicked === "/dashboard/home/overview" ? " " : "text-gray-100/70"}>Home</h1>
+              className={clicked.includes("/dashboard/home") ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
+                <i id={clicked.includes("/dashboard/home") ? "yellow-color" : "white-color"} className="icon ion-md-home" title="Home"></i>
+                <h1 className={clicked.includes("/dashboard/home") ? " " : "text-gray-100/70"}>Home</h1>
             </Link>
           </div>
           
@@ -105,9 +105,9 @@ export default function Sidebar() {
 
           <div onClick={() => setClicked('/dashboard/preferences/website')}>
             <Link href="/dashboard/preferences/website" 
-            className={clicked === "/dashboard/preferences/website" ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
-              <i id={clicked ==="/dashboard/preferences/website" ? "yellow-color" : "white-color"}  className="icon ion-md-brush" title="Design"></i>
-              <h1 className={clicked === "/dashboard/preferences/website" ? " " : "text-gray-100/70"}>Preferences</h1>
+            className={clicked.includes("/dashboard/preferences") ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
+              <i id={clicked.includes("/dashboard/preferences") ? "yellow-color" : "white-color"}  className="icon ion-md-brush" title="Design"></i>
+              <h1 className={clicked.includes("/dashboard/preferences") ? " " : "text-gray-100/70"}>Preferences</h1>
             </Link>
           </div>
 
@@ -127,7 +127,7 @@ export default function Sidebar() {
             </Link>
           </div>
           
-          <div onClick={() => setClicked('/dashboard/preferences/website')}>
+          <div onClick={() => setClicked('/dashboard/preferences/developer')}>
               <Link href="/dashboard/preferences/developer" 
               className="m-auto mt-6 mb-4">{`</> Developer`}</Link>
           </div>

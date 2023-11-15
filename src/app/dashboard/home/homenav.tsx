@@ -5,12 +5,12 @@ import ToggleNav from "@/app/dashboard/toggleNav";
 import Sidebar from "@/app/dashboard/sidebar";
 import ModeToggle from "../modetoggle";
 import * as React from "react";
-
+import { usePathname } from "next/navigation";
 
 export default function HomeNav(){
-  const [clickIt, setClickIt] = useState<string>('overview');
+  const pathname = usePathname();
+  const [clickIt, setClickIt] = useState<string>(pathname);
   const [windowWidth, setWindowWidth]= useState<number>(0);
-  
   useEffect(function onFirstMount() {
     function checkWidth() {
         setWindowWidth(window.innerWidth);
@@ -20,16 +20,13 @@ export default function HomeNav(){
     });
 
     useEffect(() => {
-      const homepage = localStorage.getItem('homepage');
-      if(homepage) {
-        setClickIt(JSON.parse(homepage))
-      }
       setWindowWidth(window.innerWidth)
     }, [])
-  
+
     useEffect(() => {
-      localStorage.setItem('homepage', JSON.stringify(clickIt))
-    }, [clickIt]);
+      setClickIt(pathname)
+    }, [pathname])  
+
 
     return(
         <div className= "flex z-10 dark:bg-red-500 bg-blue-700 top-0 phone:w-full laptop:w-10/12 overflow-x-auto bg-gray-100 phone:pr-10 laptop:pr-24 fixed justify-between items-center shadow-sm">            
@@ -43,7 +40,6 @@ export default function HomeNav(){
             link="/dashboard/home/overview" 
             icon="icon ion-md-list"
             clicked={clickIt} 
-            name="overview" 
             tooltip="List" 
             handleClick={setClickIt}
              />
@@ -54,7 +50,6 @@ export default function HomeNav(){
             icon="icon ion-md-cash" 
             clicked={clickIt} 
             tooltip="Cash" 
-            name="billing" 
             handleClick={setClickIt}
              />
              </div>

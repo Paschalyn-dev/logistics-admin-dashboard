@@ -4,10 +4,12 @@ import ToggleNav from "../toggleNav";
 import Sidebar from "../sidebar";
 import 'src/app/globals.css';
 import InsideNav from "../home/insidenav";
+import { usePathname } from "next/navigation";
 
 
 export default function PreferencesNav(){
-    const [clicked, setClicked]= useState<string>('website');
+    const pathname = usePathname();
+    const [clicked, setClicked]= useState<string>(pathname);
     const [windowWidth, setWindowWidth]= useState<number>(0);
 
     useEffect(() => {
@@ -23,15 +25,9 @@ export default function PreferencesNav(){
     });
 
     useEffect(() => {
-        const minipage = localStorage.getItem('minipage');
-        if(minipage) {
-          setClicked(JSON.parse(minipage))
-        }
-      }, [])
+        setClicked(pathname)
+      }, [pathname])  
     
-      useEffect(() => {
-        localStorage.setItem('minipage', JSON.stringify(clicked))
-      }, [clicked])
 
     return(
         <div className= "flex gap-5 z-10 h-fit bg-blue-700 top-0 phone:w-full laptop:w-10/12 bg-gray-100 phone:pr-10 laptop:pr-24 fixed justify-between items-center shadow-sm">            
@@ -46,7 +42,6 @@ export default function PreferencesNav(){
                  <div className="flex mr-5 justify-between items-center"> 
                         <InsideNav
                         icon="icon ion-md-globe"
-                        name="website"
                         tooltip="Globe"
                         title="Website"
                         clicked={clicked}
@@ -56,7 +51,6 @@ export default function PreferencesNav(){
                         
                         <InsideNav
                         icon="icon ion-md-card"
-                        name="payments"
                         tooltip="Card"
                         title="Payments"
                         clicked={clicked}
@@ -66,7 +60,6 @@ export default function PreferencesNav(){
 
                         <InsideNav
                         icon="icon ion-md-cube"
-                        name="shipment"
                         tooltip="Cube"
                         title="Shipment"
                         clicked={clicked}
@@ -76,7 +69,6 @@ export default function PreferencesNav(){
                 
                         <InsideNav
                         icon="icon ion-md-code"
-                        name="developer"
                         tooltip="Code"
                         title="Developer"
                         clicked={clicked}
@@ -86,7 +78,6 @@ export default function PreferencesNav(){
                         
                         <InsideNav
                         icon="icon ion-md-notifications"
-                        name="notifications"
                         tooltip="Notifications"
                         title="Notifications"
                         clicked={clicked}
