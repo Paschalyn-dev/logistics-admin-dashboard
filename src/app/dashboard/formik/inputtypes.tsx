@@ -4,12 +4,12 @@ type TEXTINPUT = {
     label: string, 
     id?:string, 
     stringPassword?:boolean, 
-    value?: any;
+    // value?: any;
     handlePasswordString?: any, 
     [x: string]: any; name: string; 
 }
 
-export default function TextInput ({label, id, value, stringPassword, handlePasswordString, ...props}: TEXTINPUT) {
+export default function TextInput ({label, id, stringPassword, handlePasswordString, ...props}: TEXTINPUT) {
     const [field, meta] = useField(props);
     return(
         <div className="flex mb-8 mt-2 text-gray-500 gap-2 flex-col ">

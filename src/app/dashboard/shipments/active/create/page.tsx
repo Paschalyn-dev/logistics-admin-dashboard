@@ -25,10 +25,11 @@ import { Password } from "@/app/dashboard/formik/password";
 import { authorizationKeyCustomer } from "@/app/dashboard/services/customer-api/api";
 import Loader from "@/app/dashboard/services/Loader/spinner";
 import CustomInput from "@/app/dashboard/customInput";
+import SuccessMessage from "@/app/dashboard/successmessage";
 
 export default function FormPageShipments(){
     const formikRef = useRef<any>(null);
-    const {successMessage, loading, setLoading, setSuccessMessage, id} = useContext(State_data);
+    const {successMessage, loading, setLoading, setSuccessMessage, id, setId} = useContext(State_data);
     const [windowDetails, setWindowDetails] = useState<any>('')
     const [handleToggleParcelButtons, setHandleToggleParcelButtons] = useState<any>({
         saveAndAddNewParcel: false,
@@ -129,6 +130,18 @@ export default function FormPageShipments(){
         }
     }, [ fetchCustomersData?.data, formikRef.current ]);
 
+    const updateButtons = useCallback((key: string, value: string) => {
+        formikRef.current?.setFieldValue(`${key}`, value);
+    }, [handleToggleParcelButtons, formikRef.current])
+
+
+    useEffect(() => {
+        updateButtons('fragile', handleToggleParcelButtons.parcelFragility)
+        updateButtons('completed', handleToggleParcelButtons.parcelDelivered)
+        updateButtons('paid', handleToggleParcelButtons.customerPaid)
+        updateButtons('picked', handleToggleParcelButtons.parcelPicked)
+    }, [handleToggleParcelButtons])
+
     const findCustomerIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.customer)
     useEffect(() => {
         updateCustomerInformation('pickUp', findCustomerIndex)
@@ -143,8 +156,11 @@ export default function FormPageShipments(){
     useEffect(() => {
         setWindowDetails(window)
     }, [typeof window !== 'undefined']);
-    
 
+    const handleIsNotValid = () => {
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
+    }
+    
     return(
         <Holder>
             <OrdersNav />
@@ -165,6 +181,17 @@ export default function FormPageShipments(){
                     data={createParcel?.result}
                     />
                 }
+
+                {
+                    successMessage.isNotValid && 
+                    <SuccessMessage
+                    id="failed"
+                    name="isNotValid"
+                    messageTitle="You have not filled all the required form fields."
+                    successMessageShow={successMessage.isNotValid}
+                    />
+                }
+
             
                 <Link href="/dashboard/shipments/active" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                     <i className="icon ion-md-arrow-back"></i>
@@ -257,20 +284,21 @@ export default function FormPageShipments(){
                         text: Yup.string().notRequired(),
                     }),
                     name: Yup.string()
-                    .min(5, 'Name must be five characters or more.'),
-                    // .required('Please provide name for shipment.'),
+                    .min(5, 'Name must be five characters or more.')
+                    .required('Please provide name for shipment.'),
                     description: Yup.string().notRequired(),
-                    rider: Yup.string().notRequired(),
+                    rider: Yup.string().required('Please choose a dispatcher from the list.'),
                     amount: Yup.string().notRequired(),
                     paymentType: Yup.string().notRequired()
                 })}
                 onSubmit={async (values) => {
-                   setCreateParcel((prev: any) => ({...prev, result: "", info: {...values}, code: Password()}));
-                   setSuccessMessage((prev: any) => ({...prev, createShipment: true}));
-                    }}
+                    setCreateParcel((prev: any) => ({...prev, result: "", info: {...values}, code: Password()}));
+                    setSuccessMessage((prev: any) => ({...prev, createShipment: true}));
+                    setId((prev: any) => ({...prev, customer: 0, destination: 0}))
+                }}
                 >
                     {
-                        ({ values, handleSubmit, handleChange }) => (
+                        ({ values, isValid, handleSubmit, handleChange }) => (
                             <Hero 
                             formHeading={values?.name || ""} 
                             description={`₦${values?.amount !== '0' || values?.amount !== null ? values?.amount : '0'}`}
@@ -288,8 +316,7 @@ export default function FormPageShipments(){
                                 <TextArea 
                                 label="Description (optional)"
                                 name="description"
-                                />
-                               
+                                />                             
 
                                 <ToggleButton
                                 onOff={handleToggleParcelButtons.parcelFragility}
@@ -432,7 +459,7 @@ export default function FormPageShipments(){
 
                                 <Button 
                                 type="submit" 
-                                handleClick={handleSubmit} 
+                                handleClick={() => isValid ? handleSubmit() : handleIsNotValid()} 
                                 buttonName="Save" 
                                 />
                             </Form>

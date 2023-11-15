@@ -24,11 +24,129 @@ import { Password } from "@/app/dashboard/formik/password";
 import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
 import ShowCustomers from "@/app/dashboard/showCustomers";
 import { useFetchCustomers } from "@/app/dashboard/services/swr-functions/staff-swr";
+import SuccessMessage from "@/app/dashboard/successmessage";
 
 export default function FormPageShipments({ params }: { params: {id: number}}){
     const formikRef = useRef<any>(null);
-    const [initialValues, setInitialValues] = useState<any>({});
     const {viewParcelData, viewParcelIsLoading, viewParcelIsValidating} = useViewParcels(params.id);
+    const [initialValues, setInitialValues] = useState<any>({});
+    
+    const {successMessage, setSuccessMessage, setLoading, loading, id, setId} = useContext(State_data);
+    const [handleToggleParcelButtons, setHandleToggleParcelButtons] = useState<any>({
+        saveAndAddNewParcel: false,
+        parcelFragility: viewParcelData?.data?.fragile,
+        parcelPicked: viewParcelData?.data?.picked,
+        parcelDelivered: viewParcelData?.data?.completed,
+        customerPaid: viewParcelData?.data?.paid
+    });
+    const router = useRouter();
+    const [editParcelDetails, setEditParcelDetails] = useState<any>({
+        info: "",
+        result: "", 
+        code: ""
+    });
+    
+    
+    const [showCustomer, setShowCustomer] = useState({
+        customer: false,
+        destination: false,
+        text: "", 
+        editingCustomer: false,
+        editingDestination: false
+    });
+    
+    async function handleEdit(details: any, id: any){
+        const response = await fetch(customerAPIUrl.editParcels(id), {
+            method: 'PUT',
+            body: JSON.stringify(details),
+            headers: {
+                "Content-Type": "application/json",
+                'Authorization': authorizationKeyCustomer
+                // "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTU1MTE2MjJ9.N_IW7YA6Gr7vuXPxZTvQbrRrd1VU2QeohI-DL1NRR_w"
+                
+            },
+        })
+        const data = await response.json();
+        setEditParcelDetails((prev: any) => ({...prev, result: data}));
+        setLoading((prev: any) => ({...prev, parcel: false}))
+    }
+    
+    function handleSaveAndAddNewParcel() {
+        setHandleToggleParcelButtons((prev: any) => ({
+            ...prev, saveAndAddNewParcel: !handleToggleParcelButtons.saveAndAddNewParcel
+        }))
+    }
+    useEffect(() => {
+        if(editParcelDetails?.result === "" && editParcelDetails?.info !== ""){
+            setLoading((prev: any) => ({...prev, parcel: true}))
+        }      
+        if(editParcelDetails?.info !== ""){
+            handleEdit({...editParcelDetails?.info}, viewParcelData?.data?.id);
+        }
+    }, [editParcelDetails?.code]);
+    
+    useEffect(() => {
+        if(!handleToggleParcelButtons.saveAndAddNewParcel && editParcelDetails?.result?.code === 200){
+            setTimeout(() => {
+                console.log('jhgfdsdfghjkl')
+                router.replace('/dashboard/shipments/active')
+            }, 5000);
+        }
+    }, [editParcelDetails?.result]);
+    
+    function handleParcelFragility() {
+        setHandleToggleParcelButtons((prev: any) => ({
+            ...prev, parcelFragility: !handleToggleParcelButtons.parcelFragility
+        }))
+    }
+    
+    const {fetchCustomersData} = useFetchCustomers();
+    const {dispatcherAllData} = useAllDispatchersFetcher();
+    
+    function handleParcelPicked() {
+        setHandleToggleParcelButtons((prev: any) => ({
+            ...prev, parcelPicked: !handleToggleParcelButtons.parcelPicked
+        }))
+    }
+    
+    function handleDelivered() {
+        setHandleToggleParcelButtons((prev: any) => ({
+            ...prev, parcelDelivered: !handleToggleParcelButtons.parcelDelivered
+        }))
+    }
+    
+    function handleCustomerPaid() {
+        setHandleToggleParcelButtons((prev: any) => ({
+            ...prev, customerPaid: !handleToggleParcelButtons.customerPaid
+        }))
+    }
+    
+    const handleFetchDispatcher = (name: string) => {
+        const newId = dispatcherAllData?.data?.filter((dispatcher: any) => dispatcher?.fullName === name);
+        console.log(newId[0]?.id)
+        return newId[0]?.id;
+    }
+    
+    const updateCustomerInformation = useCallback((key: string, index: number) => {
+        const { user } = fetchCustomersData?.data[index] ?? {};
+        if (user) {
+            formikRef.current?.setFieldValue(`${key}.name`, user.name);
+            formikRef.current?.setFieldValue(`${key}.email`, user.email);
+            formikRef.current?.setFieldValue(`${key}.phone`, user.phone);
+            formikRef.current?.setFieldValue(`${key}.address`, user.address);
+        }
+    }, [ fetchCustomersData?.data, formikRef.current ]);
+    
+    const findCustomerIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.customer)
+    useEffect(() => {
+        updateCustomerInformation('pickUp', findCustomerIndex)
+        console.log('pickUp',findCustomerIndex)
+    }, [fetchCustomersData?.data, findCustomerIndex])
+    
+    const findDestinationIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.destination)
+    useEffect(() => {
+        updateCustomerInformation('destination', findDestinationIndex)
+    }, [fetchCustomersData?.data, findDestinationIndex])
     useEffect(() => {
         setInitialValues({
             amount: viewParcelData?.data?.amount,
@@ -93,122 +211,20 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
         })
     }, [viewParcelData]);
 
-    const {successMessage, setSuccessMessage, setLoading, loading, id} = useContext(State_data);
-    const [handleToggleParcelButtons, setHandleToggleParcelButtons] = useState<any>({
-        saveAndAddNewParcel: false,
-        parcelFragility: viewParcelData?.data?.fragile,
-        parcelPicked: viewParcelData?.data?.picked,
-        parcelDelivered: viewParcelData?.data?.completed,
-        customerPaid: viewParcelData?.data?.paid
-    });
-    const router = useRouter();
-    const [editParcelDetails, setEditParcelDetails] = useState<any>({
-        info: "",
-        result: "", 
-        code: ""
-    });
-
-    
-    const [showCustomer, setShowCustomer] = useState({
-        customer: false,
-        destination: false,
-        text: "", 
-        editingCustomer: false,
-        editingDestination: false
-    });
-
-    async function handleEdit(details: any, id: any){
-        const response = await fetch(customerAPIUrl.editParcels(id), {
-            method: 'PUT',
-            body: JSON.stringify(details),
-            headers: {
-                "Content-Type": "application/json",
-                'Authorization': authorizationKeyCustomer
-                // "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTU1MTE2MjJ9.N_IW7YA6Gr7vuXPxZTvQbrRrd1VU2QeohI-DL1NRR_w"
-
-            },
-        })
-        const data = await response.json();
-        setEditParcelDetails((prev: any) => ({...prev, result: data}));
-        setLoading((prev: any) => ({...prev, parcel: false}))
-    }
-    
-    function handleSaveAndAddNewParcel() {
-        setHandleToggleParcelButtons((prev: any) => ({
-            ...prev, saveAndAddNewParcel: !handleToggleParcelButtons.saveAndAddNewParcel
-        }))
-    }
-    useEffect(() => {
-        if(editParcelDetails?.result === "" && editParcelDetails?.info !== ""){
-            setLoading((prev: any) => ({...prev, parcel: true}))
-        }      
-        if(editParcelDetails?.info !== ""){
-            handleEdit({...editParcelDetails?.info}, viewParcelData?.data?.id);
-        }
-    }, [editParcelDetails?.code]);
+    const updateButtons = useCallback((key: string, value: string) => {
+        formikRef.current?.setFieldValue(`${key}`, value);
+    }, [handleToggleParcelButtons, formikRef.current])
 
     useEffect(() => {
-        if(!handleToggleParcelButtons.saveAndAddNewParcel && editParcelDetails?.result?.code === 200){
-            setTimeout(() => {
-                console.log('jhgfdsdfghjkl')
-                router.replace('/dashboard/shipments/active')
-            }, 5000);
-        }
-    }, [editParcelDetails?.result]);
+        updateButtons('fragile', handleToggleParcelButtons.parcelFragility)
+        updateButtons('completed', handleToggleParcelButtons.parcelDelivered)
+        updateButtons('paid', handleToggleParcelButtons.customerPaid)
+        updateButtons('picked', handleToggleParcelButtons.parcelPicked)
+    }, [handleToggleParcelButtons])
 
-    function handleParcelFragility() {
-        setHandleToggleParcelButtons((prev: any) => ({
-            ...prev, parcelFragility: !handleToggleParcelButtons.parcelFragility
-        }))
+    const handleIsNotValid = () => {
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
     }
-    
-    const {fetchCustomersData} = useFetchCustomers();
-    const {dispatcherAllData} = useAllDispatchersFetcher();
-
-    function handleParcelPicked() {
-        setHandleToggleParcelButtons((prev: any) => ({
-            ...prev, parcelPicked: !handleToggleParcelButtons.parcelPicked
-        }))
-    }
-
-    function handleDelivered() {
-        setHandleToggleParcelButtons((prev: any) => ({
-            ...prev, parcelDelivered: !handleToggleParcelButtons.parcelDelivered
-        }))
-    }
-
-    function handleCustomerPaid() {
-        setHandleToggleParcelButtons((prev: any) => ({
-            ...prev, customerPaid: !handleToggleParcelButtons.customerPaid
-        }))
-    }
-
-    const handleFetchDispatcher = (name: string) => {
-        const newId = dispatcherAllData?.data?.filter((dispatcher: any) => dispatcher?.fullName === name);
-        console.log(newId[0]?.id)
-        return newId[0]?.id;
-    }
-
-    const updateCustomerInformation = useCallback((key: string, index: number) => {
-        const { user } = fetchCustomersData?.data[index] ?? {};
-        if (user) {
-            formikRef.current?.setFieldValue(`${key}.name`, user.name);
-            formikRef.current?.setFieldValue(`${key}.email`, user.email);
-            formikRef.current?.setFieldValue(`${key}.phone`, user.phone);
-            formikRef.current?.setFieldValue(`${key}.address`, user.address);
-        }
-    }, [ fetchCustomersData?.data, formikRef.current ]);
-
-    const findCustomerIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.customer)
-    useEffect(() => {
-        updateCustomerInformation('pickUp', findCustomerIndex)
-        console.log('pickUp',findCustomerIndex)
-    }, [fetchCustomersData?.data, findCustomerIndex])
-
-    const findDestinationIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.destination)
-    useEffect(() => {
-        updateCustomerInformation('destination', findDestinationIndex)
-    }, [fetchCustomersData?.data, findDestinationIndex])
 
     return(
         <Holder>
@@ -236,6 +252,16 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                 data={editParcelDetails?.result}
                 />
             }
+
+                {
+                    successMessage.isNotValid && 
+                    <SuccessMessage
+                    id="failed"
+                    name="isNotValid"
+                    messageTitle="You have not filled all the required form fields."
+                    successMessageShow={successMessage.isNotValid}
+                    />
+                }
 
             <Link href="/dashboard/shipments/active" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                 <i className="icon ion-md-arrow-back"></i>
@@ -273,18 +299,19 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                     .min(5, 'Name must be five characters or more.')
                     .required('Please provide name for shipment.'),
                     description: Yup.string().notRequired(),
-                    rider: Yup.string().notRequired(),
-                    amount: Yup.string(),
+                    rider: Yup.string().required('Please choose a dispatcher from the list.'),
+                    amount: Yup.string().notRequired(),
                     paymentType: Yup.string().notRequired()
                   })}
                   onSubmit={async (values) => {
                         setSuccessMessage((prev:any) => ({...prev, editShipment: true}));
                         setEditParcelDetails((prev: any) => ({...prev, info:{...values}, code: Password(), result: ""}));
+                        setId((prev: any) => ({...prev, customer: 0, destination: 0}))
                     }}
                     enableReinitialize={true}
                 >
                     {
-                        ({ values, getFieldProps, handleChange, handleSubmit }) => (
+                        ({ values, getFieldProps, isValid, handleSubmit }) => (
                             <Hero 
                             formHeading={values.name} 
                             description={values.amount ? `₦${values.amount}` : `₦0`}
@@ -431,6 +458,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
 
                                 <Button 
                                 type="submit" 
+                                handleClick={() => isValid ? handleSubmit() : handleIsNotValid()} 
                                 buttonName="Save" 
                                 />
                             </Form>

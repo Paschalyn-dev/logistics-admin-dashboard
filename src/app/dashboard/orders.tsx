@@ -3,10 +3,11 @@ import { useEffect, useState } from "react";
 import ToggleNav from "./toggleNav";
 import Sidebar from "./sidebar";
 import InsideNav from "./home/insidenav";
+import { usePathname } from "next/navigation";
 
 export default function OrdersNav(){   
-    const [clickIt, setClickIt] = useState<string>('active');
-        
+  const pathname = usePathname();
+  const [clickIt, setClickIt] = useState<string>(pathname);
     const [windowWidth, setWindowWidth]= useState<number>(0);
     
     useEffect(() => {
@@ -18,18 +19,13 @@ export default function OrdersNav(){
     });
 
     useEffect(() => {
-        const ordersPage = localStorage.getItem('ordersPage');
-        if(ordersPage) {
-          setClickIt(JSON.parse(ordersPage))
-          // router.replace(`/dashboard/${JSON.parse(ordersPage)}`);
-        }
         setWindowWidth(window.innerWidth);
       }, []);
-      
+
       useEffect(() => {
-        localStorage.setItem('ordersPage', JSON.stringify(clickIt))
-      }, [clickIt]);
-  
+        setClickIt(pathname)
+      }, [pathname])
+        
 
     return(
         <div className= "flex gap-5 z-10 h-fit bg-blue-700 top-0 phone:w-full laptop:w-10/12 bg-gray-100 phone:pr-10 laptop:pr-24 fixed justify-between items-center shadow-sm">            
@@ -46,7 +42,6 @@ export default function OrdersNav(){
                   link="/dashboard/shipments/active"
                   title="Active"
                   clicked={clickIt}
-                  name="active"
                   icon="icon ion-md-rocket"
                   tooltip="Rocket"
                   handleClick={setClickIt}
@@ -56,7 +51,6 @@ export default function OrdersNav(){
                   link="/dashboard/shipments/delivered"
                   title="Delivered"
                   clicked={clickIt}
-                  name="delievered"
                   icon="icon ion-md-happy"
                   tooltip="Happy"
                   handleClick={setClickIt}
@@ -66,7 +60,6 @@ export default function OrdersNav(){
                   link="/dashboard/shipments/late"
                   title="Late"
                   clicked={clickIt}
-                  name="late"
                   icon="icon ion-md-sad"
                   tooltip="Sad"
                   handleClick={setClickIt}
@@ -76,7 +69,6 @@ export default function OrdersNav(){
                   link="/dashboard/shipments/scheduled"
                   title="Scheduled"
                   clicked={clickIt}
-                  name="scheduled"
                   icon="icon ion-md-clock"
                   tooltip="Clock"
                   handleClick={setClickIt}

@@ -38,7 +38,7 @@ const handleFetchDispatcher = (id: any) => {
           <Hero comingsoon="Not Picked" description={viewParcelData?.data?.trackId.toUpperCase()} icon="icon ion-md-cube" heading={viewParcelData?.data?.name}>
             <div className="flex justify-center items-center w-full gap-2">
               <Link target="_blank" href={`https://radar.logistix.africa/track/${viewParcelData?.data?.trackId}`} className="bg-green-500 border-4 hover:bg-green-600 phone:py-1 phone:px-2 tablet:py-2 phone:text-base text-gray-50 tablet:px-3 tablet:text-lg rounded-lg">Track</Link>
-              <Link href={`/dashboard/shipments/${viewParcelData?.data?.id}/edit`} className="bg-blue-500 border-4 hover:bg-blue-600 tablet:py-2 phone:py-1 text-gray-50 phone:text-base phone:px-2 tablet:px-3 tablet:text-lg rounded-lg">Edit</Link>
+              {!viewParcelData?.data?.completed && <Link href={`/dashboard/shipments/${viewParcelData?.data?.id}/edit`} className="bg-blue-500 border-4 hover:bg-blue-600 tablet:py-2 phone:py-1 text-gray-50 phone:text-base phone:px-2 tablet:px-3 tablet:text-lg rounded-lg">Edit</Link>}
               <button className="bg-red-500 border-4 hover:bg-red-600 py-2 text-gray-50 phone:py-1 phone:px-2 phone:text-base tablet:py-2 tablet:px-3 tablet:text-lg rounded-lg"
                   onClick={() => {
                     setOpenUIBoxes(true);
@@ -53,7 +53,6 @@ const handleFetchDispatcher = (id: any) => {
 
             <EditHeading subheading="Shipped"/>
             <MiniText minitext={useDateHandler(viewParcelData?.data?.createdAt)} />
-
             <EditHeading subheading="Fragile"/>
             <MiniText minitext={viewParcelData?.data?.fragile ? 'Yes' : 'No'} />
 
@@ -66,7 +65,7 @@ const handleFetchDispatcher = (id: any) => {
             <EditHeading subheading="Estimated Time"/>
             <MiniText minitext={viewParcelData?.data?.time || 'N/A'} />
 
-            <EditHeading subheading="Cost ofSHipping"/>
+            <EditHeading subheading="Cost of Shipping"/>
             <MiniText minitext={viewParcelData?.data ? NumberComma(viewParcelData?.data?.amount) : '0'} />
 
             <EditHeading subheading="Payment Method"/>

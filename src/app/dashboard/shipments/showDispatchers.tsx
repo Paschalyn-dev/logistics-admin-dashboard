@@ -46,8 +46,8 @@ export default function ShowDispatchers ({show, mutate, setShow}: any){
     return(
         <div>
             <DarkFill />
-            <div className="fixed z-30 animate__animated animate__zoomIn flex justify-center items-center phone:h-screen laptop:h-screen top-0 bottom-0 phone:-ml-10  laptop:w-3/4 after-tablet:w-10/12 after-tablet:ml-5 laptop:ml-0 tablet:w-full phone:w-full">
-                <div className="relative bg-gray-50 p-6 phone:h-4/6 mt-10 w-2/4 rounded-lg">
+            <div className="fixed z-30 animate__animated animate__zoomIn flex justify-center items-center phone:h-screen laptop:h-screen top-0 bottom-0 phone:-ml-10 laptop:w-3/4 after-tablet:w-10/12 after-tablet:ml-5 laptop:ml-0 tablet:w-full phone:w-full">
+                <div className="relative bg-gray-50 p-6 phone:h-4/6 tablet:h-3/6 after-tablet:h-5/6 laptop:h-4/6 mt-10 laptop:w-2/4 phone:w-3/4 py-10 rounded-lg">
                     <h1 className="font-bold relative text-center text-lg">Select Dispatcher</h1>
 
                     <div className="flex items-center bg-gray-200 gap-3 rounded-xl w-full justify-start p-4 my-5">

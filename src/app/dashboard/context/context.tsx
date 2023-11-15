@@ -138,6 +138,7 @@ export default function Context({children}: any){
         changeDispatcher: false,
         saveLocations: false,
         activeShipment: true,
+        isNotValid: false,
         deliveredShipment: true,
         customer: true,
         reviews: true,
