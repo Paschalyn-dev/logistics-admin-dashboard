@@ -27,7 +27,9 @@ export default function Delivered(){
     }
     const handleFetchDispatcher = (id: any) => {
         const newId = dispatcherAllData?.data?.filter((dispatcher: any) => dispatcher?.id === id);
-        return newId[0]?.fullName;
+        if(newId){
+            return newId[0]?.fullName;
+        }
     }
     return(
         <Holder>
