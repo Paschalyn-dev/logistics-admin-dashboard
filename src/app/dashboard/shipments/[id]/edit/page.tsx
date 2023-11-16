@@ -226,6 +226,11 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
         setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
     }
 
+    const [timeAndDistance, setTimeAndDistance] = useState({
+        time: 0,
+        distance: 0
+    })
+
     return(
         <Holder>
             {
@@ -290,22 +295,34 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                         address: Yup.string().required('Please provide the destination address'),
                     }),
                     estimatedDistance: Yup.object({
-                        text: Yup.string().notRequired(),
+                        text: Yup.number().notRequired(),
+                        value: Yup.number().notRequired(),
                     }),
                     estimatedTime: Yup.object({
-                        text: Yup.string().notRequired(),
+                        text: Yup.number().notRequired(),
+                        value: Yup.number().notRequired(),
                     }),
                     name: Yup.string()
                     .min(5, 'Name must be five characters or more.')
                     .required('Please provide name for shipment.'),
                     description: Yup.string().notRequired(),
-                    rider: Yup.string().required('Please choose a dispatcher from the list.'),
+                    rider: Yup.string(),
                     amount: Yup.string().notRequired(),
                     paymentType: Yup.string().notRequired()
                   })}
                   onSubmit={async (values) => {
+                        if(Number(values?.meta?.estimatedTime?.text || values?.meta?.estimatedDistance?.text) >= 0){
+                            setTimeAndDistance((prev: any) => ({...prev, time: Number(values?.meta?.estimatedTime?.text) * 3600, 
+                            distance: Number(values?.meta?.estimatedDistance?.text) / 1000}))
+                        }
                         setSuccessMessage((prev:any) => ({...prev, editShipment: true}));
-                        setEditParcelDetails((prev: any) => ({...prev, info:{...values}, code: Password(), result: ""}));
+                        setEditParcelDetails((prev: any) => ({...prev, info:{...values,
+                            meta: {...values?.meta, 
+                                estimatedTime: {...values?.meta?.estimatedTime, 
+                                value: timeAndDistance?.time},
+                                estimatedDistance: {...values?.meta?.estimatedDistance, 
+                                value: timeAndDistance?.distance}}
+                        }, code: Password(), result: ""}));
                         setId((prev: any) => ({...prev, customer: 0, destination: 0}))
                     }}
                     enableReinitialize={true}
@@ -418,19 +435,19 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                                 <div className="my-4 cursor-pointer text-green-500">Refresh Estimate</div>
 
                                 <TextInput
-                                label="Estimated Time"
-                                {...getFieldProps('estimatedTime.text')}
+                                label="Estimated Distance(meters)"
+                                {...getFieldProps('meta.estimatedDistance.text')}
                                 type="number"
                                 /> 
 
-                                {/* <TextInput
-                                label=""
-                                name="estimatedMinutes"
+                                <TextInput
+                                label="Estimated Time(hrs)"
+                                {...getFieldProps('meta.estimatedTime.text')}
                                 type="number"
-                                />  */}
+                                /> 
 
                                 <TextInput
-                                label="Estimated Amount"
+                                label="Estimated Amount(₦)"
                                 {...getFieldProps('amount')}
                                 type="number"
                                 /> 

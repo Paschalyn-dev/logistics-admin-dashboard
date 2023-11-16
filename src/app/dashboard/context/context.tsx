@@ -61,6 +61,7 @@ export default function Context({children}: any){
         messagesRange: "",
         reviewsRange: ""
     });
+    const [myKey, setMyKey] = useState('')
     const [searchFields, setSearchFields] = useState<any>({
         activeShipments: [],
         customersRange: [],
@@ -140,6 +141,7 @@ export default function Context({children}: any){
         activeShipment: true,
         isNotValid: false,
         deliveredShipment: true,
+        noRider: false,
         customer: true,
         reviews: true,
         lateShipment: true,
@@ -171,6 +173,11 @@ export default function Context({children}: any){
         staffAndCustomerLogin: false,
         signOut: false,
     });
+    const [storedName, setStoredName] = useState<any>({
+        dispatcher: "",
+        parcel: ""
+    })
+
 
     const [inputData, setInputData] = useState<any>({
         shipment: "",
@@ -183,7 +190,7 @@ export default function Context({children}: any){
     })
 
     return(
-        <State_data.Provider value={{ globaldata, showDispatchers, setShowDispatcher, loading, setLoading, setGlobalData, globalPriceList, inputData, setInputData, deleteWithId, setDeleteWithId, setGlobalPriceList, inputField, setInputField, createdAtStart, setCreatedAtStart, createdAtEnd, setCreatedAtEnd, amountStart, setAmountStart, amountEnd, setAmountEnd, searchFields, setSearchFields, parcelRange, setParcelRange, customersRange, dispatcher, setDispatcher, setCustomersRange, dispatchersRange, setDispatchersRange, administratorsRange, setAdministratorsRange, messagesRange, setMessagesRange, reviewsRange, setReviewsRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage, id, setId, setSearchData, searchData }}>
+        <State_data.Provider value={{ globaldata, storedName, setStoredName, myKey, setMyKey, showDispatchers, setShowDispatcher, loading, setLoading, setGlobalData, globalPriceList, inputData, setInputData, deleteWithId, setDeleteWithId, setGlobalPriceList, inputField, setInputField, createdAtStart, setCreatedAtStart, createdAtEnd, setCreatedAtEnd, amountStart, setAmountStart, amountEnd, setAmountEnd, searchFields, setSearchFields, parcelRange, setParcelRange, customersRange, dispatcher, setDispatcher, setCustomersRange, dispatchersRange, setDispatchersRange, administratorsRange, setAdministratorsRange, messagesRange, setMessagesRange, reviewsRange, setReviewsRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage, id, setId, setSearchData, searchData }}>
             {children}
         </State_data.Provider>
     )

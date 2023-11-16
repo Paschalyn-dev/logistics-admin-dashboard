@@ -15,7 +15,7 @@ export default function ShowDispatchers ({show, mutate, setShow}: any){
         text: "",
         objects: []
     });
-    const {setDispatcher} = useContext(State_data);
+    const {setDispatcher, setMyKey, setStoredName} = useContext(State_data);
     const [fullName, setFullName] = useState<string>('');
 
     function handleSearch(event: any){
@@ -35,11 +35,15 @@ export default function ShowDispatchers ({show, mutate, setShow}: any){
     
     function handleDone(){
         setDispatcher((prev: any) => ({...prev, name: fullName}));
+        setStoredName(((prev: any) => ({...prev, dispatcher: fullName})));
+        setMyKey();
         setShow(false);
     }
     
     function handleCancel(){
-        setDispatcher((prev: any) => ({...prev, name: ""}))
+        if(fullName){
+            setDispatcher((prev: any) => ({...prev, name: ""}))
+        }
         setShow(false)
     }
     

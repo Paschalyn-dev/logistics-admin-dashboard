@@ -6,7 +6,7 @@ import OrdersNav from "../../orders";
 import Section from "../../section";
 import { useContext, useEffect, useState } from "react";
 import SearchFilter from "./search";
-import { useAllDispatchersFetcher, useAllParcelsFetcher, useAllParcelsRangeFetcher, useSearchParcelRange } from "../../services/swr-functions/customer-swr";
+import { useAllDispatchersFetcher, useAllParcelsFetcher, useAllParcelsRangeFetcher } from "../../services/swr-functions/customer-swr";
 import SubHeading from "../../preferences/website/subheading";
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
 import BoxesHolder from "../../boxesholder";
@@ -29,11 +29,15 @@ export default function Shipments(){
     const [code, setCode] = useState<number>(0)
     const [filter, setFiltered] = useState({});
     const [pass, setPass] = useState<string>('')
-    const {setDeleteWithId, parcelRange, searchData, setSearchData, setShowDispatcher, showDispatchers, successMessage,  inputData, setInputData, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
+    const {setDeleteWithId, parcelRange, searchData, setSearchData, setShowDispatcher, showDispatchers, successMessage,  inputData, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
     const {parcelAllData, parcelAllError, parcelAllIsLoading, parcelAllIsValiddating, parcelAllMutate} = useAllParcelsFetcher();
     const {parcelRData, parcelRMutate} = useAllParcelsRangeFetcher(parcelRange)
-    const {dispatcher, setDispatcher, setSuccessMessage} = useContext(State_data)
-    const {dispatcherAllData} = useAllDispatchersFetcher()
+    const {dispatcher, setDispatcher, setSuccessMessage, setMyKey, myKey, storedName, setStoredName} = useContext(State_data)
+    const [windowDetails, setWindowWidth] = useState<any>(0)
+    const {dispatcherAllData} = useAllDispatchersFetcher();
+    const [key, setKey] = useState<string>('');
+    const lengthActive = searchData?.parcelResult?.data?.filter((parcel: any) => !parcel.completed && !parcel.paid && !parcel.picked );
+    
     const handleOpenSearch = () => {
         setOpenUIBoxes((prev: any) => ({...prev, shipmentSearch: true, shipmentClearData: true}))
     }
@@ -42,42 +46,12 @@ export default function Shipments(){
         setOpenUIBoxes((prev: any) => ({...prev, shipmentClearData: false}))
     }
     
-    const handleCloseFill = () => {
-        setOpenUIBoxes((prev: any) => ({...prev, shipmentPopup: false}))
+    const handleParcelOwner = () => {
+        const parcelOwner = parcelAllData?.data?.filter((parcel: any) => parcel.id === storedName.parcel)
+        return parcelOwner[0]?.name
     }
-    const lengthActive = searchData?.parcelResult?.data?.filter((parcel: any) => !parcel.completed && !parcel.paid && !parcel.picked )
-    
-    const handleFetchDispatcher = (id: any) => {
-        const newId = dispatcherAllData?.data?.filter((dispatcher: any) => dispatcher?.id === id);
-        if(newId && id){
-            return newId[0]?.fullName;
-        }
-    }   
-    const [windowDetails, setWindowWidth] = useState<any>(0)
-    useEffect(function onFirstMount() {
-        function checkWidth(){
-          setWindowWidth(window.innerWidth);
-        }
-        window.addEventListener("resize", checkWidth);
-        return () => window.removeEventListener('resize', checkWidth);
-      });
-    useEffect(() => {
-        setWindowWidth(window.innerWidth);
-    }, []);
-    
-    useEffect(() => {
-        setSuccessMessage((prev: any) => ({...prev, changeDispatcher: false}))
-        if(pass !== ''){
-            setShowDispatcher(true);
-            setDispatcher((prev: any) => ({...prev, id: code}));
-            if(code === dispatcher.id){
-                const filterId = parcelAllData?.data?.filter((parcel: any) => parcel?.id === dispatcher?.id);
-                if(filterId){   
-                    setFiltered(filterId);
-                }
-            }   
-        }
-    }, [pass]);
+
+
     
     async function handlePutDispatcher(id: any){
         const response = await fetch(customerAPIUrl.editParcels(id), {
@@ -90,12 +64,37 @@ export default function Shipments(){
         });
         const data = await response.json();
         handleFetchDispatcher(data?.data?.id);
-        if(dispatcher.name !== '' && code !== 0 && pass !== ''){
-            setSuccessMessage((prev: any) => ({...prev, changeDispatcher: true}))
-        }
         parcelAllMutate(parcelAllData);
         parcelRMutate(parcelRData);
+        if(dispatcher.name !== '' && code !== 0 && pass !== ''){
+            setMyKey(Password())
+            setStoredName((prev: any) => ({...prev, parcel: code}))
+        }
     }
+
+    function sendEmailDefault(email: string, name: string, dispatcher: string){
+        var email = email;
+        var subject = "PARCEL SHIPMENT ON LOGISTIX AFRICA";
+        var msgBody = `Hello ${dispatcher}, ${name.slice(0, 1).toUpperCase() + name.slice(1).toLowerCase()} wants to ship a parcel on Logistix Africa. Confirm your availability and send a mail to this email with the same subject.`;
+        window.open(`mailto:${email}?subject=${subject}&body=${msgBody}`);
+    }
+
+    const handleDispatcherEmail = (riderId: number, name: string, dispatcher: string) => {
+        const dispatcherName = handleFetchDispatcher(dispatcher)
+        const id = dispatcherAllData?.data?.filter((rider: any) => riderId === rider?.id)
+        if(id){
+            sendEmailDefault(id[0]?.email, name, dispatcherName);
+        }
+    }
+    
+    const handleCloseFill = () => {
+        setOpenUIBoxes((prev: any) => ({...prev, shipmentPopup: false}))
+    }
+    
+    const handleNoRider = () => {
+        setSuccessMessage((prev: any) => ({...prev, noRider: false}))
+        setKey(Password());
+    } 
 
     const handleDispatcherNumber = (riderId: number) => {
        const id = dispatcherAllData?.data?.filter((rider: any) => riderId === rider?.id)
@@ -109,21 +108,46 @@ export default function Shipments(){
             }
        }
     }
-
-    function sendEmailDefault(email: string, name: string, dispatcher: string){
-        var email = email;
-        var subject = "PARCEL SHIPMENT ON LOGISTIX AFRICA";
-        var msgBody = `Hello ${dispatcher}, ${name.slice(0, 1).toUpperCase() + name.slice(1).toLowerCase()} wants to ship a parcel on Logistix Africa. Confirm your availability and send a mail to this email with the same subject.`;
-        window.open(`mailto:${email}?subject=${subject}&body=${msgBody}`);
-      }
-
-    const handleDispatcherEmail = (riderId: number, name: string, dispatcher: string) => {
-        const dispatcherName = handleFetchDispatcher(dispatcher)
-        const id = dispatcherAllData?.data?.filter((rider: any) => riderId === rider?.id)
-        if(id){
-            sendEmailDefault(id[0]?.email, name, dispatcherName);
+    
+    const handleFetchDispatcher = (id: any) => {
+        const newId = dispatcherAllData?.data?.filter((dispatcher: any) => dispatcher?.id === id);
+        if(newId && id){
+            return newId[0]?.fullName;
         }
-     }
+    }   
+    
+    useEffect(() => {
+        setSuccessMessage((prev: any) => ({...prev, noRider: true}))
+    }, [key])
+    
+    useEffect(function onFirstMount() {
+        function checkWidth(){
+            setWindowWidth(window.innerWidth);
+        }
+        window.addEventListener("resize", checkWidth);
+        return () => window.removeEventListener('resize', checkWidth);
+      });
+    useEffect(() => {
+        setWindowWidth(window.innerWidth);
+    }, []);
+
+    
+    useEffect(() => {
+        if(pass !== ''){
+            setShowDispatcher(true);
+            setDispatcher((prev: any) => ({...prev, id: code}));
+            if(code === dispatcher.id){
+                const filterId = parcelAllData?.data?.filter((parcel: any) => parcel?.id === dispatcher?.id);
+                if(filterId){   
+                    setFiltered(filterId);
+                }
+            }   
+        }
+    }, [pass]);
+    
+    useEffect(() => {
+        setSuccessMessage((prev: any) => ({...prev, changeDispatcher: true}));
+    }, [myKey !== undefined])
     
     useEffect(() => {
         const newId = dispatcherAllData?.data?.filter((rider: any) => rider?.fullName === dispatcher.name);
@@ -141,19 +165,14 @@ export default function Shipments(){
             handlePutDispatcher(code)
         }
     }, [filter])
-
-    const handleParcelOwner = () => {
-        const parcelOwner = parcelAllData?.data?.filter((parcel: any) => parcel.id === code)
-        return parcelOwner[0]?.name
-    }
     
     useEffect(() => {
         setPass('')
         setShowDispatcher(false)
+        setMyKey('')
+        setSuccessMessage((prev: any) => ({...prev, changeDispatcher: false, noRider: false}))
         setDispatcher((prev: any) => ({...prev, name: "", id: ""}))
-        setSuccessMessage((prev: any) => ({...prev, changeDispatcher: false}))
-    },[])
-
+    },[]);
 
     
     return(
@@ -163,11 +182,20 @@ export default function Shipments(){
                 <SkeletonLoading title="all active shipments." />
             }
             {
-                successMessage.changeDispatcher && 
-                <SuccessMessage 
+                successMessage.changeDispatcher && storedName && myKey !== undefined &&
+                 <SuccessMessage 
                 name="changeDispatcher"
                 successMessageShow={successMessage.changeDispatcher}
-                messageTitle={`Dispatcher  on ${handleParcelOwner() ? `Parcel '${handleParcelOwner()}'` : `empty parcel`} has been changed to '${dispatcher.name}'.`}
+                messageTitle={`Dispatcher  on ${handleParcelOwner() ? `Parcel '${handleParcelOwner()}'` : `empty parcel`} has been changed to '${storedName.dispatcher}'.`}
+                />
+            }
+            {
+                successMessage.noRider &&
+                <SuccessMessage
+                name="noRider"
+                id="failed"
+                successMessageShow={successMessage.noRider}
+                messageTitle="No Dispatcher detail. Please fill in dispatcher details." 
                 />
             }
             {
@@ -257,15 +285,19 @@ export default function Shipments(){
                                 <i className="icon ion-md-person text-gray-300 px-5 py-3 bg-gray-100 rounded-full text-3xl"></i>
                                 <div>
                                 <p className="-mb-1">{ windowDetails < 700 && handleFetchDispatcher(parcel?.rider)?.length > 4 ? handleFetchDispatcher(parcel?.rider)?.slice(0, 4) + '...' : handleFetchDispatcher(parcel?.rider) || 'None'}</p>
-                                {/* <p className="-mb-1">{ windowDetails < 700 && !handleFetchDispatcher(parcel?.rider).length ? 'None' : 'No Dispatcher'}</p> */}
-                                    <button onClick={() => {setCode(parcel?.id); setPass(Password())}} className="text-blue-600 text-sm">Change</button>
+                                    <button onClick={() => {setCode(parcel?.id);  setPass(Password())}} className="text-blue-600 text-sm">Change</button>
                                 </div>
                             </div>
                             <div className="flex phone:gap-4 laptop:gap-2 phone:flex-col laptop:flex-row">
-                                <a href={handleDispatcherNumber(parcel?.rider) ? `https://api.whatsapp.com/send?phone=${handleDispatcherNumber(parcel?.rider)}&text=Hello%20${handleFetchDispatcher(parcel?.rider)}%2C%20I%20got%20your%20contact%20from%20Logistix%20Africa%20website.%20I%20want%20to%20ship%20a%20parcel.%20My%20name%20is%20${parcel?.pickUp?.name}.` : ""} target="_blank">
-                                    <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
-                                </a>
-                                <button onClick={() => handleDispatcherEmail(parcel?.rider, parcel?.name, parcel?.rider)}>
+                                { parcel?.rider ?
+                                    <a href={handleDispatcherNumber(parcel?.rider) ? `https://api.whatsapp.com/send?phone=${handleDispatcherNumber(parcel?.rider)}&text=Hello%20${handleFetchDispatcher(parcel?.rider)}%2C%20I%20got%20your%20contact%20from%20Logistix%20Africa%20website.%20I%20want%20to%20ship%20a%20parcel.%20My%20name%20is%20${parcel?.pickUp?.name}.` : ""} target="_blank">
+                                        <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
+                                    </a> : 
+                                    <button onClick={handleNoRider}>
+                                        <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
+                                    </button>
+                                }
+                                <button onClick={() => parcel?.rider ? handleDispatcherEmail(parcel?.rider, parcel?.name, parcel?.rider) : handleNoRider()}>
                                     <i className="icon ion-md-mail text-blue-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-blue-100 rounded-full laptop:text-3xl"></i>
                                 </button>
                             </div>
@@ -340,10 +372,15 @@ export default function Shipments(){
                                 </div>
                             </div>
                             <div className="flex phone:gap-4 laptop:gap-2 phone:flex-col laptop:flex-row">
-                                <a href={handleDispatcherNumber(parcelRange?.rider) ? `https://api.whatsapp.com/send?phone=${handleDispatcherNumber(parcelRange?.rider)}&text=Hello%20${handleFetchDispatcher(parcelRange?.rider)}%2C%20I%20got%20your%20contact%20from%20Logistix%20Africa%20website.%20I%20want%20to%20ship%20a%20parcel.%20My%20name%20is%20${parcelRange?.pickUp?.name}.` : ""} target="_blank">
-                                    <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
-                                </a>
-                                <button onClick={() => handleDispatcherEmail(parcelRange?.rider, parcelRange?.name, parcelRange?.rider)}>
+                            { parcelRange?.rider ?
+                                    <a href={handleDispatcherNumber(parcelRange?.rider) ? `https://api.whatsapp.com/send?phone=${handleDispatcherNumber(parcelRange?.rider)}&text=Hello%20${handleFetchDispatcher(parcelRange?.rider)}%2C%20I%20got%20your%20contact%20from%20Logistix%20Africa%20website.%20I%20want%20to%20ship%20a%20parcel.%20My%20name%20is%20${parcelRange?.pickUp?.name}.` : ""} target="_blank">
+                                        <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
+                                    </a> : 
+                                    <button onClick={handleNoRider}>
+                                        <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
+                                    </button>
+                                }
+                                <button onClick={() => parcelRange?.rider ? handleDispatcherEmail(parcelRange?.rider, parcelRange?.name, parcelRange?.rider) : handleNoRider()}>
                                     <i className="icon ion-md-mail text-blue-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-blue-100 rounded-full laptop:text-3xl"></i>
                                 </button>
                             </div>

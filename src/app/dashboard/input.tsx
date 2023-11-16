@@ -27,7 +27,11 @@ export default function Input({phonetext, handleClick, mt, justify, laptoptext, 
         }
         window.addEventListener("resize", checkWidth);
         return () => window.removeEventListener('resize', checkWidth);
-    }, []);
+      });
+    
+      useEffect(() => {
+        setWindowWidth(window.innerWidth);
+      }, []);
 
     return(
         <div>

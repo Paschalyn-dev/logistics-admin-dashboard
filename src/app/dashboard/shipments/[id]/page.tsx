@@ -60,13 +60,13 @@ const handleFetchDispatcher = (id: any) => {
             <MiniText minitext={viewParcelData?.data?.paid ? 'Yes' : 'No'} />
 
             <EditHeading subheading="Estimated Distance"/>
-            <MiniText minitext={viewParcelData?.data?.distance || 'N/A'} />
+            <MiniText minitext={ viewParcelData?.data?.meta?.estimatedDistance?.text ? viewParcelData?.data?.meta?.estimatedDistance?.text + 'km' : 'N/A'} />
 
             <EditHeading subheading="Estimated Time"/>
-            <MiniText minitext={viewParcelData?.data?.time || 'N/A'} />
+            <MiniText minitext={viewParcelData?.data?.meta?.estimatedTime?.text ? viewParcelData?.data?.meta?.estimatedTime?.text + ((viewParcelData?.data?.meta?.estimatedTime?.text > 1) ? 'hrs' : 'hr') : 'N/A'} />
 
             <EditHeading subheading="Cost of Shipping"/>
-            <MiniText minitext={viewParcelData?.data ? NumberComma(viewParcelData?.data?.amount) : '0'} />
+            <MiniText minitext={viewParcelData?.data?.amount ? '₦' + NumberComma(viewParcelData?.data?.amount) : '₦0'} />
 
             <EditHeading subheading="Payment Method"/>
             <MiniText minitext={viewParcelData?.data?.paymentType.replace(viewParcelData?.data?.paymentType[0], (letter: any) => letter.toUpperCase()).replace(/_/g, " ")} />

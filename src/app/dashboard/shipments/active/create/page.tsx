@@ -134,6 +134,10 @@ export default function FormPageShipments(){
         formikRef.current?.setFieldValue(`${key}`, value);
     }, [handleToggleParcelButtons, formikRef.current])
 
+    const [timeAndDistance, setTimeAndDistance] = useState({
+        time: 0,
+        distance: 0
+    })
 
     useEffect(() => {
         updateButtons('fragile', handleToggleParcelButtons.parcelFragility)
@@ -160,6 +164,7 @@ export default function FormPageShipments(){
     const handleIsNotValid = () => {
         setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
     }
+
     
     return(
         <Holder>
@@ -278,10 +283,12 @@ export default function FormPageShipments(){
                         address: Yup.string().required('Please provide the destination address'),
                     }),
                     estimatedDistance: Yup.object({
-                        text: Yup.string().notRequired(),
+                        text: Yup.number().notRequired(),
+                        value: Yup.number(),
                     }),
                     estimatedTime: Yup.object({
-                        text: Yup.string().notRequired(),
+                        text: Yup.number().notRequired(),
+                        value: Yup.number(),
                     }),
                     name: Yup.string()
                     .min(5, 'Name must be five characters or more.')
@@ -292,7 +299,18 @@ export default function FormPageShipments(){
                     paymentType: Yup.string().notRequired()
                 })}
                 onSubmit={async (values) => {
-                    setCreateParcel((prev: any) => ({...prev, result: "", info: {...values}, code: Password()}));
+                    if(Number(values?.meta?.estimatedTime?.text || values?.meta?.estimatedDistance?.text) >= 0){
+                        setTimeAndDistance((prev: any) => ({...prev, time: Number(values?.meta?.estimatedTime?.text) * 3600, 
+                        distance: Number(values?.meta?.estimatedDistance?.text) / 1000}))
+                    }
+                    setCreateParcel((prev: any) => ({...prev, result: "", 
+                    info: {...values, 
+                        meta: {...values?.meta, 
+                            estimatedTime: {...values?.meta?.estimatedTime, 
+                            value: timeAndDistance?.time},
+                            estimatedDistance: {...values?.meta?.estimatedDistance, 
+                            value: timeAndDistance?.distance}}}, 
+                            code: Password()}));
                     setSuccessMessage((prev: any) => ({...prev, createShipment: true}));
                     setId((prev: any) => ({...prev, customer: 0, destination: 0}))
                 }}
@@ -419,21 +437,21 @@ export default function FormPageShipments(){
                                 <div className="my-4 cursor-pointer text-green-500">Refresh Estimate</div>
 
                                 <TextInput
-                                label="Estimated Time"
-                                name="estimatedTime.text"
+                                 label="Estimated Distance(meters)" 
+                                 name="meta.estimatedDistance.text"
+                                 type="number"
+                                />
+
+                                <TextInput
+                                label="Estimated Time(hrs)"
+                                name="meta.estimatedTime.text"
                                 type="number"
                                 /> 
 
-                                {/* <TextInput
-                                label=""
-                                name="estimatedMinutes"
-                                type="number"
-                                />  */}
-
                                 <TextInput
-                                label="Estimated Amount"
+                                label="Estimated Amount(₦)"
                                 name="amount"
-                                type="text"
+                                type="number"
                                 /> 
 
                                 <SubHeading subheading="Payment" />
