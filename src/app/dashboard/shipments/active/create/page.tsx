@@ -126,10 +126,14 @@ export default function FormPageShipments(){
     useEffect(() => {
         if(!handleToggleParcelButtons.saveAndAddNewParcel && createParcel?.result?.code === 200){
             setTimeout(() => {
-                router.replace('/dashboard/shipments/active')
+                if(window?.location.pathname === `/dashboard/shipments/active/create`){
+                    router.replace('/dashboard/shipments/active')
+                }
+                else{}
             }, 5000);                        
         }
-    }, [createParcel?.result]);
+    }, [createParcel?.result, window?.location.pathname]);
+
 
     function handleParcelFragility(e: any) {
         e.preventDefault();

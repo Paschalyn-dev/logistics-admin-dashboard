@@ -41,7 +41,6 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
     });
     const {fetchCustomersData} = useFetchCustomers();
     const {dispatcherAllData} = useAllDispatchersFetcher();
-    const pathname = usePathname();
     const [myInitialValues, setInitialValues] = useState<any>({
         amount: "",
         card: {
@@ -225,6 +224,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
     const updateButtons = useCallback((key: string, value: string) => {
         formikRef.current?.setFieldValue(`${key}`, value);
     }, [handleToggleParcelButtons, formikRef.current])
+
     
     
     const handleIsNotValid = (submit: any) => {
@@ -301,14 +301,13 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
     useEffect(() => {
         if(!handleToggleParcelButtons.saveAndAddNewParcel && editParcelDetails?.result?.code === 200){
             setTimeout(() => {
-                    if(pathname === `/dashboard/shipments/${params?.id}/edit`){
+                    if(window?.location.pathname === `/dashboard/shipments/${params?.id}/edit`){
                         handleRouter();
-                        console.log('oiewsrtuideytdrxsuyqwfdcsiag', pathname)
                     }
                     else{}
                 }, 5000);
         }
-    }, [editParcelDetails?.result, pathname]);
+    }, [editParcelDetails?.result, window?.location.pathname]);
     
     useEffect(() => {
         if(viewParcelData?.data){
@@ -454,6 +453,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                 successMessage.isNotValid && 
                 <SuccessMessage
                 id="failed"
+                top={20}
                 name="isNotValid"
                 messageTitle="You have not filled all the required form fields."
                 successMessageShow={successMessage.isNotValid}

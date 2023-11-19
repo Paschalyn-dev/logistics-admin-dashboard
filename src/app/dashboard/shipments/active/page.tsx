@@ -189,7 +189,8 @@ export default function Shipments(){
                 successMessageShow={successMessage.changeDispatcher}
                 messageTitle={`Dispatcher  on ${handleParcelOwner() ? `Parcel '${handleParcelOwner()}'` : `empty parcel`} has been changed to '${storedName.dispatcher}'.`}
                 />
-            }
+            }                     
+                
             {
                 successMessage.noRider &&
                 <SuccessMessage

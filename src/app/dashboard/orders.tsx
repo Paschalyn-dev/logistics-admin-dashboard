@@ -24,6 +24,9 @@ export default function OrdersNav(){
 
       useEffect(() => {
         setClickIt(pathname)
+        // if(window.location.pathname === '/dashboard/shipments/active/create'){
+        //     setClickIt('/dashboard/shipments/active')
+        // }
       }, [pathname])
         
 

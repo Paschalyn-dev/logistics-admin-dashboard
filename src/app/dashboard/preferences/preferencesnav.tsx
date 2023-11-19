@@ -6,7 +6,6 @@ import 'src/app/globals.css';
 import InsideNav from "../home/insidenav";
 import { usePathname } from "next/navigation";
 
-
 export default function PreferencesNav(){
     const pathname = usePathname();
     const [clicked, setClicked]= useState<string>(pathname);
