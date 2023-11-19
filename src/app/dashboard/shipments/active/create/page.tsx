@@ -24,7 +24,6 @@ import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/err
 import { Password } from "@/app/dashboard/formik/password";
 import { authorizationKeyCustomer } from "@/app/dashboard/services/customer-api/api";
 import Loader from "@/app/dashboard/services/Loader/spinner";
-import CustomInput from "@/app/dashboard/customInput";
 import SuccessMessage from "@/app/dashboard/successmessage";
 
 export default function FormPageShipments(){
@@ -53,6 +52,43 @@ export default function FormPageShipments(){
         result: "",
         code: ""
     });
+    const [validation, setValidation] = useState(
+        Yup.object({
+            pickUp: Yup.object({
+                name: Yup.string().required('Please provide name for pickup.'),
+                phone: Yup.string()
+                .matches(phoneRegExp, 'Phone number is not valid')
+                .min(1, 'Must be 1 character or more.')
+                .required('Please provide phone number'),   
+                email: Yup.string().email('This email seems invalid!').required('Please provide email'),
+                address: Yup.string().required('Please provide the pick up address'),
+            }),
+            destination: Yup.object({
+                name: Yup.string().required('Please provide name for destination.'),
+                phone: Yup.string()
+                .matches(phoneRegExp, 'Phone number is not valid')
+                .min(1, 'Must be 1 character or more.')
+                .required('Please provide phone number'),   
+                email: Yup.string().email('This email seems invalid!').required('Please provide email'),
+                address: Yup.string().required('Please provide the destination address'),
+            }),
+            estimatedDistance: Yup.object({
+                text: Yup.number().notRequired(),
+                value: Yup.number(),
+            }),
+            estimatedTime: Yup.object({
+                text: Yup.number().notRequired(),
+                value: Yup.number(),
+            }),
+            name: Yup.string()
+            .min(5, 'Name must be five characters or more.')
+            .required('Please provide name for shipment.'),
+            description: Yup.string().notRequired(),
+            rider: Yup.string().required('Please choose a dispatcher from the list.'),
+            amount: Yup.string().notRequired(),
+            paymentType: Yup.string().notRequired()
+        })
+    )
     
     async function handleCreate(details: any){
         const response = await fetch(customerAPIUrl.createParcel, {
@@ -101,9 +137,9 @@ export default function FormPageShipments(){
             ...prev, parcelFragility: !handleToggleParcelButtons.parcelFragility
         }))
     }
-        
+    
     function handleParcelPicked() {
-            setHandleToggleParcelButtons((prev: any) => ({
+        setHandleToggleParcelButtons((prev: any) => ({
             ...prev, parcelPicked: !handleToggleParcelButtons.parcelPicked
         }))
     }
@@ -119,52 +155,92 @@ export default function FormPageShipments(){
             ...prev, customerPaid: !handleToggleParcelButtons.customerPaid
         }))
     }
-
-    const updateCustomerInformation = useCallback((key: string, index: number) => {
-        const { user } = fetchCustomersData?.data[index] ?? {};
-        if (user) {
-            formikRef.current?.setFieldValue(`${key}.name`, user.name);
-            formikRef.current?.setFieldValue(`${key}.email`, user.email);
-            formikRef.current?.setFieldValue(`${key}.phone`, user.phone);
-            formikRef.current?.setFieldValue(`${key}.address`, user.address);
-        }
-    }, [ fetchCustomersData?.data, formikRef.current ]);
-
+    
     const updateButtons = useCallback((key: string, value: string) => {
         formikRef.current?.setFieldValue(`${key}`, value);
     }, [handleToggleParcelButtons, formikRef.current])
-
+    
     const [timeAndDistance, setTimeAndDistance] = useState({
         time: 0,
         distance: 0
     })
 
+    const updateCustomerInformation = useCallback((key: string, index: number | string) => {
+        const { user } = fetchCustomersData?.data[index] ?? {};
+        if (user && typeof(index) !== 'string') {
+            formikRef.current?.setFieldValue(`${key}.name`, user.name);
+            formikRef.current?.setFieldValue(`${key}.email`, user.email);
+            formikRef.current?.setFieldValue(`${key}.phone`, user.phone);
+            formikRef.current?.setFieldValue(`${key}.address`, user.address);
+        }
+    }, [ fetchCustomersData?.data, formikRef.current]);
+    
     useEffect(() => {
         updateButtons('fragile', handleToggleParcelButtons.parcelFragility)
         updateButtons('completed', handleToggleParcelButtons.parcelDelivered)
         updateButtons('paid', handleToggleParcelButtons.customerPaid)
         updateButtons('picked', handleToggleParcelButtons.parcelPicked)
-    }, [handleToggleParcelButtons])
-
+    }, [handleToggleParcelButtons, formikRef?.current])
+    
     const findCustomerIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.customer)
     useEffect(() => {
         updateCustomerInformation('pickUp', findCustomerIndex)
     }, [fetchCustomersData?.data, findCustomerIndex])
-
+    
     const findDestinationIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.destination)
     useEffect(() => {
         updateCustomerInformation('destination', findDestinationIndex)
     }, [fetchCustomersData?.data, findDestinationIndex])
-
     
     useEffect(() => {
         setWindowDetails(window)
     }, [typeof window !== 'undefined']);
-
+    
     const handleIsNotValid = () => {
         setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
     }
 
+    useEffect(() => {
+        setValidation(Yup.object({
+            pickUp: Yup.object({
+                name: Yup.string().required('Please provide name for pickup.'),
+                phone: Yup.string()
+                .matches(phoneRegExp, 'Phone number is not valid')
+                .min(1, 'Must be 1 character or more.')
+                .required('Please provide phone number'),   
+                email: Yup.string().email('This email seems invalid!').required('Please provide email'),
+                address: Yup.string().required('Please provide the pick up address'),
+            }),
+            destination: Yup.object({
+                name: Yup.string().required('Please provide name for destination.'),
+                phone: Yup.string()
+                .matches(phoneRegExp, 'Phone number is not valid')
+                .min(1, 'Must be 1 character or more.')
+                .required('Please provide phone number'),   
+                email: Yup.string().email('This email seems invalid!').required('Please provide email'),
+                address: Yup.string().required('Please provide the destination address'),
+            }),
+            estimatedDistance: Yup.object({
+                text: Yup.number().notRequired(),
+                value: Yup.number(),
+            }),
+            estimatedTime: Yup.object({
+                text: Yup.number().notRequired(),
+                value: Yup.number(),
+            }),
+            name: Yup.string()
+            .min(5, 'Name must be five characters or more.')
+            .required('Please provide name for shipment.'),
+            description: Yup.string().notRequired(),
+            rider: Yup.string().required('Please choose a dispatcher from the list.'),
+            amount: Yup.string().notRequired(),
+            paymentType: Yup.string().notRequired()
+        }));
+    },[findCustomerIndex, findDestinationIndex])
+
+    useEffect(() => {
+        setId((prev: any) => ({...prev, customer: 0, destination: 0}))
+    },[])
     
     return(
         <Holder>
@@ -205,99 +281,65 @@ export default function FormPageShipments(){
                 <Formik
                     innerRef={(ref) => formikRef.current = ref}
                     initialValues={{
-                      amount: '0',
-                      card: {
-                          authorizationCode: "",
-                          email: ""
+                        amount: '0',
+                        card: {
+                            authorizationCode: "",
+                            email: ""
+                          },
+                          company: company,
+                          description: '',
+                          completed: handleToggleParcelButtons.parcelDelivered,
+                          destination:{
+                              address: "",
+                              email: "",
+                              name: "",
+                              phone: "",
                         },
-                        company: company,
-                        description: '',
-                        completed: handleToggleParcelButtons.parcelDelivered,
-                        destination:{
+                        fragile: handleToggleParcelButtons.parcelFragility,
+                        meta: {
+                            by: {
+                                entity: 'BUSINESS',
+                                id: null
+                            },
+                            company:{
+                                alias: data
+                            },
+                            device:{
+                                appBuild: null,
+                                appId: windowDetails?.navigator?.appCodeName || "",
+                                appName: windowDetails?.navigator?.appName || "",
+                                appVersion: windowDetails?.navigator?.appVersion || "",
+                                isVirtual: false,
+                                manufacturer: windowDetails?.navigator?.vendor || "",
+                                model: windowDetails?.navigator?.appName || "",
+                                name: "CakenUs Services",
+                                operatingSystem: windowDetails?.navigator?.platform || "",
+                                platform: windowDetails?.navigator?.userAgent || ""
+                            },
+                            estimatedDistance: {
+                                text: "",
+                                value: null
+                            },
+                            estimatedTime: {
+                                text: "",
+                                value: null
+                            },
+                        },
+                        name: '',
+                        paid: handleToggleParcelButtons.customerPaid,
+                        paymentType: "",
+                        pickUp: {
                             address: "",
-                            email: "",
-                            name: "",
-                            phone: "",
-                    },
-                    fragile: handleToggleParcelButtons.parcelFragility,
-                    meta: {
-                        by: {
-                            entity: 'BUSINESS',
-                            id: null
+                            email:  "",
+                            name:   "",
+                            phone:  "",
                         },
-                        company:{
-                            alias: data
-                        },
-                        device:{
-                            appBuild: null,
-                            appId: windowDetails?.navigator?.appCodeName || "",
-                            appName: windowDetails?.navigator?.appName || "",
-                            appVersion: windowDetails?.navigator?.appVersion || "",
-                            isVirtual: false,
-                            manufacturer: windowDetails?.navigator?.vendor || "",
-                            model: windowDetails?.navigator?.appName || "",
-                            name: "CakenUs Services",
-                            operatingSystem: windowDetails?.navigator?.platform || "",
-                            platform: windowDetails?.navigator?.userAgent || ""
-                        },
-                        estimatedDistance: {
-                            text: "",
-                            value: null
-                        },
-                        estimatedTime: {
-                            text: "",
-                            value: null
-                        },
-                    },
-                    name: '',
-                    paid: handleToggleParcelButtons.customerPaid,
-                    paymentType: "",
-                    pickUp: {
-                        address: "",
-                        email:  "",
-                        name:   "",
-                        phone:  "",
-                    },
-                    picked: handleToggleParcelButtons.parcelPicked,
-                    reference: "",
-                    rider: '' || null,
-                    user: null
-                }}
-                validationSchema={Yup.object({
-                    pickUp: Yup.object({
-                        name: Yup.string().required('Please provide name for pickup.'),
-                        phone: Yup.string()
-                        .matches(phoneRegExp, 'Phone number is not valid')
-                        .min(1, 'Must be 1 character or more.')
-                        .required('Please provide phone number'),   
-                        email: Yup.string().email('This email seems invalid!').required('Please provide email'),
-                        address: Yup.string().required('Please provide the pick up address'),
-                    }),
-                    destination: Yup.object({
-                        name: Yup.string().required('Please provide name for destination.'),
-                        phone: Yup.string()
-                        .matches(phoneRegExp, 'Phone number is not valid')
-                        .min(1, 'Must be 1 character or more.')
-                        .required('Please provide phone number'),   
-                        email: Yup.string().email('This email seems invalid!').required('Please provide email'),
-                        address: Yup.string().required('Please provide the destination address'),
-                    }),
-                    estimatedDistance: Yup.object({
-                        text: Yup.number().notRequired(),
-                        value: Yup.number(),
-                    }),
-                    estimatedTime: Yup.object({
-                        text: Yup.number().notRequired(),
-                        value: Yup.number(),
-                    }),
-                    name: Yup.string()
-                    .min(5, 'Name must be five characters or more.')
-                    .required('Please provide name for shipment.'),
-                    description: Yup.string().notRequired(),
-                    rider: Yup.string().required('Please choose a dispatcher from the list.'),
-                    amount: Yup.string().notRequired(),
-                    paymentType: Yup.string().notRequired()
-                })}
+                        picked: handleToggleParcelButtons.parcelPicked,
+                        reference: "",
+                        rider: '',
+                        user: null
+                    }}
+                validationSchema={validation}
                 onSubmit={async (values) => {
                     if(Number(values?.meta?.estimatedTime?.text || values?.meta?.estimatedDistance?.text) >= 0){
                         setTimeAndDistance((prev: any) => ({...prev, time: Number(values?.meta?.estimatedTime?.text) * 3600, 
@@ -316,7 +358,7 @@ export default function FormPageShipments(){
                 }}
                 >
                     {
-                        ({ values, isValid, handleSubmit, handleChange }) => (
+                        ({ values, errors, handleSubmit }) => (
                             <Hero 
                             formHeading={values?.name || ""} 
                             description={`₦${values?.amount !== '0' || values?.amount !== null ? values?.amount : '0'}`}
@@ -358,11 +400,10 @@ export default function FormPageShipments(){
                                     <option>Please choose a dispatcher from the list</option>
                                     {
                                         dispatcherAllData?.data?.map((dispatcher: any) => (
-                                            <option value={handleFetchDispatcher(dispatcher?.fullName) || null}>{dispatcher.fullName}</option>
+                                            <option key={dispatcher?.id} value={handleFetchDispatcher(dispatcher?.fullName) || ''}>{dispatcher.fullName}</option>
                                         ))
                                     }
                                 </Select> 
-
                                 <SubHeading subheading="Pickup" />
                                 <div onClick={() => {setShowCustomer((prev: any) => ({...prev, customer: true, text: "customer", creatingCustomer: true}))}} className="my-4 cursor-pointer text-green-500">Select Customer</div>
 
@@ -370,32 +411,24 @@ export default function FormPageShipments(){
                                  name="pickUp.name"
                                  type="text"
                                  label="Name"
-                                 handleChange={handleChange}
-                                 value={values?.pickUp?.name}
                                  />
 
                                 <TextInput
                                     label="Email Address"
                                     type="email"
                                     name='pickUp.email'
-                                    handleChange={handleChange}
-                                    value={values?.pickUp?.email}
                                 /> 
 
                                 <TextInput
                                 label="Phone"
                                 type="tel"
                                 name='pickUp.phone'
-                                handleChange={handleChange}
-                                value={values?.pickUp?.phone}
                                 /> 
 
                                 <TextInput
                                 label="Address"
                                 type="text"
                                 name='pickUp.address'
-                                handleChange={handleChange}
-                                value={values?.pickUp?.address}
                                 /> 
 
                                 <SubHeading subheading="Destination" /> 
@@ -405,32 +438,24 @@ export default function FormPageShipments(){
                                 label="Name"
                                 type="text"
                                 name='destination.name'
-                                handleChange={handleChange}
-                                value={values?.destination?.name}
                                 />
 
                                 <TextInput
                                 label="Email Address"
                                 type="email"
                                 name='destination.email'
-                                handleChange={handleChange}
-                                value={values?.destination?.email}
                                 /> 
 
                                 <TextInput
                                 label="Phone"
                                 type="tel"
                                 name='destination.phone'
-                                handleChange={handleChange}
-                                value={values?.destination?.phone}
                                 /> 
 
                                 <TextInput
                                 label="Address"
                                 type="text"
                                 name='destination.address'
-                                handleChange={handleChange}
-                                value={values?.destination?.address}
                                 /> 
 
                                 <SubHeading subheading="Route Estimate" />
@@ -477,7 +502,7 @@ export default function FormPageShipments(){
 
                                 <Button 
                                 type="submit" 
-                                handleClick={() => isValid ? handleSubmit() : handleIsNotValid()} 
+                                handleClick={() => !Object.keys(errors).length ? handleSubmit() : handleIsNotValid()} 
                                 buttonName="Save" 
                                 />
                             </Form>

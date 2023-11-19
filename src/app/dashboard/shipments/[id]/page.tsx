@@ -35,7 +35,7 @@ const handleFetchDispatcher = (id: any) => {
           <Link href="/dashboard/shipments/active" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                 <i className="icon ion-md-arrow-back"></i>
           </Link>
-          <Hero comingsoon="Not Picked" description={viewParcelData?.data?.trackId.toUpperCase()} icon="icon ion-md-cube" heading={viewParcelData?.data?.name}>
+          <Hero comingsoon={viewParcelData?.data?.picked ? "Picked" : "Not Picked"} description={viewParcelData?.data?.trackId.toUpperCase()} icon="icon ion-md-cube" heading={viewParcelData?.data?.name}>
             <div className="flex justify-center items-center w-full gap-2">
               <Link target="_blank" href={`https://radar.logistix.africa/track/${viewParcelData?.data?.trackId}`} className="bg-green-500 border-4 hover:bg-green-600 phone:py-1 phone:px-2 tablet:py-2 phone:text-base text-gray-50 tablet:px-3 tablet:text-lg rounded-lg">Track</Link>
               {!viewParcelData?.data?.completed && <Link href={`/dashboard/shipments/${viewParcelData?.data?.id}/edit`} className="bg-blue-500 border-4 hover:bg-blue-600 tablet:py-2 phone:py-1 text-gray-50 phone:text-base phone:px-2 tablet:px-3 tablet:text-lg rounded-lg">Edit</Link>}

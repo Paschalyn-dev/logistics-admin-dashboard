@@ -29,7 +29,7 @@ export default function Shipments(){
     const [code, setCode] = useState<number>(0)
     const [filter, setFiltered] = useState({});
     const [pass, setPass] = useState<string>('')
-    const {setDeleteWithId, parcelRange, searchData, setSearchData, setShowDispatcher, showDispatchers, successMessage,  inputData, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
+    const {setDeleteWithId, parcelRange, searchData, setSearchData, setShowDispatcher, showDispatchers, setId, successMessage,  inputData, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
     const {parcelAllData, parcelAllError, parcelAllIsLoading, parcelAllIsValiddating, parcelAllMutate} = useAllParcelsFetcher();
     const {parcelRData, parcelRMutate} = useAllParcelsRangeFetcher(parcelRange)
     const {dispatcher, setDispatcher, setSuccessMessage, setMyKey, myKey, storedName, setStoredName} = useContext(State_data)
@@ -40,6 +40,7 @@ export default function Shipments(){
     
     const handleOpenSearch = () => {
         setOpenUIBoxes((prev: any) => ({...prev, shipmentSearch: true, shipmentClearData: true}))
+        setId((prev: any) => ({...prev, customer: 0, destination: 0}))
     }
     
     const handleClearData = () => {
@@ -238,7 +239,7 @@ export default function Shipments(){
                 {parcelAllData?.data &&
                 (parcelAllData.data.map((parcel: any) => {
                     return(
-                        <div className={!openUIBoxes?.shipmentClearData ? "bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5" : "hidden"}>
+                        <div key={Password()} className={!openUIBoxes?.shipmentClearData ? "bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5" : "hidden"}>
                         <div className="flex justify-between">
                             <div>
                                 <p className="text-red-600 text-xs">NOT PICKED</p>
@@ -321,7 +322,7 @@ export default function Shipments(){
             {  searchData?.parcelResult?.data &&
                 (searchData?.parcelResult?.data?.map((parcelRange: any) => {
                     return(
-                        <div className={openUIBoxes.shipmentClearData  ? "bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5": "hidden"}>
+                        <div key={Password()} className={openUIBoxes.shipmentClearData  ? "bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5": "hidden"}>
                         <div className="flex justify-between">
                             <div>
                             <p className={parcelRange.completed || parcelRange.paid || parcelRange.picked ? "text-green-600 text-xs" :"text-red-600 text-xs"}>{parcelRange.completed && parcelRange.paid && parcelRange.picked ? 'DELIVERED' : parcelRange.completed || parcelRange.picked || parcelRange.paid ? 'NOT PICKED' : "NOT PICKED"}</p>

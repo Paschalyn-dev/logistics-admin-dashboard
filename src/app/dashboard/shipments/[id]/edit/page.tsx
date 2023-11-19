@@ -1,6 +1,6 @@
 'use client'
 import { useState, useContext, useEffect, useRef, useCallback } from "react";
-import { Formik, Form } from 'formik';
+import { Formik, Form, validateYupSchema } from 'formik';
 import Hero from "../../../preferences/hero";
 import SubHeading from "../../../preferences/website/subheading";
 import * as Yup from 'yup';
@@ -14,7 +14,7 @@ import Section from "../../../section";
 import { useRouter } from "next/navigation";
 import OrdersNav from "../../../orders";
 import TextArea from "../../../formik/textarea";
-import { useAllDispatchersFetcher, useAllParcelsFetcher, useEditParcels, useViewParcels } from "../../../services/swr-functions/customer-swr";
+import { useAllDispatchersFetcher, useViewParcels } from "../../../services/swr-functions/customer-swr";
 import Loader from "@/app/dashboard/services/Loader/spinner";
 import SkeletonLoading from "@/app/dashboard/services/eventhandlers/skeleton-loading";
 import { State_data, phoneRegExp } from "@/app/dashboard/context/context";
@@ -25,83 +25,132 @@ import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/err
 import ShowCustomers from "@/app/dashboard/showCustomers";
 import { useFetchCustomers } from "@/app/dashboard/services/swr-functions/staff-swr";
 import SuccessMessage from "@/app/dashboard/successmessage";
+import { usePathname } from "next/navigation";
 
 export default function FormPageShipments({ params }: { params: {id: number}}){
+    const router = useRouter();
     const formikRef = useRef<any>(null);
-    const {viewParcelData, viewParcelIsLoading, viewParcelIsValidating} = useViewParcels(params.id);
-    const [initialValues, setInitialValues] = useState<any>({});
-    
+    const {viewParcelData, viewParcelIsLoading, viewParcelIsValidating} = useViewParcels(params?.id);
     const {successMessage, setSuccessMessage, setLoading, loading, id, setId} = useContext(State_data);
     const [handleToggleParcelButtons, setHandleToggleParcelButtons] = useState<any>({
         saveAndAddNewParcel: false,
-        parcelFragility: viewParcelData?.data?.fragile,
-        parcelPicked: viewParcelData?.data?.picked,
-        parcelDelivered: viewParcelData?.data?.completed,
-        customerPaid: viewParcelData?.data?.paid
+        parcelFragility: false,
+        parcelPicked: false,
+        parcelDelivered: false,
+        customerPaid: false
     });
-    const router = useRouter();
-    const [editParcelDetails, setEditParcelDetails] = useState<any>({
-        info: "",
-        result: "", 
-        code: ""
-    });
-    
-    
-    const [showCustomer, setShowCustomer] = useState({
-        customer: false,
-        destination: false,
-        text: "", 
-        editingCustomer: false,
-        editingDestination: false
-    });
-    
-    async function handleEdit(details: any, id: any){
-        const response = await fetch(customerAPIUrl.editParcels(id), {
-            method: 'PUT',
-            body: JSON.stringify(details),
-            headers: {
-                "Content-Type": "application/json",
-                'Authorization': authorizationKeyCustomer
-                // "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJyb2xlIjoic3VwZXJhZG1pbiIsImFsaWFzIjoiY2FrZW51cyJ9LCJpYXQiOjE2OTU1MTE2MjJ9.N_IW7YA6Gr7vuXPxZTvQbrRrd1VU2QeohI-DL1NRR_w"
-                
+    const {fetchCustomersData} = useFetchCustomers();
+    const {dispatcherAllData} = useAllDispatchersFetcher();
+    const pathname = usePathname();
+    const [myInitialValues, setInitialValues] = useState<any>({
+        amount: "",
+        card: {
+            authorizationCode: "",
+            email: ""
+        },
+        company: "",
+        completed: handleToggleParcelButtons.parcelDelivered,
+        description: "",
+        destination: {
+            address: "",
+            email:  "",
+            name:  "",
+            phone: ""
+        },
+        fragile: handleToggleParcelButtons.parcelFragility,
+        meta: {
+            by: {
+                entity: "",
+                id: ""
             },
+            company: {
+                alias: ""
+            },
+            device: {
+                appBuild: "",
+                appId: "",
+                appName: "",
+                appVersion: "",
+                isVirtual: "",
+                manufacturer: "",
+                model: "",
+                name: "",
+                operatingSystem: "",
+                platform: ""
+            },
+            estimatedDistance: {
+                text: "",
+                value: ""
+            },
+            estimatedTime: {
+                text:  "",
+                value: ""
+            },
+        },
+        name: "",
+        paid: handleToggleParcelButtons.customerPaid,
+        paymentType:  "",
+        pickUp: {
+            address: "",
+            email:  "",
+            name: "",
+            phone:  "",
+        },
+        picked: handleToggleParcelButtons.parcelPicked,
+        rider:  "",
+        size:  "",
+        trackId: "",
+        updatedAt: "", 
+        userId: "",
+    });
+    
+    const findCustomerIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.customer)
+    
+    const findDestinationIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.destination)
+    
+    const [myValidation, setValidation] = useState(
+        Yup.object().shape({
+            pickUp: Yup.object({
+                name: Yup.string().required('Please provide name for pickup.'),
+                phone: Yup.string()
+                .matches(phoneRegExp, 'Phone number is not valid')
+                .min(1, 'Must be 1 character or more.')
+                .required('Please provide phone number'),   
+                email: Yup.string().email('This email seems invalid!').required('Please provide email'),
+                address: Yup.string().required('Please provide the pick up address'),
+            }),
+            destination: Yup.object({
+                name: Yup.string().required('Please provide name for destination.'),
+                phone: Yup.string()
+                .matches(phoneRegExp, 'Phone number is not valid')
+                .min(1, 'Must be 1 character or more.')
+                .required('Please provide phone number'),   
+                email: Yup.string().email('This email seems invalid!').required('Please provide email'),
+                address: Yup.string().required('Please provide the destination address'),
+            }),
+            estimatedDistance: Yup.object({
+                text: Yup.number().notRequired(),
+                value: Yup.number(),
+            }),
+            estimatedTime: Yup.object({
+                text: Yup.number().notRequired(),
+                value: Yup.number(),
+            }),
+            name: Yup.string()
+            .min(5, 'Name must be five characters or more.')
+            .required('Please provide name for shipment.'),
+            description: Yup.string().notRequired(),
+            rider: Yup.string().required('Please choose a dispatcher from the list.'),
+            amount: Yup.string().notRequired(),
+            paymentType: Yup.string().notRequired()
         })
-        const data = await response.json();
-        setEditParcelDetails((prev: any) => ({...prev, result: data}));
-        setLoading((prev: any) => ({...prev, parcel: false}))
-    }
-    
-    function handleSaveAndAddNewParcel() {
-        setHandleToggleParcelButtons((prev: any) => ({
-            ...prev, saveAndAddNewParcel: !handleToggleParcelButtons.saveAndAddNewParcel
-        }))
-    }
-    useEffect(() => {
-        if(editParcelDetails?.result === "" && editParcelDetails?.info !== ""){
-            setLoading((prev: any) => ({...prev, parcel: true}))
-        }      
-        if(editParcelDetails?.info !== ""){
-            handleEdit({...editParcelDetails?.info}, viewParcelData?.data?.id);
-        }
-    }, [editParcelDetails?.code]);
-    
-    useEffect(() => {
-        if(!handleToggleParcelButtons.saveAndAddNewParcel && editParcelDetails?.result?.code === 200){
-            setTimeout(() => {
-                console.log('jhgfdsdfghjkl')
-                router.replace('/dashboard/shipments/active')
-            }, 5000);
-        }
-    }, [editParcelDetails?.result]);
-    
+    )
+
     function handleParcelFragility() {
         setHandleToggleParcelButtons((prev: any) => ({
             ...prev, parcelFragility: !handleToggleParcelButtons.parcelFragility
         }))
     }
-    
-    const {fetchCustomersData} = useFetchCustomers();
-    const {dispatcherAllData} = useAllDispatchersFetcher();
     
     function handleParcelPicked() {
         setHandleToggleParcelButtons((prev: any) => ({
@@ -123,7 +172,6 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
     
     const handleFetchDispatcher = (name: string) => {
         const newId = dispatcherAllData?.data?.filter((dispatcher: any) => dispatcher?.fullName === name);
-        console.log(newId[0]?.id)
         return newId[0]?.id;
     }
     
@@ -135,39 +183,156 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
             formikRef.current?.setFieldValue(`${key}.phone`, user.phone);
             formikRef.current?.setFieldValue(`${key}.address`, user.address);
         }
-    }, [ fetchCustomersData?.data, formikRef.current ]);
+    }, [ fetchCustomersData?.data, formikRef.current]);
     
-    const findCustomerIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.customer)
-    useEffect(() => {
-        updateCustomerInformation('pickUp', findCustomerIndex)
-        console.log('pickUp',findCustomerIndex)
-    }, [fetchCustomersData?.data, findCustomerIndex])
     
-    const findDestinationIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.destination)
     useEffect(() => {
         updateCustomerInformation('destination', findDestinationIndex)
-    }, [fetchCustomersData?.data, findDestinationIndex])
+    }, [fetchCustomersData?.data, findDestinationIndex]);
+    
     useEffect(() => {
-        setInitialValues({
-            amount: viewParcelData?.data?.amount,
-            card: {
-                authorizationCode: "",
-                email: ""
+        updateCustomerInformation('pickUp', findCustomerIndex)
+    }, [fetchCustomersData?.data, findCustomerIndex])
+    
+    const [editParcelDetails, setEditParcelDetails] = useState<any>({
+        info: "",
+        result: "", 
+        code: ""
+    });
+    
+    const [showCustomer, setShowCustomer] = useState({
+        customer: false,
+        destination: false,
+        text: "", 
+        editingCustomer: false,
+        editingDestination: false
+    });
+    
+    async function handleEdit(details: any, id: any){
+        const response = await fetch(customerAPIUrl.editParcels(id), {
+            method: 'PUT',
+            body: JSON.stringify(details),
+            headers: {
+                "Content-Type": "application/json",
+                'Authorization': authorizationKeyCustomer                
             },
-            company: viewParcelData?.data?.company,
-            completed: handleToggleParcelButtons.parcelDelivered,
-            description: viewParcelData?.data?.description,
-            destination: {
-                address: viewParcelData?.data?.destination?.address,
-                email: viewParcelData?.data?.destination?.email,
+        })
+        const data = await response.json();
+        setEditParcelDetails((prev: any) => ({...prev, result: data}));
+        setLoading((prev: any) => ({...prev, parcel: false}))
+    }
+    
+    const updateButtons = useCallback((key: string, value: string) => {
+        formikRef.current?.setFieldValue(`${key}`, value);
+    }, [handleToggleParcelButtons, formikRef.current])
+    
+    
+    const handleIsNotValid = (submit: any) => {
+        if(viewParcelData?.data){
+            setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
+        }
+        else{
+            setLoading((prev: any) => ({...prev, parcel: true}))
+            submit();
+        }
+    }
+    
+    const [timeAndDistance, setTimeAndDistance] = useState({
+        time: 0,
+        distance: 0
+    })
+    
+    function handleSaveAndAddNewParcel() {
+        setHandleToggleParcelButtons((prev: any) => ({
+            ...prev, saveAndAddNewParcel: !handleToggleParcelButtons.saveAndAddNewParcel
+        }))
+    }
+    
+    useEffect(() => {
+        if(viewParcelData?.data){
+            setHandleToggleParcelButtons((prev: any) => ({...prev, 
+                parcelFragility: viewParcelData?.data?.fragile,
+                parcelPicked: viewParcelData?.data?.picked,
+                parcelDelivered: viewParcelData?.data?.completed,
+                customerPaid: viewParcelData?.data?.paid
+            }))
+        }
+        setLoading((prev: any) => ({...prev, parcel: false}))
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
+    },[])
+
+    useEffect(() => {
+        if(viewParcelData?.data?.fragile){
+            setHandleToggleParcelButtons((prev: any) => ({...prev, parcelFragility: true}))
+        }
+    },[viewParcelData?.data?.fragile])
+    
+    useEffect(() => {
+        if(viewParcelData?.data?.completed){
+            setHandleToggleParcelButtons((prev: any) => ({...prev, parcelDelivered: true}))
+        }
+    },[viewParcelData?.data?.completed])
+    
+    useEffect(() => {
+        if(viewParcelData?.data?.picked){
+            setHandleToggleParcelButtons((prev: any) => ({...prev, parcelPicked: true}))
+        }
+    },[viewParcelData?.data?.picked])
+
+    useEffect(() => {
+        if(viewParcelData?.data?.paid){
+            setHandleToggleParcelButtons((prev: any) => ({...prev, customerPaid: true}))
+        }
+    },[viewParcelData?.data?.paid])
+    
+    useEffect(() => {
+        if(editParcelDetails?.result === "" && editParcelDetails?.info !== ""){
+            setLoading((prev: any) => ({...prev, parcel: true}))
+        }      
+        if(editParcelDetails?.info !== ""){
+            handleEdit({...editParcelDetails?.info}, viewParcelData?.data?.id);
+        }
+    }, [editParcelDetails?.code]);
+    
+    const handleRouter = () => {
+        router.replace('/dashboard/shipments/active')
+    }
+
+    useEffect(() => {
+        if(!handleToggleParcelButtons.saveAndAddNewParcel && editParcelDetails?.result?.code === 200){
+            setTimeout(() => {
+                    if(pathname === `/dashboard/shipments/${params?.id}/edit`){
+                        handleRouter();
+                        console.log('oiewsrtuideytdrxsuyqwfdcsiag', pathname)
+                    }
+                    else{}
+                }, 5000);
+        }
+    }, [editParcelDetails?.result, pathname]);
+    
+    useEffect(() => {
+        if(viewParcelData?.data){
+            setInitialValues((prev: any) => ({
+                ...prev,
+                amount: viewParcelData?.data?.amount,
+                card: {
+                    authorizationCode: "",
+                    email: ""
+                },
+                company: viewParcelData?.data?.company ,
+                completed: handleToggleParcelButtons.parcelDelivered,
+                description: viewParcelData?.data?.description,
+                destination: {
+                    address: viewParcelData?.data?.destination?.address,
+                    email: viewParcelData?.data?.destination?.email,
                 name:  viewParcelData?.data?.destination?.name,
                 phone: viewParcelData?.data?.destination?.phone
             },
             fragile: handleToggleParcelButtons.parcelFragility,
             meta: {
                 by: {
-                    entity: viewParcelData?.data?.meta?.by?.entity,
-                    id: viewParcelData?.data?.meta?.by?.id
+                    entity: viewParcelData?.data?.meta?.by?.entity ,
+                    id: viewParcelData?.data?.meta?.by?.id 
                 },
                 company: {
                     alias: viewParcelData?.data?.meta?.company?.alias
@@ -208,29 +373,56 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
             trackId: viewParcelData?.data?.trackId,
             updatedAt: viewParcelData?.data?.updatedAt,
             userId: viewParcelData?.data?.userId,
-        })
+        }))
+    }
+    setLoading((prev: any) => ({...prev, parcel: false}))
     }, [viewParcelData]);
 
-    const updateButtons = useCallback((key: string, value: string) => {
-        formikRef.current?.setFieldValue(`${key}`, value);
-    }, [handleToggleParcelButtons, formikRef.current])
-
+    useEffect(() => {
+        setValidation(Yup.object({
+            pickUp: Yup.object({
+                name: Yup.string().required('Please provide name for pickup.'),
+                phone: Yup.string()
+                .matches(phoneRegExp, 'Phone number is not valid')
+                .min(1, 'Must be 1 character or more.')
+                .required('Please provide phone number'),   
+                email: Yup.string().email('This email seems invalid!').required('Please provide email'),
+                address: Yup.string().required('Please provide the pick up address'),
+            }),
+            destination: Yup.object({
+                name: Yup.string().required('Please provide name for destination.'),
+                phone: Yup.string()
+                .matches(phoneRegExp, 'Phone number is not valid')
+                .min(1, 'Must be 1 character or more.')
+                .required('Please provide phone number'),   
+                email: Yup.string().email('This email seems invalid!').required('Please provide email'),
+                address: Yup.string().required('Please provide the destination address'),
+            }),
+            estimatedDistance: Yup.object({
+                text: Yup.number().notRequired(),
+                value: Yup.number(),
+            }),
+            estimatedTime: Yup.object({
+                text: Yup.number().notRequired(),
+                value: Yup.number(),
+            }),
+            name: Yup.string()
+            .min(5, 'Name must be five characters or more.')
+            .required('Please provide name for shipment.'),
+            description: Yup.string().notRequired(),
+            rider: Yup.string().required('Please choose a dispatcher from the list.'),
+            amount: Yup.string().notRequired(),
+            paymentType: Yup.string().notRequired()
+        }));
+    },[findCustomerIndex, findDestinationIndex])
+    
     useEffect(() => {
         updateButtons('fragile', handleToggleParcelButtons.parcelFragility)
         updateButtons('completed', handleToggleParcelButtons.parcelDelivered)
         updateButtons('paid', handleToggleParcelButtons.customerPaid)
         updateButtons('picked', handleToggleParcelButtons.parcelPicked)
-    }, [handleToggleParcelButtons])
-
-    const handleIsNotValid = () => {
-        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
-    }
-
-    const [timeAndDistance, setTimeAndDistance] = useState({
-        time: 0,
-        distance: 0
-    })
-
+    }, [handleToggleParcelButtons, formikRef?.current])
+        
     return(
         <Holder>
             {
@@ -258,58 +450,25 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                 />
             }
 
-                {
-                    successMessage.isNotValid && 
-                    <SuccessMessage
-                    id="failed"
-                    name="isNotValid"
-                    messageTitle="You have not filled all the required form fields."
-                    successMessageShow={successMessage.isNotValid}
-                    />
-                }
+            {
+                successMessage.isNotValid && 
+                <SuccessMessage
+                id="failed"
+                name="isNotValid"
+                messageTitle="You have not filled all the required form fields."
+                successMessageShow={successMessage.isNotValid}
+                />
+            }
 
-            <Link href="/dashboard/shipments/active" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
+            <Link onClick={() => setId((prev: any) => ({...prev, customer: 0, destination: 0}))} 
+                href="/dashboard/shipments/active" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                 <i className="icon ion-md-arrow-back"></i>
             </Link>
 
             <Formik
                   innerRef={(ref) => formikRef.current = ref}
-                  initialValues={initialValues}
-                  validationSchema={Yup.object({
-                    pickUp: Yup.object({
-                        name: Yup.string().required('Please provide name for pickup.'),
-                        phone: Yup.string()
-                        .matches(phoneRegExp, 'Phone number is not valid')
-                        .min(1, 'Must be 1 character or more.')
-                        .required('Please provide phone number'),  
-                        email: Yup.string().email('This email seems invalid!').required('Please provide email'),
-                        address: Yup.string().required('Please provide the pick up address'),
-                    }),
-                    destination: Yup.object({
-                        name: Yup.string().required('Please provide name for pickup.'),
-                        phone: Yup.string()
-                        .matches(phoneRegExp, 'Phone number is not valid')
-                        .min(1, 'Must be 1 character or more.')
-                        .required('Please provide phone number'),                          
-                        email: Yup.string().email('This email seems invalid!').required('Please provide email'),
-                        address: Yup.string().required('Please provide the destination address'),
-                    }),
-                    estimatedDistance: Yup.object({
-                        text: Yup.number().notRequired(),
-                        value: Yup.number().notRequired(),
-                    }),
-                    estimatedTime: Yup.object({
-                        text: Yup.number().notRequired(),
-                        value: Yup.number().notRequired(),
-                    }),
-                    name: Yup.string()
-                    .min(5, 'Name must be five characters or more.')
-                    .required('Please provide name for shipment.'),
-                    description: Yup.string().notRequired(),
-                    rider: Yup.string(),
-                    amount: Yup.string().notRequired(),
-                    paymentType: Yup.string().notRequired()
-                  })}
+                  initialValues={myInitialValues}
+                  validationSchema={myValidation}
                   onSubmit={async (values) => {
                         if(Number(values?.meta?.estimatedTime?.text || values?.meta?.estimatedDistance?.text) >= 0){
                             setTimeAndDistance((prev: any) => ({...prev, time: Number(values?.meta?.estimatedTime?.text) * 3600, 
@@ -328,27 +487,26 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                     enableReinitialize={true}
                 >
                     {
-                        ({ values, getFieldProps, isValid, handleSubmit }) => (
+                        ({ values, errors, handleSubmit }) => (
                             <Hero 
                             formHeading={values.name} 
                             description={values.amount ? `₦${values.amount}` : `₦0`}
                             heading="Edit A Shipment" 
                             icon="icon ion-md-cube">
-                            <Form onSubmit={handleSubmit}>
+                            <Form>
                                 <SubHeading subheading="Parcel" />
 
                                 <TextInput
-                                    label="Name"
-                                    type="text"
-                                    {...getFieldProps('name')}
+                                label="Name"
+                                name="name"
+                                type="text"
                                 />
 
                                 <TextArea 
                                 label="Description (optional)"
-                                {...getFieldProps('description')}
-                                />
+                                name="description"
+                                />   
                                
-
                                 <ToggleButton
                                 onOff={handleToggleParcelButtons.parcelFragility}
                                 handleOnOff={handleParcelFragility}
@@ -370,38 +528,36 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                                 <Select label="Dispatcher" name="rider">
                                     {
                                         dispatcherAllData?.data?.map((dispatcher: any) => (
-                                            <option value={handleFetchDispatcher(dispatcher.fullName) || null}>{dispatcher.fullName}</option>
+                                            <option key={dispatcher?.id} value={handleFetchDispatcher(dispatcher.fullName) || ''}>{dispatcher.fullName}</option>
                                         ))
                                     }
                                 </Select> 
-
+                                    
                                 <SubHeading subheading="Pickup" />
                                 <div onClick={() => setShowCustomer((prev: any) => ({...prev, customer: true, text: "customer", editingCustomer: true}))} className="my-4 cursor-pointer text-green-500">Select Customer</div>
 
                                 <TextInput
+                                 name="pickUp.name"
                                  type="text"
                                  label="Name"
-                                 {...getFieldProps('pickUp.name')}
                                  />
 
                                 <TextInput
-                                    label="Email Address"
-                                    type="email"
-                                    {...getFieldProps('pickUp.email')}
-
+                                label="Email Address"
+                                type="email"
+                                name='pickUp.email'
                                 /> 
 
                                 <TextInput
                                 label="Phone"
                                 type="tel"
-                                {...getFieldProps('pickUp.phone')}
+                                name='pickUp.phone'
                                 /> 
 
                                 <TextInput
                                 label="Address"
                                 type="text"
-                                {...getFieldProps('pickUp.address')}
-
+                                name='pickUp.address'
                                 /> 
 
                                 <SubHeading subheading="Destination" /> 
@@ -409,52 +565,52 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
 
                                 <TextInput
                                 label="Name"
-                                {...getFieldProps('destination.name')}
                                 type="text"
+                                name='destination.name'
                                 />
 
                                 <TextInput
                                 label="Email Address"
-                                {...getFieldProps('destination.email')}
                                 type="email"
+                                name='destination.email'
                                 /> 
 
                                 <TextInput
                                 label="Phone"
-                                {...getFieldProps('destination.phone')}
                                 type="tel"
+                                name='destination.phone'
                                 /> 
 
                                 <TextInput
                                 label="Address"
-                                {...getFieldProps('destination.address')}
                                 type="text"
+                                name='destination.address'
                                 /> 
 
                                 <SubHeading subheading="Route Estimate" />
                                 <div className="my-4 cursor-pointer text-green-500">Refresh Estimate</div>
 
                                 <TextInput
-                                label="Estimated Distance(meters)"
-                                {...getFieldProps('meta.estimatedDistance.text')}
-                                type="number"
-                                /> 
+                                 label="Estimated Distance(meters)" 
+                                 name="meta.estimatedDistance.text"
+                                 type="number"
+                                />
 
                                 <TextInput
                                 label="Estimated Time(hrs)"
-                                {...getFieldProps('meta.estimatedTime.text')}
+                                name="meta.estimatedTime.text"
                                 type="number"
                                 /> 
 
                                 <TextInput
                                 label="Estimated Amount(₦)"
-                                {...getFieldProps('amount')}
+                                name="amount"
                                 type="number"
                                 /> 
 
                                 <SubHeading subheading="Payment" />
 
-                                <Select label="Payment Option" {...getFieldProps('paymentType')}>
+                                <Select label="Payment Option" name="paymentType">
                                     <option value="PAY_ON_DELIVERY">Pay On Delivery</option>
                                     <option value="PAY_ON_PICKUP">Pay On Pickup</option>
                                 </Select>
@@ -472,10 +628,9 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                                 onOff={handleToggleParcelButtons.saveAndAddNewParcel}
                                 description="Enable this if you want to edit more details on this shipment immediately after clicking on the save button."
                                 />  
-
                                 <Button 
                                 type="submit" 
-                                handleClick={() => isValid ? handleSubmit() : handleIsNotValid()} 
+                                handleClick={() => !Object.keys(errors).length && viewParcelData?.data ? handleSubmit() : handleIsNotValid(handleSubmit)} 
                                 buttonName="Save" 
                                 />
                             </Form>

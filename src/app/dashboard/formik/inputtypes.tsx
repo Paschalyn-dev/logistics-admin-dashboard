@@ -4,7 +4,6 @@ type TEXTINPUT = {
     label: string, 
     id?:string, 
     stringPassword?:boolean, 
-    // value?: any;
     handlePasswordString?: any, 
     [x: string]: any; name: string; 
 }

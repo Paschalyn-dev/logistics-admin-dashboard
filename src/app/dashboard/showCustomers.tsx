@@ -67,7 +67,7 @@ export default function ShowCustomers({show, setShow}: any){
                     <div className="overflow-y-auto overflow-x-hidden h-3/5">
                         {  search.text === "" ?
                             fetchCustomersData?.data?.map((customer: any, i: number) => (
-                                <div  onClick={() => handleClick(customer.id)} className={customer.id === myId || customer.id === id.customer || customer.id === id.destination ? "p-2 rounded-lg flex justify-between bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex justify-between mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
+                                <div key={customer?.id}  onClick={() => handleClick(customer.id)} className={customer.id === myId || customer.id === id.customer || customer.id === id.destination ? "p-2 rounded-lg flex justify-between bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex justify-between mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
                                     <div className="flex gap-3">
                                         <p>{i + 1}</p>
                                         <p>{customer.user.name}</p>
@@ -80,7 +80,7 @@ export default function ShowCustomers({show, setShow}: any){
                             ))
                             :
                             search.objects.map((searches: any, i: number) => (
-                                <div  onClick={() => handleClick(searches.id)} className={searches.id === id.customer || searches.id === myId  || searches.id === id.destination ? "p-2 rounded-lg flex gap-3 bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex gap-3 mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
+                                <div key={searches?.id} onClick={() => handleClick(searches.id)} className={searches.id === id.customer || searches.id === myId  || searches.id === id.destination ? "p-2 rounded-lg flex gap-3 bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex gap-3 mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
                                     <p>{i + 1}</p>
                                     <p>{searches.user.name}</p>
                                 </div>
