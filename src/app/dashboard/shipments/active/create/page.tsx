@@ -30,6 +30,7 @@ export default function FormPageShipments(){
     const formikRef = useRef<any>(null);
     const {successMessage, loading, setLoading, setSuccessMessage, id, setId} = useContext(State_data);
     const [windowDetails, setWindowDetails] = useState<any>('')
+    const [windowLocations, setWindowLocations] = useState<any>('')
     const [handleToggleParcelButtons, setHandleToggleParcelButtons] = useState<any>({
         saveAndAddNewParcel: false,
         parcelFragility: false,
@@ -126,13 +127,13 @@ export default function FormPageShipments(){
     useEffect(() => {
         if(!handleToggleParcelButtons.saveAndAddNewParcel && createParcel?.result?.code === 200){
             setTimeout(() => {
-                if(window?.location.pathname === `/dashboard/shipments/active/create`){
+                if(windowLocations?.location?.pathname === `/dashboard/shipments/active/create`){
                     router.replace('/dashboard/shipments/active')
                 }
                 else{}
             }, 5000);                        
         }
-    }, [createParcel?.result, window?.location.pathname]);
+    }, [createParcel?.result, windowLocations?.location?.pathname]);
 
 
     function handleParcelFragility(e: any) {
@@ -198,6 +199,7 @@ export default function FormPageShipments(){
     
     useEffect(() => {
         setWindowDetails(window)
+        setWindowLocations(window)
     }, [typeof window !== 'undefined']);
     
     const handleIsNotValid = () => {

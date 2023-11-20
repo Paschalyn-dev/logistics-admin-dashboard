@@ -30,6 +30,8 @@ import { usePathname } from "next/navigation";
 export default function FormPageShipments({ params }: { params: {id: number}}){
     const router = useRouter();
     const formikRef = useRef<any>(null);
+    const [windowWidth, setWindowWidth]= useState<any>('');
+    const [windowLocation, setLocations]= useState<any>('');
     const {viewParcelData, viewParcelIsLoading, viewParcelIsValidating} = useViewParcels(params?.id);
     const {successMessage, setSuccessMessage, setLoading, loading, id, setId} = useContext(State_data);
     const [handleToggleParcelButtons, setHandleToggleParcelButtons] = useState<any>({
@@ -184,6 +186,10 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
         }
     }, [ fetchCustomersData?.data, formikRef.current]);
     
+    useEffect(() => {
+        setWindowWidth(window);
+        setLocations(window);
+      }, [typeof window !== undefined]);
     
     useEffect(() => {
         updateCustomerInformation('destination', findDestinationIndex)
@@ -301,13 +307,13 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
     useEffect(() => {
         if(!handleToggleParcelButtons.saveAndAddNewParcel && editParcelDetails?.result?.code === 200){
             setTimeout(() => {
-                    if(window?.location.pathname === `/dashboard/shipments/${params?.id}/edit`){
+                    if(windowLocation?.location?.pathname === `/dashboard/shipments/${params?.id}/edit`){
                         handleRouter();
                     }
                     else{}
                 }, 5000);
         }
-    }, [editParcelDetails?.result, window?.location.pathname]);
+    }, [editParcelDetails?.result, windowLocation?.location?.pathname]);
     
     useEffect(() => {
         if(viewParcelData?.data){
