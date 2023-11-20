@@ -246,6 +246,8 @@ export default function FormPageShipments(){
 
     useEffect(() => {
         setId((prev: any) => ({...prev, customer: 0, destination: 0}))
+        setLoading((prev: any) => ({...prev, parcel: false}))
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
     },[])
     
     return(
