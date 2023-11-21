@@ -1,9 +1,9 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
-/* @import 'tailwindcss/base';
+@tailwind utilities; */
+@import 'tailwindcss/base';
 @import 'tailwindcss/components';
-@import 'tailwindcss/utilities'; */
+@import 'tailwindcss/utilities';
   @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300&display=swap');
 
 :root {
@@ -114,7 +114,8 @@
 
 body{
   overflow-x: hidden;
-  background: rgb(var(--background-start-rgb));
+  /* background: rgb(var(--background-start-rgb)); */
+  background: rgb(243, 244, 246);
 }
 
 #input{
