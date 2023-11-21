@@ -138,7 +138,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                 value: Yup.number(),
             }),
             name: Yup.string()
-            .min(5, 'Name must be five characters or more.')
+            .min(1, 'Name must be five characters or more.')
             .required('Please provide name for shipment.'),
             description: Yup.string().notRequired(),
             rider: Yup.string().required('Please choose a dispatcher from the list.'),
@@ -234,7 +234,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
     
     
     const handleIsNotValid = (submit: any) => {
-        if(viewParcelData?.data){
+        if(viewParcelData?.data && !editParcelDetails?.result?.length && !loading.parcel){
             setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
         }
         else{
@@ -412,14 +412,14 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                 value: Yup.number(),
             }),
             name: Yup.string()
-            .min(5, 'Name must be five characters or more.')
+            .min(1, 'Name must be five characters or more.')
             .required('Please provide name for shipment.'),
             description: Yup.string().notRequired(),
             rider: Yup.string().required('Please choose a dispatcher from the list.'),
             amount: Yup.string().notRequired(),
             paymentType: Yup.string().notRequired()
         }));
-    },[findCustomerIndex, findDestinationIndex])
+    },[findCustomerIndex, findDestinationIndex, " "])
     
     useEffect(() => {
         updateButtons('fragile', handleToggleParcelButtons.parcelFragility)
@@ -459,7 +459,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                 successMessage.isNotValid && 
                 <SuccessMessage
                 id="failed"
-                top={20}
+                top={30}
                 name="isNotValid"
                 messageTitle="You have not filled all the required form fields."
                 successMessageShow={successMessage.isNotValid}
@@ -636,7 +636,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                                 />  
                                 <Button 
                                 type="submit" 
-                                handleClick={() => !Object.keys(errors).length && viewParcelData?.data ? handleSubmit() : handleIsNotValid(handleSubmit)} 
+                                handleClick={() => !Object.keys(errors).length && viewParcelData?.data ? () => {handleSubmit()} :  handleIsNotValid(handleSubmit)} 
                                 buttonName="Save" 
                                 />
                             </Form>

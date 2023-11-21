@@ -15,9 +15,10 @@ type Btn = {
     handleClick?: any;
     justify?: string;
     mt?: number;
+    handleLinkClick?: any;
 }
 
-export default function Input({phonetext, handleClick, mt, justify, laptoptext, placeholder, name, link, message, searchInput}: Btn){
+export default function Input({phonetext, handleClick, mt, justify, laptoptext, placeholder, name, link, message, searchInput, handleLinkClick}: Btn){
     const [windowWidth, setWindowWidth]= useState<number>(0);
     const {successMessage, setInputData, inputData, setSuccessMessage} = useContext(State_data);
 
@@ -41,6 +42,7 @@ export default function Input({phonetext, handleClick, mt, justify, laptoptext, 
         { (phonetext || laptoptext) && 
          <div className="font-bold w-fit laptop:text-base desktop:text-lg phone:text-sm text-gray-50 flex justify-start items-center">
               { link && <Link href={link} 
+                onClick={handleLinkClick}
                 className="cursor-pointer bg-green-600/80 shadow-lg px-7 py-2 rounded-3xl select-none
                 active:translate-y-1 active:[box-shadow:0_0px_0_0_#16a34a,0_0px_0_0_#16a34a]
                 active:border-b-[0px]

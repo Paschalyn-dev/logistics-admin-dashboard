@@ -1,9 +1,10 @@
 'use client'
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ToggleNav from "./toggleNav";
 import Sidebar from "./sidebar";
 import InsideNav from "./home/insidenav";
 import { usePathname } from "next/navigation";
+import { State_data } from "./context/context";
 
 export default function OrdersNav(){   
   const pathname = usePathname();
@@ -24,10 +25,10 @@ export default function OrdersNav(){
 
       useEffect(() => {
         setClickIt(pathname)
-        // if(window.location.pathname === '/dashboard/shipments/active/create'){
-        //     setClickIt('/dashboard/shipments/active')
-        // }
-      }, [pathname])
+        if(window.location.pathname === '/dashboard/shipments/active/create'){
+            setClickIt('/dashboard/shipments/active')
+        }
+      }, [pathname]);
         
 
     return(

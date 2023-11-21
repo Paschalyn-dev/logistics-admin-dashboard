@@ -82,7 +82,7 @@ export default function FormPageShipments(){
                 value: Yup.number(),
             }),
             name: Yup.string()
-            .min(5, 'Name must be five characters or more.')
+            .min(1, 'Name must be five characters or more.')
             .required('Please provide name for shipment.'),
             description: Yup.string().notRequired(),
             rider: Yup.string().required('Please choose a dispatcher from the list.'),
@@ -115,29 +115,9 @@ export default function FormPageShipments(){
             ...prev, saveAndAddNewParcel: !handleToggleParcelButtons.saveAndAddNewParcel
         }))
     }
-    useEffect(() => {
-        if(createParcel?.result === "" && createParcel?.info !== ""){
-            setLoading((prev: any) => ({...prev, parcel: true}))
-        }
-        if(createParcel?.info !== ""){
-          handleCreate(createParcel?.info);
-        }
-    }, [createParcel?.code]);
-
-    useEffect(() => {
-        if(!handleToggleParcelButtons.saveAndAddNewParcel && createParcel?.result?.code === 200){
-            setTimeout(() => {
-                if(windowLocations?.location?.pathname === `/dashboard/shipments/active/create`){
-                    router.replace('/dashboard/shipments/active')
-                }
-                else{}
-            }, 5000);                        
-        }
-    }, [createParcel?.result, windowLocations?.location?.pathname]);
-
-
-    function handleParcelFragility(e: any) {
-        e.preventDefault();
+    
+    
+    function handleParcelFragility() {
         setHandleToggleParcelButtons((prev: any) => ({
             ...prev, parcelFragility: !handleToggleParcelButtons.parcelFragility
         }))
@@ -170,6 +150,10 @@ export default function FormPageShipments(){
         distance: 0
     })
 
+    const findDestinationIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.destination)
+
+    const findCustomerIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.customer)
+    
     const updateCustomerInformation = useCallback((key: string, index: number | string) => {
         const { user } = fetchCustomersData?.data[index] ?? {};
         if (user && typeof(index) !== 'string') {
@@ -179,6 +163,26 @@ export default function FormPageShipments(){
             formikRef.current?.setFieldValue(`${key}.address`, user.address);
         }
     }, [ fetchCustomersData?.data, formikRef.current]);
+
+    useEffect(() => {
+        if(createParcel?.result === "" && createParcel?.info !== ""){
+            setLoading((prev: any) => ({...prev, parcel: true}))
+        }
+        if(createParcel?.info !== ""){
+          handleCreate(createParcel?.info);
+        }
+    }, [createParcel?.code]);
+
+    useEffect(() => {
+        if(!handleToggleParcelButtons.saveAndAddNewParcel && createParcel?.result?.code === 200){
+            setTimeout(() => {
+                if(windowLocations?.location?.pathname === `/dashboard/shipments/active/create`){
+                    router.replace('/dashboard/shipments/active')
+                }
+                else{}
+            }, 5000);                        
+        }
+    }, [createParcel?.result, windowLocations?.location?.pathname]);
     
     useEffect(() => {
         updateButtons('fragile', handleToggleParcelButtons.parcelFragility)
@@ -187,12 +191,10 @@ export default function FormPageShipments(){
         updateButtons('picked', handleToggleParcelButtons.parcelPicked)
     }, [handleToggleParcelButtons, formikRef?.current])
     
-    const findCustomerIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.customer)
     useEffect(() => {
         updateCustomerInformation('pickUp', findCustomerIndex)
     }, [fetchCustomersData?.data, findCustomerIndex])
     
-    const findDestinationIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.destination)
     useEffect(() => {
         updateCustomerInformation('destination', findDestinationIndex)
     }, [fetchCustomersData?.data, findDestinationIndex])
@@ -205,7 +207,7 @@ export default function FormPageShipments(){
     const handleIsNotValid = () => {
         setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
     }
-
+    
     useEffect(() => {
         setValidation(Yup.object({
             pickUp: Yup.object({
@@ -235,17 +237,16 @@ export default function FormPageShipments(){
                 value: Yup.number(),
             }),
             name: Yup.string()
-            .min(5, 'Name must be five characters or more.')
+            .min(1, 'Name must be five characters or more.')
             .required('Please provide name for shipment.'),
             description: Yup.string().notRequired(),
             rider: Yup.string().required('Please choose a dispatcher from the list.'),
             amount: Yup.string().notRequired(),
             paymentType: Yup.string().notRequired()
         }));
-    },[findCustomerIndex, findDestinationIndex])
-
+    },[findCustomerIndex, findDestinationIndex, " "])
+    
     useEffect(() => {
-        setId((prev: any) => ({...prev, customer: 0, destination: 0}))
         setLoading((prev: any) => ({...prev, parcel: false}))
         setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
     },[])
@@ -280,7 +281,6 @@ export default function FormPageShipments(){
                     successMessageShow={successMessage.isNotValid}
                     />
                 }
-
             
                 <Link href="/dashboard/shipments/active" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                     <i className="icon ion-md-arrow-back"></i>
@@ -366,7 +366,7 @@ export default function FormPageShipments(){
                 }}
                 >
                     {
-                        ({ values, errors, handleSubmit }) => (
+                        ({ values, isValid, handleSubmit }) => (
                             <Hero 
                             formHeading={values?.name || ""} 
                             description={`₦${values?.amount !== '0' || values?.amount !== null ? values?.amount : '0'}`}
@@ -510,7 +510,7 @@ export default function FormPageShipments(){
 
                                 <Button 
                                 type="submit" 
-                                handleClick={() => !Object.keys(errors).length ? handleSubmit() : handleIsNotValid()} 
+                                handleClick={() => {isValid ? () => {handleSubmit()} : handleIsNotValid()}} 
                                 buttonName="Save" 
                                 />
                             </Form>

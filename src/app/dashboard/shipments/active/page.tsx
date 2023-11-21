@@ -40,7 +40,6 @@ export default function Shipments(){
     
     const handleOpenSearch = () => {
         setOpenUIBoxes((prev: any) => ({...prev, shipmentSearch: true, shipmentClearData: true}))
-        setId((prev: any) => ({...prev, customer: 0, destination: 0}))
     }
     
     const handleClearData = () => {
@@ -52,7 +51,7 @@ export default function Shipments(){
         return parcelOwner[0]?.name
     }
 
-
+    
     
     async function handlePutDispatcher(id: any){
         const response = await fetch(customerAPIUrl.editParcels(id), {
@@ -79,7 +78,7 @@ export default function Shipments(){
         var msgBody = `Hello ${dispatcher}, ${name.slice(0, 1).toUpperCase() + name.slice(1).toLowerCase()} wants to ship a parcel on Logistix Africa. Confirm your availability and send a mail to this email with the same subject.`;
         window.open(`mailto:${email}?subject=${subject}&body=${msgBody}`);
     }
-
+    
     const handleDispatcherEmail = (riderId: number, name: string, dispatcher: string) => {
         const dispatcherName = handleFetchDispatcher(dispatcher)
         const id = dispatcherAllData?.data?.filter((rider: any) => riderId === rider?.id)
@@ -96,10 +95,10 @@ export default function Shipments(){
         setSuccessMessage((prev: any) => ({...prev, noRider: false}))
         setKey(Password());
     } 
-
+    
     const handleDispatcherNumber = (riderId: number) => {
-       const id = dispatcherAllData?.data?.filter((rider: any) => riderId === rider?.id)
-       if(id){
+        const id = dispatcherAllData?.data?.filter((rider: any) => riderId === rider?.id)
+        if(id){
             const checkPlus = id[0]?.phone.slice(0, 1);
             if(checkPlus === '+'){
                 return id[0]?.phone;
@@ -107,7 +106,11 @@ export default function Shipments(){
             else{
                 return '+' + id[0]?.phone;
             }
-       }
+        }
+    }
+    
+    const handleLinkClick = () => {
+        setId((prev: any) => ({...prev, customer: 0, destination: 0}))
     }
     
     const handleFetchDispatcher = (id: any) => {
@@ -210,6 +213,7 @@ export default function Shipments(){
                {parcelAllData?.data?.length >= 0 && !openUIBoxes?.shipmentClearData && <p>You have <span className="font-bold">{parcelAllData?.data?.length || 0}</span> active shipment{parcelAllData?.data?.length > 1 && "s"}.</p>}
                {searchData?.parcelResult !== '' && openUIBoxes?.shipmentClearData && <p><span className="font-bold">{lengthActive?.length || 0}</span> active parcel match(es) found.</p>}
                 <Input 
+                handleLinkClick={handleLinkClick}
                 link="/dashboard/shipments/active/create"
                 phonetext="Add" 
                 name="shipment"
@@ -243,7 +247,7 @@ export default function Shipments(){
                         <div key={Password()} className={!openUIBoxes?.shipmentClearData ? "bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5" : "hidden"}>
                         <div className="flex justify-between">
                             <div>
-                                <p className="text-red-600 text-xs">NOT PICKED</p>
+                                <p className={parcel?.paid ? "text-green-600 text-xs" : "text-red-600 text-xs"}>NOT PICKED</p>
                                 <p className="laptop:text-lg my-1 phone:text-base">{parcel.name}</p>
                                 <Link title="View on Tracker" target="_blank" href={`https://radar.logistix.africa/track/${parcel?.trackId}`} className="text-blue-600 mb-1 text-xs uppercase">{parcel?.trackId}</Link>
                                 <p className="text-xs">{useDateHandler(parcel?.createdAt)}</p>
@@ -326,7 +330,7 @@ export default function Shipments(){
                         <div key={Password()} className={openUIBoxes.shipmentClearData  ? "bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5": "hidden"}>
                         <div className="flex justify-between">
                             <div>
-                            <p className={parcelRange.completed || parcelRange.paid || parcelRange.picked ? "text-green-600 text-xs" :"text-red-600 text-xs"}>{parcelRange.completed && parcelRange.paid && parcelRange.picked ? 'DELIVERED' : parcelRange.completed || parcelRange.picked || parcelRange.paid ? 'NOT PICKED' : "NOT PICKED"}</p>
+                            <p className={parcelRange.completed || parcelRange.paid || parcelRange.picked ? "text-green-600 text-xs" :"text-red-600 text-xs"}>{parcelRange.completed && parcelRange.paid && parcelRange.picked ? 'DELIVERED' : parcelRange.picked ? 'PICKED' : "NOT PICKED"}</p>
                             <p className="laptop:text-lg my-1 phone:text-base">{parcelRange.name}</p>
                             <Link title="View on Tracker" target="_blank" href={`https://radar.logistix.africa/track/${parcelRange?.trackId}`} className="text-blue-600 mb-1 text-xs uppercase">{parcelRange?.trackId}</Link>
                                 <p className="text-xs">{useDateHandler(parcelRange?.createdAt)}</p>
