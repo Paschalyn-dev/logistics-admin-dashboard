@@ -37,8 +37,8 @@ export default function SuccessMessage({messageTitle, top, id, name, successMess
     return(
     // <div className="h-screen w-fit right-5 z-20 top-20 fixed flex flex-col justify-between items-start">
         <div className={id === 'failed' ? 
-        `animate__animated animate__slideInRight z-20 flex flex-col bg-red-500 shadow-sm laptop:text-lg phone:text-base h-16 fixed justify-center items-center text-white rounded-xl px-2 py-3 right-5 top-${top}`
-        : `animate__animated animate__slideInRight z-20 flex flex-col bg-green-600 shadow-sm laptop:text-lg phone:text-base h-16 fixed justify-center items-center text-white rounded-xl px-2 py-3 right-5 top-${top}`}>
+        `animate__animated animate__slideInRight z-20 flex flex-col bg-red-500 shadow-sm laptop:text-lg phone:text-base h-16 fixed justify-center items-center text-white rounded-xl px-2 py-3 right-5 top-${top || "24"}`
+        : `animate__animated animate__slideInRight z-20 flex flex-col bg-green-600 shadow-sm laptop:text-lg phone:text-base h-16 fixed justify-center items-center text-white rounded-xl px-2 py-3 right-5 top-${top || "24"}`}>
             <div className="flex px-3 justify-between gap-5 items-center">
                 <span className={ id === "failed" ? "rounded-full text-sm bg-gray-50 text-red-500 px-3 py-1 font-extrabold" : "rounded-full text-sm bg-gray-50 text-green-600 px-3 py-1 font-extrabold"}>   
                 {                 

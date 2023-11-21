@@ -48,7 +48,12 @@ export default function Shipments(){
     
     const handleParcelOwner = () => {
         const parcelOwner = parcelAllData?.data?.filter((parcel: any) => parcel.id === storedName.parcel)
-        return parcelOwner[0]?.name
+        if(parcelOwner[0]?.name){
+            return parcelOwner[0]?.name
+        }
+        else{
+            return "empty parcel"
+        }
     }
 
     
@@ -190,7 +195,7 @@ export default function Shipments(){
                  <SuccessMessage 
                 name="changeDispatcher"
                 successMessageShow={successMessage.changeDispatcher}
-                messageTitle={`Dispatcher  on ${handleParcelOwner() ? `Parcel '${handleParcelOwner()}'` : `empty parcel`} has been changed to '${storedName.dispatcher}'.`}
+                messageTitle={`Dispatcher  on Parcel '${handleParcelOwner()}' has been changed to '${storedName.dispatcher}'.`}
                 />
             }                     
                 
@@ -374,7 +379,7 @@ export default function Shipments(){
                                 <i className="icon ion-md-person text-gray-300 px-5 py-3 bg-gray-100 rounded-full text-3xl"></i>
                                 <div>
                                 <p className="-mb-1">{ windowDetails < 700 && handleFetchDispatcher(parcelRange?.rider)?.length > 4 ? handleFetchDispatcher(parcelRange?.rider)?.slice(0, 4) + '...' : handleFetchDispatcher(parcelRange?.rider) || 'None'}</p>
-                                <button onClick={() => {setCode(parcelRange?.id); setPass(Password())}} className="text-blue-600 text-sm">Change</button>
+                                <button onClick={() => {setCode(parcelRange?.id);  setPass(Password())}} className="text-blue-600 text-sm">Change</button>
                                 </div>
                             </div>
                             <div className="flex phone:gap-4 laptop:gap-2 phone:flex-col laptop:flex-row">
