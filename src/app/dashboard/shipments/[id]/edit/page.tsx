@@ -419,7 +419,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
             amount: Yup.string().notRequired(),
             paymentType: Yup.string().notRequired()
         }));
-    },[findCustomerIndex, findDestinationIndex, " "])
+    },[findCustomerIndex, findDestinationIndex, fetchCustomersData?.data, " "])
     
     useEffect(() => {
         updateButtons('fragile', handleToggleParcelButtons.parcelFragility)
