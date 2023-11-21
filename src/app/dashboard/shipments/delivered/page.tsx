@@ -50,7 +50,7 @@ export default function Delivered(){
                 messageTitle="Error occured! Check network connection!"
                 />
                }
-               {openUIBoxes.shipmentPopup && <Popup closeFill={handleCloseFill} text="Shipment" name="parcels" popupShow={openUIBoxes.shipmentPopup} id={deleteWithId.parcels} />}
+               {openUIBoxes.shipmentPopup && <Popup closeFill={handleCloseFill} text="Shipment" name="parcels" mutate={deliveredParcelsMutate} popupShow={openUIBoxes.shipmentPopup} id={deleteWithId.parcels} />}
 
             <BoxesHolder>
                {deliveredParcelsData?.data && 

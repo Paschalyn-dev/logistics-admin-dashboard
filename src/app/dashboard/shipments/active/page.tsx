@@ -45,6 +45,7 @@ export default function Shipments(){
     const handleClearData = () => {
         setOpenUIBoxes((prev: any) => ({...prev, shipmentClearData: false}))
     }
+
     
     const handleParcelOwner = () => {
         const parcelOwner = parcelAllData?.data?.filter((parcel: any) => parcel.id === storedName.parcel)
