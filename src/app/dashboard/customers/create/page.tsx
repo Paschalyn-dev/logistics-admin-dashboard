@@ -17,20 +17,29 @@ import { authorizationKey } from "../../services/staff-api/api";
 import { Password } from "../../formik/password";
 import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
 import Loader from "../../services/Loader/spinner";
+import SuccessMessage from "../../successmessage";
 
 export default function FormPageCustomers(){
-    const {successMessage, setSuccessMessage, loading, setLoading} = useContext(State_data);
-    const [saveAndAddNewCustomer, setSaveAndAddNewCustomer] = useState<boolean>(false);
-    const [customerDetails, setCustomerDetails] = useState<any>({
-      info: "",
-      result: "",
-      code: ""
-    });
-    let router = useRouter();
-    const handleSaveAndAddNewCustomer = (e: any) => {
-        e.preventDefault();
-        setSaveAndAddNewCustomer(!saveAndAddNewCustomer)
+  const {successMessage, setSuccessMessage, loading, setLoading} = useContext(State_data);
+  const [saveAndAddNewCustomer, setSaveAndAddNewCustomer] = useState<boolean>(false);
+  const [windowLocation, setLocationWindow] = useState<any>('');
+  const [customerDetails, setCustomerDetails] = useState<any>({
+    info: "",
+    result: "",
+    code: ""
+  });
+  let router = useRouter();
+  const handleSaveAndAddNewCustomer = (e: any) => {
+    e.preventDefault();
+    setSaveAndAddNewCustomer(!saveAndAddNewCustomer)
     }
+    
+    const handleIsNotValid = () => {
+      setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
+    }
+    useEffect(() => {
+      setLocationWindow(window)
+  }, [typeof window !== 'undefined']);
     
     async function handleCreate(details: any){
       const response = await fetch(staffAPIURL.createCustomer, {
@@ -43,6 +52,7 @@ export default function FormPageCustomers(){
       });
       const data = await response.json();
       setCustomerDetails((prev: any) => ({...prev, result: data}));
+      setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
       setLoading((prev: any) => ({...prev, customer: false}))
     }
     
@@ -58,10 +68,19 @@ export default function FormPageCustomers(){
     useEffect(() => {
       if(!saveAndAddNewCustomer && customerDetails?.result?.code === 200){
           setTimeout(() => {
+            if(windowLocation?.location?.pathname === `/dashboard/customers/create`){
               router.replace('/dashboard/customers')
-          }, 6000);
+            }
+            else{}
+          }, 5000);
       }
-  }, [customerDetails?.result])
+  }, [customerDetails?.result, windowLocation?.location?.pathname])
+
+  useEffect(() => {
+    setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
+},[])
+
+
 
     return(
         <Holder>
@@ -85,6 +104,16 @@ export default function FormPageCustomers(){
             />
           }
 
+          {
+              successMessage.isNotValid && 
+              <SuccessMessage
+              id="failed"
+              name="isNotValid"
+              messageTitle="You have not filled all the required form fields."
+              successMessageShow={successMessage.isNotValid}
+              />
+          }
+
            <Link href="/dashboard/customers">
                 <div className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                       <i className="icon ion-md-arrow-back"></i>
@@ -98,22 +127,23 @@ export default function FormPageCustomers(){
                     phone: "",
                   }}
                   validationSchema={Yup.object({
-                    name: Yup.string().min(5, 'Name must be five characters or more.')
-                    .required('Required'),
+                    name: Yup.string().min(1, 'Name must be one character or more.')
+                    .required('This field is required.'),
                     email: Yup.string().email('This email address seems invalid.')
-                    .required('Required'),
+                    .required('This field is required.'),
                     phone: Yup.number().min(1, 'Must be 1 character or more.')
-                    .required('Required'),
+                    .required('This field is required.'),
                     address: Yup.string()
-                    .required('Required'),
+                    .required('This field is required.'),
                   })}
                   onSubmit={async (values) => {
                       setCustomerDetails((prev: any) => ({...prev, result: "", info: {...values}, code: Password()}))
                       setSuccessMessage((prev: any) => ({...prev, createCustomer: true}));
                   }}
+                  validateOnMount={true}
                 >
 
-{             ({values, handleSubmit}) => (   
+{             ({values, errors, handleSubmit, isValid}) => (   
               <Hero formHeading={values.name} heading="New Customer" icon="icon ion-md-contact">
              
                     <Form>
@@ -151,7 +181,8 @@ export default function FormPageCustomers(){
                         />
                                    
                          <Button 
-                         handleClick={handleSubmit} 
+                         handleClick={() => {isValid && !Object.keys(errors).length ? () => handleSubmit() :  handleIsNotValid()}} 
+                         type='submit'
                          buttonName="Save" />
                     </Form>
                     </Hero>)}

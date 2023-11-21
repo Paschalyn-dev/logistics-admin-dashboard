@@ -11,6 +11,8 @@ import Popup from "../../services/eventhandlers/popup"
 import { useEffect, useContext } from "react";
 import ConstantNav from "../../constantNav"
 import { State_data } from "../../context/context"
+import { dateStringChanger } from "../../services/api-url/customer-api-url"
+import { useDateHandler } from "../../date"
 export default function EditParcel({ params }: { params: {id: number}}){
   const handleCloseFill = () => {
     setOpenUIBoxes((prev: any) => ({...prev, customerPopup: false}))
@@ -53,14 +55,18 @@ export default function EditParcel({ params }: { params: {id: number}}){
             <MiniText minitext={viewCustomerData?.data?.phone || 'N/A'} />
 
             <EditHeading subheading="Address"/>
-            <MiniText minitext={viewCustomerData?.data?.address || 'No'} />
-
-            <EditHeading subheading="Gender"/>
-            <MiniText minitext={viewCustomerData?.data?.gender || 'N/A'} />
+            <MiniText minitext={viewCustomerData?.data?.address || 'N/A'} />
 
             <EditHeading subheading="Parcels Shipped"/>
             <MiniText minitext={viewCustomerData?.data?.parcels || '0'} />
 
+            <EditHeading subheading="Created on"/>
+            <MiniText minitext={viewCustomerData?.data?.createdAt?.slice(0, 10) || 'N/A'} />
+            <MiniText minitext={'(' + useDateHandler(viewCustomerData?.data?.createdAt?.slice(0, 10)) + ')'} />
+
+            <EditHeading subheading="Last updated on"/>
+            <MiniText minitext={viewCustomerData?.data?.updatedAt?.slice(0, 10) || 'N/A'} />
+            <MiniText minitext={'(' + useDateHandler(viewCustomerData?.data?.updatedAt?.slice(0, 10)) + ')'} />
           </Hero>
         </Section>
       </Holder>

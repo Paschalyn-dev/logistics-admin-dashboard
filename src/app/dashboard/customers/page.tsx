@@ -77,10 +77,10 @@ export default function Customers(){
                         fetchCustomersData?.data && !openUIBoxes.customerClearData &&
                          fetchCustomersData?.data?.map((customer: any) => {
                             return (
-                                <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
+                                <div key={customer?.id} className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                                     <p className="text-xs">{useDateHandler(customer?.user?.createdAt)}</p>
                                     <h3 className="text-lg">{customer?.user?.name}</h3>
-                                    <p>{customer?.user?.parcels || 0} parcels shipped</p>
+                                    <p>{customer?.user?.parcels || 0} { customer?.user?.parcels > 1? 'parcels' : 'parcel'} shipped</p>
                                     <hr className="my-2" />
 
                                     <div className="flex text-gray-500 justify-start gap-3 items-center">

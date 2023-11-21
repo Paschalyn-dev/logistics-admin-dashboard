@@ -491,6 +491,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                         setId((prev: any) => ({...prev, customer: 0, destination: 0}))
                     }}
                     enableReinitialize={true}
+                    validateOnMount={true}
                 >
                     {
                         ({ values, errors, handleSubmit }) => (

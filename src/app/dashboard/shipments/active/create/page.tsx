@@ -364,6 +364,7 @@ export default function FormPageShipments(){
                     setSuccessMessage((prev: any) => ({...prev, createShipment: true}));
                     setId((prev: any) => ({...prev, customer: 0, destination: 0}))
                 }}
+                validateOnMount={true}
                 >
                     {
                         ({ values, isValid, handleSubmit }) => (
