@@ -18,7 +18,6 @@ import { Password } from "../../formik/password";
 import { State_data } from "../../context/context";
 import { staffAPIURL } from "../../services/api-url/staff-api-url";
 import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
-import { authorizationKeyCustomer } from "../../services/customer-api/api";
 import { authorizationKey } from "../../services/staff-api/api";
 import Loader from "../../services/Loader/spinner";
 import SuccessMessage from "../../successmessage";
@@ -71,14 +70,6 @@ export default function FormPageDispatcher({handleOpenForm}: any){
           handleCreate({...dispatcherDetails?.info});
         }
     }, [dispatcherDetails?.code]);
-
-    useEffect(() => {
-        if(!saveAndAddNewRider && dispatcherDetails?.result?.code === 200){
-            setTimeout(() => {
-                router.replace('/dashboard/dispatchers')
-            }, 6000);
-        }
-    }, [dispatcherDetails?.result]);
 
     useEffect(() => {
         setLoading((prev: any) => ({...prev, dispatcher: false}))

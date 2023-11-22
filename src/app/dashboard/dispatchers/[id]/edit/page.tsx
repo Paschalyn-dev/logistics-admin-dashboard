@@ -28,7 +28,24 @@ import MiniText from "@/app/dashboard/minitext";
 export default function EditDispatchers({ params }: { params: {id: number}}){
     const {successMessage, loading, setLoading, setSuccessMessage} = useContext(State_data);
     const [saveAndAddNewRider, setSaveAndAddNewRider] = useState<boolean>(false);
-    const [windowLocation, setWindowLocations] = useState<any>('')
+    const [windowLocation, setWindowLocations] = useState<any>('');
+    const [validation, setValidation] = useState(
+        Yup.object({
+            address: Yup.object({
+                state: Yup.string().required('This field is required.'),
+                street: Yup.string().required('This field is required.'),
+            }),
+            fullName: Yup.string()
+            .min(5, 'Name must be five characters or more.')
+            .required('This field is required.'),
+            email: Yup.string()
+            .email('This email address seems invalid.')
+            .required('This field is required.'),
+            phone: Yup.number()
+            .min(1, 'Must be 1 character or more.')
+            .required('This field is required.'),
+          })
+    )
     const [dispatcherDetails, setDispatcherDetails] = useState<any>({
         info: "",
         result: "",
@@ -68,45 +85,8 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
         updatedAt: "",
         vehicle: ""
       });
-
-      useEffect(() => {
-        if(viewDispatcherData?.data){
-            setInitialValues((prev: any) => ({
-                ...prev,
-                address: {
-                    city: viewDispatcherData?.data?.address?.city,
-                    country: viewDispatcherData?.data?.address?.country,
-                    state: viewDispatcherData?.data?.address?.state,
-                    street: viewDispatcherData?.data?.address?.street
-                },
-            bioDetails: viewDispatcherData?.data?.bioDetails,
-            createdAt: viewDispatcherData?.data?.createdAt,
-            email: viewDispatcherData?.data?.email,
-            fullName: viewDispatcherData?.data?.fullName,
-            id: viewDispatcherData?.data?.id,
-            image: viewDispatcherData?.data?.image,
-            insurance: "",
-            // insurance: viewDispatcherData?.data?.insurance || "",
-            isDefaultPassword: viewDispatcherData?.data?.isDefaultPassword,
-            // licence: viewDispatcherData?.data?.licence || "",
-            licence: "",
-            misc: viewDispatcherData?.data?.misc,
-            parcels: viewDispatcherData?.data?.parcels,
-            personalWebsite: viewDispatcherData?.data?.personalWebsite,
-            phone: viewDispatcherData?.data?.phone,
-            rating: viewDispatcherData?.data?.rating,
-            // roadWorthiness: viewDispatcherData?.data?.roadWorthiness || "",
-            roadWorthiness: "",
-            role: viewDispatcherData?.data?.role,
-            socialProfiles: viewDispatcherData?.data?.socialProfiles,
-            updatedAt: viewDispatcherData?.data?.updatedAt,
-            vehicle: ""
-            // vehicle: viewDispatcherData?.data?.vehicle || ""
-        }))
-    }
-  }, [viewDispatcherData?.data]);
-
-    const handleIsNotValid = () => {
+      
+      const handleIsNotValid = () => {
         setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
     }
     
@@ -116,7 +96,7 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
         setSaveAndAddNewRider(!saveAndAddNewRider)
     }
     
-        async function handleEdit(details: any, id: any){
+    async function handleEdit(details: any, id: any){
         const response = await fetch(staffAPIURL.editDispatcher(id), {
             method: 'PUT',
             body: JSON.stringify(details),
@@ -138,12 +118,12 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
             handleEdit({...dispatcherDetails?.info}, viewDispatcherData?.data?.id);
         }
     }, [dispatcherDetails?.code]);
-
+    
     useEffect(() => {
         setLoading((prev: any) => ({...prev, dispatcher: false}))
         setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
     },[])
-
+    
     useEffect(() => {
         if(!saveAndAddNewRider && dispatcherDetails?.result?.code === 200){
             setTimeout(() => {
@@ -151,17 +131,68 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                         router.replace('/dashboard/dispatchers')
                     }else{}
                 }, 5000);
-        }
-    }, [dispatcherDetails?.result, windowLocation?.location?.pathname]);
-
+            }
+        }, [dispatcherDetails?.result, windowLocation?.location?.pathname]);
+        
+        useEffect(() => {
+            if(typeof window !== 'undefined'){
+                setWindowLocations(window)
+            }
+        },[typeof window !== 'undefined'])
+        
+        useEffect(() => {
+          if(viewDispatcherData?.data){
+              setInitialValues((prev: any) => ({
+                  ...prev,
+                  address: {
+                      city: viewDispatcherData?.data?.address?.city,
+                      country: viewDispatcherData?.data?.address?.country,
+                      state: viewDispatcherData?.data?.address?.state,
+                      street: viewDispatcherData?.data?.address?.street
+                  },
+              bioDetails: viewDispatcherData?.data?.bioDetails,
+              createdAt: viewDispatcherData?.data?.createdAt,
+              email: viewDispatcherData?.data?.email,
+              fullName: viewDispatcherData?.data?.fullName,
+              id: viewDispatcherData?.data?.id,
+              image: viewDispatcherData?.data?.image,
+              insurance: "",
+              isDefaultPassword: viewDispatcherData?.data?.isDefaultPassword,
+              licence: "",
+              misc: viewDispatcherData?.data?.misc,
+              parcels: viewDispatcherData?.data?.parcels,
+              personalWebsite: viewDispatcherData?.data?.personalWebsite,
+              phone: viewDispatcherData?.data?.phone,
+              rating: viewDispatcherData?.data?.rating,
+              roadWorthiness: "",
+              role: viewDispatcherData?.data?.role,
+              socialProfiles: viewDispatcherData?.data?.socialProfiles,
+              updatedAt: viewDispatcherData?.data?.updatedAt,
+              vehicle: ""
+          }))
+      }
+    }, [viewDispatcherData?.data]);
+    
     useEffect(() => {
-        if(typeof window !== 'undefined'){
-            setWindowLocations(window)
-        }
-    },[typeof window !== 'undefined'])
+      setValidation(Yup.object().shape({
+          address: Yup.object({
+              state: Yup.string().required('This field is required.'),
+              street: Yup.string().required('This field is required.'),
+          }),
+          fullName: Yup.string()
+          .min(5, 'Name must be five characters or more.')
+          .required('This field is required.'),
+          email: Yup.string()
+          .email('This email address seems invalid.')
+          .required('This field is required.'),
+          phone: Yup.number()
+          .min(1, 'Must be 1 character or more.')
+          .required('This field is required.'),
+      }))
+    }, [viewDispatcherData?.data, " "])
 
-    return(
-        <Holder>
+        return(
+            <Holder>
             {
                 viewDispatcherIsLoading || viewDispatcherIsValidating  &&
                 <SkeletonLoading title="dispatcher data" />
@@ -204,21 +235,7 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
 
             <Formik
                   initialValues={initialValues}
-                  validationSchema={Yup.object({
-                    address: Yup.object({
-                        state: Yup.string().required('This field is required.'),
-                        street: Yup.string().required('This field is required.'),
-                    }),
-                    fullName: Yup.string()
-                    .min(5, 'Name must be five characters or more.')
-                    .required('This field is required.'),
-                    email: Yup.string()
-                    .email('This email address seems invalid.')
-                    .required('This field is required.'),
-                    phone: Yup.number()
-                    .min(1, 'Must be 1 character or more.')
-                    .required('This field is required.'),
-                  })}
+                  validationSchema={validation}
                   onSubmit={(values) => {
                     setSuccessMessage((prev: any) => ({...prev, editDispatcher: true}));
                     setDispatcherDetails((prev: any) => ({...prev, code: Password(), result: "", info: {...values}}) );
