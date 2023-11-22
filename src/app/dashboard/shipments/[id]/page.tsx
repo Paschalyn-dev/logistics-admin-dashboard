@@ -13,6 +13,7 @@ import EditHeading from "../../editHeading"
 import {useState, useContext } from "react";
 import Popup from "../../services/eventhandlers/popup"
 import { State_data } from "../../context/context"
+import SkeletonLoading from "../../services/eventhandlers/skeleton-loading"
 
 export default function EditParcel({ params }: { params: {id: number}}){
   const [openUIBoxes, setOpenUIBoxes] = useState(false);
@@ -26,10 +27,14 @@ const handleFetchDispatcher = (id: any) => {
       return newId[0]?.fullName;
   }
 }   
- const {viewParcelData} = useViewParcels(params.id)
+ const {viewParcelData, viewParcelError, viewParcelIsLoading, viewParcelIsValidating, viewParcelMutate} = useViewParcels(params.id)
  const {setDeleteWithId, deleteWithId} = useContext(State_data);
     return(
       <Holder>
+        {
+           viewParcelIsLoading || viewParcelIsValidating &&
+          <SkeletonLoading title="parcel details." />
+        }
         <OrdersNav />
         <Section>
           <Link href="/dashboard/shipments/active" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
@@ -86,6 +91,13 @@ const handleFetchDispatcher = (id: any) => {
             <MiniText minitext={viewParcelData?.data?.destination.phone || 'N/A'} />
             <MiniText minitext={viewParcelData?.data?.destination.address || 'N/A'} />
 
+            <EditHeading subheading="Created on"/>
+            <MiniText minitext={viewParcelData?.data?.createdAt?.slice(0, 10) || 'N/A'} />
+            <MiniText minitext={"(" + useDateHandler(viewParcelData?.data?.createdAt?.slice(0, 10)) + ")" || 'N/A'} />
+
+            <EditHeading subheading="Last updated on"/>
+            <MiniText minitext={viewParcelData?.data?.updatedAt?.slice(0, 10) || 'N/A'} />
+            <MiniText minitext={"(" + useDateHandler(viewParcelData?.data?.updatedAt?.slice(0, 10)) + ")" || 'N/A'} />
           </Hero>
         </Section>
       </Holder>

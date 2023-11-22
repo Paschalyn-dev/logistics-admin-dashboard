@@ -13,6 +13,7 @@ import ConstantNav from "../../constantNav"
 import { State_data } from "../../context/context"
 import { dateStringChanger } from "../../services/api-url/customer-api-url"
 import { useDateHandler } from "../../date"
+import SkeletonLoading from "../../services/eventhandlers/skeleton-loading"
 export default function EditParcel({ params }: { params: {id: number}}){
   const handleCloseFill = () => {
     setOpenUIBoxes((prev: any) => ({...prev, customerPopup: false}))
@@ -29,6 +30,10 @@ export default function EditParcel({ params }: { params: {id: number}}){
  
  return(
    <Holder>
+        {
+           viewCustomerIsLoading || viewCustomerIsValidating &&
+          <SkeletonLoading title="customer details." />
+        }
         <ConstantNav />
         <Section>
           <Link href="/dashboard/customers" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">

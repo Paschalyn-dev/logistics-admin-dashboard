@@ -21,12 +21,14 @@ import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-suc
 import { authorizationKeyCustomer } from "../../services/customer-api/api";
 import { authorizationKey } from "../../services/staff-api/api";
 import Loader from "../../services/Loader/spinner";
+import SuccessMessage from "../../successmessage";
 
 export default function FormPageDispatcher({handleOpenForm}: any){
     const {successMessage, setSuccessMessage, loading, setLoading} = useContext(State_data);
     const [saveAndAddNewRider, setSaveAndAddNewRider] = useState<boolean>(false);
     const [passwordString, setPasswordString] = useState<boolean>(true)
     const [generatePassword, setGeneratePassword] = useState<boolean>(true);
+    const [windowLocation, setWindowLocations] =useState<any>('')
     const [dispatcherDetails, setDispatcherDetails] = useState<any>({
         info: "",
         result: "",
@@ -36,6 +38,10 @@ export default function FormPageDispatcher({handleOpenForm}: any){
     const handleSaveAndAddNewRider = (e: any) => {
         e.preventDefault();
         setSaveAndAddNewRider(!saveAndAddNewRider)
+    }
+
+    const handleIsNotValid = () => {
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
     }
 
     const handleAdministratorsPage = () => {
@@ -74,6 +80,27 @@ export default function FormPageDispatcher({handleOpenForm}: any){
         }
     }, [dispatcherDetails?.result]);
 
+    useEffect(() => {
+        setLoading((prev: any) => ({...prev, dispatcher: false}))
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
+    },[])
+
+    useEffect(() => {
+        if(!saveAndAddNewRider && dispatcherDetails?.result?.code === 200){
+            setTimeout(() => {
+                    if(windowLocation?.location?.pathname === `/dashboard/dispatchers/create`){
+                        router.replace('/dashboard/dispatchers')
+                    }else{}
+                }, 5000);
+        }
+    }, [dispatcherDetails?.result, windowLocation?.location?.pathname]);
+
+    useEffect(() => {
+        if(typeof window !== 'undefined'){
+            setWindowLocations(window)
+        }
+    },[typeof window !== 'undefined'])
+
     return(
         <Holder>
             {
@@ -96,6 +123,15 @@ export default function FormPageDispatcher({handleOpenForm}: any){
             data={dispatcherDetails?.result}
             />
           }
+            {
+                successMessage.isNotValid && 
+                <SuccessMessage
+                id="failed"
+                name="isNotValid"
+                messageTitle="You have not filled all the required form fields."
+                successMessageShow={successMessage.isNotValid}
+                />
+            }
             <Link href="/dashboard/dispatchers" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                 <i className="icon ion-md-arrow-back"></i>
             </Link>
@@ -115,15 +151,18 @@ export default function FormPageDispatcher({handleOpenForm}: any){
                   }}
                   validationSchema={Yup.object({
                     address: Yup.object({
-                        state: Yup.string(),
-                        street: Yup.string(),
+                        state: Yup.string().required('This field is required.'),
+                        street: Yup.string().required('This field is required.'),
                     }),
                     fullName: Yup.string()
-                    .min(1, 'Name must be five characters or more.'),
+                    .min(1, 'Name must be five characters or more.')
+                    .required('This field is required.'),
                     email: Yup.string()
-                    .email('This email address seems invalid.'),
+                    .email('This email address seems invalid.')
+                    .required('This field is required.'),
                     phone: Yup.number()
-                    .min(1, 'Must be 1 character or more.'),
+                    .min(1, 'Must be 1 character or more.')
+                    .required('This field is required.'),
                     password: Yup.string()
                     .min(8, 'Password is too short. It should be 8 characters or more')
                     .matches(/[a-zaA-z0-9]/, 'Password can only contain letters and numbers.')
@@ -132,9 +171,10 @@ export default function FormPageDispatcher({handleOpenForm}: any){
                     setDispatcherDetails((prev: any) => ({...prev, result: "", info: {...values}, code: Password()}));
                     setSuccessMessage((prev: any) => ({...prev, createDispatcher: true}));
                 }}
+                validateOnMount={true}
                 >
                     {
-                        ({ values, handleSubmit }) => (
+                        ({ values, handleSubmit, isValid }) => (
                             <Hero formHeading={values.fullName} heading="Create Rider Account" icon="icon ion-md-bicycle">
                             <Form>
                                 <Select label="Role" onChange={handleAdministratorsPage} name="role">
@@ -235,7 +275,7 @@ export default function FormPageDispatcher({handleOpenForm}: any){
                                 />  
 
                                 <Button
-                                handleClick={handleSubmit}
+                                handleClick={() => { isValid ? () => handleSubmit() : handleIsNotValid()}}
                                 type="submit" 
                                 buttonName="Save" />
                             </Form>

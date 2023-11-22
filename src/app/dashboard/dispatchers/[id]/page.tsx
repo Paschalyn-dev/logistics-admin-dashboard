@@ -12,6 +12,7 @@ import { useEffect, useState, useContext } from "react";
 import ConstantNav from "../../constantNav"
 import SubHeading from "../../preferences/website/subheading"
 import { State_data } from "../../context/context"
+import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
 
 export default function EditParcel({ params }: { params: {id: number}}){
   const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
@@ -28,6 +29,10 @@ export default function EditParcel({ params }: { params: {id: number}}){
     }, []);
     return(
       <Holder>
+        {
+          viewDispatcherIsValidating || viewDispatcherIsLoading &&
+          <SkeletonLoading title="dispatcher details." />
+        }
         <ConstantNav />
         <Section>
           <Link href="/dashboard/dispatchers" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
@@ -60,10 +65,15 @@ export default function EditParcel({ params }: { params: {id: number}}){
                 + viewDispatcherData?.data?.address?.state + " "
                 + viewDispatcherData?.data?.address?.street || 'N/A'} />
 
-            <EditHeading subheading="Created" />
-            <MiniText minitext={useDateHandler(viewDispatcherData?.data?.createdAt)} />
+            <EditHeading subheading="Created on" />
+            <MiniText minitext={viewDispatcherData?.data?.createdAt?.slice(0, 10)} />
+            <MiniText minitext={'(' + useDateHandler(viewDispatcherData?.data?.createdAt?.slice(0, 10)) + ')'} />
 
-            <SubHeading subheading="Documents" />
+            <EditHeading subheading="Last updated on" />
+            <MiniText minitext={viewDispatcherData?.data?.updatedAt?.slice(0, 10)} />
+            <MiniText minitext={'(' + useDateHandler(viewDispatcherData?.data?.updatedAt?.slice(0, 10)) + ')'} />
+
+            <SubHeading subheading="Documents:" />
 
             <EditHeading subheading="Licence" />
             <MiniText minitext={viewDispatcherData?.data?.licence || 'No Lincence'} />

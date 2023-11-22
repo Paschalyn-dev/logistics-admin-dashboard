@@ -22,29 +22,100 @@ import { State_data } from "@/app/dashboard/context/context";
 import { staffAPIURL } from "@/app/dashboard/services/api-url/staff-api-url";
 import { authorizationKey } from "@/app/dashboard/services/staff-api/api";
 import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
+import SkeletonLoading from "@/app/dashboard/services/eventhandlers/skeleton-loading";
+import MiniText from "@/app/dashboard/minitext";
 
 export default function EditDispatchers({ params }: { params: {id: number}}){
     const {successMessage, loading, setLoading, setSuccessMessage} = useContext(State_data);
     const [saveAndAddNewRider, setSaveAndAddNewRider] = useState<boolean>(false);
-    const [passwordString, setPasswordString] = useState<boolean>(true)
-    const [generatePassword, setGeneratePassword] = useState<boolean>(true);
+    const [windowLocation, setWindowLocations] = useState<any>('')
     const [dispatcherDetails, setDispatcherDetails] = useState<any>({
         info: "",
         result: "",
         code: ""
     });
+    
     const {viewDispatcherData, 
         viewDispatcherError, 
         viewDispatcherIsLoading, 
         viewDispatcherIsValidating, 
         viewDispatcherMutate} = useViewDispatcher(params.id);
 
-        const router = useRouter();
-        const handleSaveAndAddNewRider = (e: any) => {
-            e.preventDefault();
-            setSaveAndAddNewRider(!saveAndAddNewRider)
-        }
-        
+    const [initialValues, setInitialValues] = useState<any>({
+        address: {
+            city: "",
+            country: "",
+            state: "",
+            street: ""
+        },
+        bioDetails: "",
+        createdAt: "",
+        email:  "",
+        fullName:  "",
+        id: "",
+        image:  "",
+        insurance: "",
+        isDefaultPassword: "",
+        licence: "",
+        misc: "",
+        parcels: "",
+        personalWebsite: "",
+        phone:  "",
+        rating: "",
+        roadWorthiness: "",
+        role: "",
+        socialProfiles: "",
+        updatedAt: "",
+        vehicle: ""
+      });
+
+      useEffect(() => {
+        if(viewDispatcherData?.data){
+            setInitialValues((prev: any) => ({
+                ...prev,
+                address: {
+                    city: viewDispatcherData?.data?.address?.city,
+                    country: viewDispatcherData?.data?.address?.country,
+                    state: viewDispatcherData?.data?.address?.state,
+                    street: viewDispatcherData?.data?.address?.street
+                },
+            bioDetails: viewDispatcherData?.data?.bioDetails,
+            createdAt: viewDispatcherData?.data?.createdAt,
+            email: viewDispatcherData?.data?.email,
+            fullName: viewDispatcherData?.data?.fullName,
+            id: viewDispatcherData?.data?.id,
+            image: viewDispatcherData?.data?.image,
+            insurance: "",
+            // insurance: viewDispatcherData?.data?.insurance || "",
+            isDefaultPassword: viewDispatcherData?.data?.isDefaultPassword,
+            // licence: viewDispatcherData?.data?.licence || "",
+            licence: "",
+            misc: viewDispatcherData?.data?.misc,
+            parcels: viewDispatcherData?.data?.parcels,
+            personalWebsite: viewDispatcherData?.data?.personalWebsite,
+            phone: viewDispatcherData?.data?.phone,
+            rating: viewDispatcherData?.data?.rating,
+            // roadWorthiness: viewDispatcherData?.data?.roadWorthiness || "",
+            roadWorthiness: "",
+            role: viewDispatcherData?.data?.role,
+            socialProfiles: viewDispatcherData?.data?.socialProfiles,
+            updatedAt: viewDispatcherData?.data?.updatedAt,
+            vehicle: ""
+            // vehicle: viewDispatcherData?.data?.vehicle || ""
+        }))
+    }
+  }, [viewDispatcherData?.data]);
+
+    const handleIsNotValid = () => {
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
+    }
+    
+    const router = useRouter();
+    const handleSaveAndAddNewRider = (e: any) => {
+        e.preventDefault();
+        setSaveAndAddNewRider(!saveAndAddNewRider)
+    }
+    
         async function handleEdit(details: any, id: any){
         const response = await fetch(staffAPIURL.editDispatcher(id), {
             method: 'PUT',
@@ -69,22 +140,39 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
     }, [dispatcherDetails?.code]);
 
     useEffect(() => {
+        setLoading((prev: any) => ({...prev, dispatcher: false}))
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
+    },[])
+
+    useEffect(() => {
         if(!saveAndAddNewRider && dispatcherDetails?.result?.code === 200){
             setTimeout(() => {
-                router.replace('/dashboard/dispatchers')
-            }, 5000);
+                    if(windowLocation?.location?.pathname === `/dashboard/dispatchers/${params?.id}/edit`){
+                        router.replace('/dashboard/dispatchers')
+                    }else{}
+                }, 5000);
         }
-    }, [dispatcherDetails?.result]);
-    
+    }, [dispatcherDetails?.result, windowLocation?.location?.pathname]);
+
+    useEffect(() => {
+        if(typeof window !== 'undefined'){
+            setWindowLocations(window)
+        }
+    },[typeof window !== 'undefined'])
+
     return(
         <Holder>
+            {
+                viewDispatcherIsLoading || viewDispatcherIsValidating  &&
+                <SkeletonLoading title="dispatcher data" />
+            }   
+            {
+                (loading.dispatcher) &&
+                <Loader />
+            }  
             <ConstantNav />
             <Section>
 
-            {
-                (viewDispatcherIsLoading || viewDispatcherIsValidating  || loading.dispatcher) &&
-                <Loader />
-            }     
             {
                 dispatcherDetails.result !== "" && dispatcherDetails.info !== "" && dispatcherDetails?.code !== '' &&
                 <ErrorAndSucccessHandlers
@@ -100,38 +188,22 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                 />
             }
 
+        {
+            successMessage.isNotValid && 
+            <SuccessMessage
+            id="failed"
+            name="isNotValid"
+            messageTitle="You have not filled all the required form fields."
+            successMessageShow={successMessage.isNotValid}
+            />
+        }
+
             <Link href="/dashboard/dispatchers" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                 <i className="icon ion-md-arrow-back"></i>
             </Link>
 
             <Formik
-                  initialValues={{
-                    address: {
-                        city: viewDispatcherData?.data?.address?.city,
-                        country: viewDispatcherData?.data?.address?.country,
-                        state: viewDispatcherData?.data?.address?.state,
-                        street: viewDispatcherData?.data?.address?.street
-                    },
-                    bioDetails: viewDispatcherData?.data?.bioDetails,
-                    createdAt: viewDispatcherData?.data?.createdAt,
-                    email: viewDispatcherData?.data?.email,
-                    fullName: viewDispatcherData?.data?.fullName,
-                    id: viewDispatcherData?.data?.id,
-                    image: viewDispatcherData?.data?.image,
-                    insurance: viewDispatcherData?.data?.insurance,
-                    isDefaultPassword: viewDispatcherData?.data?.isDefaultPassword,
-                    licence: viewDispatcherData?.data?.licence,
-                    misc: viewDispatcherData?.data?.misc,
-                    parcels: viewDispatcherData?.data?.parcels,
-                    personalWebsite: viewDispatcherData?.data?.personalWebsite,
-                    phone: viewDispatcherData?.data?.phone,
-                    rating: viewDispatcherData?.data?.rating,
-                    roadWorthiness: viewDispatcherData?.data?.roadWorthiness,
-                    role: viewDispatcherData?.data?.role,
-                    socialProfiles: viewDispatcherData?.data?.socialProfiles,
-                    updatedAt: viewDispatcherData?.data?.updatedAt,
-                    vehicle: viewDispatcherData?.data?.vehicle
-                  }}
+                  initialValues={initialValues}
                   validationSchema={Yup.object({
                     address: Yup.object({
                         state: Yup.string().required('This field is required.'),
@@ -152,74 +224,80 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                     setDispatcherDetails((prev: any) => ({...prev, code: Password(), result: "", info: {...values}}) );
                   }}
                   enableReinitialize={true}
+                  validateOnMount={true}
                 >
                     {
-                        ({ values, handleSubmit, getFieldProps }) => (
+                        ({ values, handleSubmit, isValid }) => (
                             <Hero formHeading={values.fullName} 
                             comingsoon="Rider" 
                             heading="Edit Rider Account" 
                             icon="icon ion-md-bicycle"
                             description={`${values.email} | ${values.phone}`}>
-                            <Form onSubmit={handleSubmit}>
+                            <Form>
                                 <TextInput
                                 label="Full Name"
                                 type="text"
-                                {...getFieldProps('fullName')}
+                                name='fullName'
                                 />
 
                                 <TextInput
                                 label="Email Address"
                                 type="email"
-                                {...getFieldProps('email')}
+                                name='email'
                                 />  
 
                                 <TextInput
                                 label="Phone"
                                 type="tel"
-                                {...getFieldProps('phone')}
+                                name="phone"
                                 /> 
-
 
                                 <TextInput
                                 label="State"
                                 type="text"
-                                {...getFieldProps('address.state')}
+                                name='address.state'
                                 />
 
                                 <TextInput
                                 label="Address"
                                 type="text"
                                 placeholder="Enter Location"
-                                {...getFieldProps('address.street')}
+                                name='address.street'
                                 /> 
 
                                 <SubHeading subheading="Documents" /> 
+                                <MiniText minitext="Click on 'choose file' to replace already existing files."/>
+                                <br/>
 
-                                {/* <div className="flex justify-between items-center flex-wrap">
+                                <div className="flex justify-between items-center flex-wrap">
                                     <UploadFile
                                     label = "License"
                                     type="file"
-                                    {...getFieldProps('licence')}
+                                    name='licence'
+                                    document={viewDispatcherData?.data?.licence}
                                     />
 
                                     <UploadFile
                                     label = "Vehicle"
                                     type="file"
-                                    {...getFieldProps('vehicle')}
+                                    name='vehicle'
+                                    document={viewDispatcherData?.data?.vehicle}
                                     />
 
                                     <UploadFile
                                     label = "Insurance"
                                     type="file"
-                                    {...getFieldProps('insurance')}
+                                    name='insurance'
+                                    document={viewDispatcherData?.data?.insurance}
                                     />
 
                                     <UploadFile
                                     label = "Roadworthiness"
                                     type="file"
-                                    {...getFieldProps('roadWorthiness')}
+                                    name='roadWorthiness'
+                                    document={viewDispatcherData?.data?.roadWorthiness}
                                     />
-                                </div> */}
+                                </div>
 
                                 <ToggleButton 
                                 title="Save & Update Customer."
@@ -231,6 +309,7 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
 
                                 <Button
                                 type="submit" 
+                                handleClick={() => {isValid ? () => handleSubmit() : handleIsNotValid()}}
                                 buttonName="Save" />
                             </Form>
                             </Hero>

@@ -29,6 +29,7 @@ export default function Sidebar() {
   useEffect(() => {
     setWindowWidth(window.innerWidth);
   }, []);
+
   
   useEffect(() => {
     setClicked(pathname)
@@ -73,33 +74,33 @@ export default function Sidebar() {
 
           <div onClick={() => setClicked('/dashboard/customers')}>
             <Link href="/dashboard/customers" 
-            className={clicked === "/dashboard/customers" ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
-                <i id={clicked ==="/dashboard/customers" ? "yellow-color" : "white-color"} className="icon ion-md-people" title="People"></i>
-                <h1 className={clicked === "/dashboard/customers" ? " " : "text-gray-100/70"}>Customers</h1>
+            className={clicked.includes('/dashboard/customers') ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
+                <i id={clicked.includes('/dashboard/customers') ? "yellow-color" : "white-color"} className="icon ion-md-people" title="People"></i>
+                <h1 className={clicked.includes('/dashboard/customers') ? " " : "text-gray-100/70"}>Customers</h1>
             </Link>
           </div>
 
           <div onClick={() => setClicked('/dashboard/dispatchers')}>
             <Link href="/dashboard/dispatchers" 
-            className={clicked === "/dashboard/dispatchers" ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
-                <i id={clicked ==="/dashboard/dispatchers" ? "yellow-color" : "white-color"} className="icon ion-md-bicycle" title="Dispatcher"></i>
-                <h1 className={clicked === "/dashboard/dispatchers" ? " " : "text-gray-100/70"}>Dispatchers</h1>
+            className={clicked.includes("/dashboard/dispatchers") ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
+                <i id={clicked.includes("/dashboard/dispatchers") ? "yellow-color" : "white-color"} className="icon ion-md-bicycle" title="Dispatcher"></i>
+                <h1 className={clicked.includes("/dashboard/dispatchers") ? " " : "text-gray-100/70"}>Dispatchers</h1>
             </Link>
           </div>
 
           <div onClick={() => setClicked('/dashboard/administrators')}>
             <Link href="/dashboard/administrators" 
-            className={clicked === "/dashboard/administrators" ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
-              <i id={clicked ==="/dashboard/administrators" ? "yellow-color" : "white-color"} className="icon ion-md-contacts" title="Administrators"></i>
-              <h1 className={clicked === "/dashboard/administrators" ? " " : "text-gray-100/70"}>Administrators</h1>
+            className={clicked.includes("/dashboard/administrators") ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
+              <i id={clicked.includes("/dashboard/administrators") ? "yellow-color" : "white-color"} className="icon ion-md-contacts" title="Administrators"></i>
+              <h1 className={clicked.includes("/dashboard/administrators") ? " " : "text-gray-100/70"}>Administrators</h1>
             </Link>
           </div>
 
           <div onClick={() => setClicked('/dashboard/transactions')}>
             <Link href="/dashboard/transactions" 
-            className={clicked === "/dashboard/transactions" ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
-              <i id={clicked ==="/dashboard/transactions" ? "yellow-color" : "white-color"}  className="icon ion-md-cash" title="Cash"></i>
-              <h1 className={clicked === "/dashboard/transactions" ? " " : "text-gray-100/70"}>Transactions</h1>
+            className={clicked.includes("/dashboard/transactions") ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
+              <i id={clicked.includes("/dashboard/transactions") ? "yellow-color" : "white-color"}  className="icon ion-md-cash" title="Cash"></i>
+              <h1 className={clicked.includes("/dashboard/transactions") ? " " : "text-gray-100/70"}>Transactions</h1>
             </Link>
           </div>
 
@@ -113,17 +114,17 @@ export default function Sidebar() {
 
           <div onClick={() => setClicked('/dashboard/messages')}>
             <Link href="/dashboard/messages" 
-            className={clicked === "/dashboard/messages" ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
-              <i id={clicked ==="/dashboard/messages" ? "yellow-color" : "white-color"}  className="icon ion-md-chatbubbles" title="Chat Bubbles"></i>
-              <h1 className={clicked === "/dashboard/messages" ? " " : "text-gray-100/70"}>Messages</h1>
+            className={clicked.includes("/dashboard/messages") ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
+              <i id={clicked.includes("/dashboard/messages") ? "yellow-color" : "white-color"}  className="icon ion-md-chatbubbles" title="Chat Bubbles"></i>
+              <h1 className={clicked.includes("/dashboard/messages") ? " " : "text-gray-100/70"}>Messages</h1>
             </Link>
           </div>
 
           <div onClick={() => setClicked('/dashboard/reviews')}>
             <Link href="/dashboard/reviews" 
-            className={clicked === "/dashboard/reviews" ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
-              <i id={clicked ==="/dashboard/reviews" ? "yellow-color" : "white-color"}  className="icon ion-md-star-half" title="Star"></i>
-              <h1 className={clicked === "/dashboard/reviews" ? " " : "text-gray-100/70"}>Reviews</h1>
+            className={clicked.includes("/dashboard/reviews") ? "flex justify-start font-bold gap-5 items-start bg-amber-500/10 text-amber-500 py-3 px-6 w-45 rounded-full" : "flex justify-start w-45 py-3 px-6 gap-5 items-start"}>
+              <i id={clicked.includes("/dashboard/reviews") ? "yellow-color" : "white-color"}  className="icon ion-md-star-half" title="Star"></i>
+              <h1 className={clicked.includes("/dashboard/reviews") ? " " : "text-gray-100/70"}>Reviews</h1>
             </Link>
           </div>
           

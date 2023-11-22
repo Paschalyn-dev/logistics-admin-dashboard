@@ -435,7 +435,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
             }
             {
                 viewParcelIsLoading || viewParcelIsValidating &&
-                <SkeletonLoading title="parcel data." />
+                <SkeletonLoading title="parcel data" />
             }
             <OrdersNav />
             <Section>

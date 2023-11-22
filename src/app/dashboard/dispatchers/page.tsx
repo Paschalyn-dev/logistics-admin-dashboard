@@ -6,13 +6,12 @@ import Input from "../input";
 import Section from "../section";
 import { useState, useContext, useEffect } from "react";
 import SearchFilter from "./search";
-import { useAllDispatchersFetcher, useDispatcherSearchRange } from "../services/swr-functions/customer-swr";
+import { useAllDispatchersFetcher } from "../services/swr-functions/customer-swr";
 import SubHeading from "../preferences/website/subheading";
 import SkeletonLoading from "../services/eventhandlers/skeleton-loading";
 import SuccessMessage from "../successmessage";
 import BoxesHolder from "../boxesholder";
 import Link from "next/link";
-import { UIBOXES } from "../shipments/active/page";
 import { State_data } from "../context/context";
 import Popup from "../services/eventhandlers/popup";
 import { useDateHandler } from "../date";
@@ -20,7 +19,7 @@ import { useDateHandler } from "../date";
 export default function Dispatcher(){
     const {dispatcherAllData, dispatcherAllError, dispatcherAllIsLoading, dispatcherAllIsValiddating, dispatcherAllMutate} = useAllDispatchersFetcher();
     const [menu, setMenu] = useState<string>('card');
-    const {setDeleteWithId, inputData, setInputData, deleteWithId, openUIBoxes, setOpenUIBoxes, successMessage, searchData} = useContext<any | string>(State_data);
+    const {setDeleteWithId, inputData, deleteWithId, openUIBoxes, setOpenUIBoxes, successMessage, searchData} = useContext<any | string>(State_data);
     const handleOpenSearch = () => {
         setOpenUIBoxes((prev: any) => ({...prev, dispatcherSearch: true, dispatcherClearData: true}))
     }
@@ -94,7 +93,7 @@ export default function Dispatcher(){
                     {dispatcherAllData?.data &&  !openUIBoxes.dispatcherClearData &&
                     (dispatcherAllData.data.map((dispatcher: any) => {
                         return(
-                            <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
+                            <div key={dispatcher?.id} className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                             <div className="flex justify-between">
                                 <div>
                                     <p className="text-lg">{dispatcher.fullName}</p>
@@ -163,7 +162,7 @@ export default function Dispatcher(){
                 {searchData?.dispatcherResult?.data && openUIBoxes.dispatcherClearData &&
                     (searchData?.dispatcherResult.data.map((dispatcher: any) => {
                         return(
-                        <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
+                        <div key={dispatcher?.id} className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                             <div className="flex justify-between">
                                 <div>
                                     <p className="text-lg">{dispatcher.fullName}</p>
