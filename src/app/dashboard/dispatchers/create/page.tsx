@@ -57,7 +57,7 @@ export default function FormPageDispatcher({handleOpenForm}: any){
         else{
             updateDispatcherInformation('')
         }
-    }, [generatePassword])
+    }, [generatePassword, formRef?.current?.values?.password])
 
     const handleIsNotValid = () => {
         setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
@@ -128,7 +128,7 @@ export default function FormPageDispatcher({handleOpenForm}: any){
             message={dispatcherDetails?.result?.code} 
             code={dispatcherDetails?.info?.code}
             successmessage="Dispatcher successfully added to the list!"
-            failedmessage="Sorry, dispatcher cannot be added to the list!"
+            failedmessage="Sorry, dispatcher cannot be added to the list or dispatcher already exists!"
             staffAndCustomer={dispatcherDetails?.result}
             error={dispatcherDetails?.result?.code !== 200}
             loading={dispatcherDetails?.result === "undefined" && dispatcherDetails?.info !== ""}
@@ -179,6 +179,7 @@ export default function FormPageDispatcher({handleOpenForm}: any){
                     password: Yup.string()
                     .min(8, 'Password is too short. It should be 8 characters or more')
                     .matches(/[a-zaA-z0-9]/, 'Password can only contain letters and numbers.')
+                    .required('This field is required.')
                   })}
                   onSubmit={(values) => {
                     setDispatcherDetails((prev: any) => ({...prev, result: "", info: {...values}, code: Password()}));

@@ -210,7 +210,7 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                 message={dispatcherDetails?.result?.code} 
                 code={dispatcherDetails?.info?.code}
                 successmessage="Dispatcher details successfully updated!"
-                failedmessage="Sorry, dispatcher details cannot be updated!"
+                failedmessage="Sorry, dispatcher cannot be added to the list or dispatcher already exists!"
                 staffAndCustomer={dispatcherDetails?.result}
                 error={dispatcherDetails?.result?.code !== 200}
                 data={dispatcherDetails?.result}
