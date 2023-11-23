@@ -1,5 +1,5 @@
 'use client'
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef, useCallback } from "react";
 import { Formik, Form } from 'formik';
 import Hero from "../../preferences/hero";
 import SubHeading from "../../preferences/website/subheading";
@@ -25,8 +25,10 @@ import SuccessMessage from "../../successmessage";
 export default function FormPageDispatcher({handleOpenForm}: any){
     const {successMessage, setSuccessMessage, loading, setLoading} = useContext(State_data);
     const [saveAndAddNewRider, setSaveAndAddNewRider] = useState<boolean>(false);
-    const [passwordString, setPasswordString] = useState<boolean>(true)
-    const [generatePassword, setGeneratePassword] = useState<boolean>(true);
+    const [passwordString, setPasswordString] = useState<boolean>(true);
+    const formRef = useRef<any>();
+    const [code, setCode] = useState('');
+    const [generatePassword, setGeneratePassword] = useState<boolean>(false);
     const [windowLocation, setWindowLocations] =useState<any>('')
     const [dispatcherDetails, setDispatcherDetails] = useState<any>({
         info: "",
@@ -38,6 +40,24 @@ export default function FormPageDispatcher({handleOpenForm}: any){
         e.preventDefault();
         setSaveAndAddNewRider(!saveAndAddNewRider)
     }
+    
+    const updateDispatcherInformation = useCallback((value: string) => {
+        formRef.current?.setFieldValue('password', value);
+        setTimeout(() => {formRef?.current?.setFieldTouched('password', true)}, 1000)
+    }, [ formRef.current?.values, generatePassword]);
+
+    useEffect(()=>{
+        setCode(Password())
+    }, [])
+    
+    useEffect(() => {
+        if(generatePassword === true){
+            updateDispatcherInformation(code)
+        }
+        else{
+            updateDispatcherInformation('')
+        }
+    }, [generatePassword])
 
     const handleIsNotValid = () => {
         setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
@@ -62,27 +82,28 @@ export default function FormPageDispatcher({handleOpenForm}: any){
         setLoading((prev: any) => ({...prev, dispatcher: false}))
     }
 
+    
     useEffect(() => {
         if(dispatcherDetails?.result === "" && dispatcherDetails?.info !== ""){
             setLoading((prev: any) => ({...prev, dispatcher: true}))
         }
         if(dispatcherDetails?.info !== ""){
-          handleCreate({...dispatcherDetails?.info});
+            handleCreate({...dispatcherDetails?.info});
         }
     }, [dispatcherDetails?.code]);
-
+    
     useEffect(() => {
         setLoading((prev: any) => ({...prev, dispatcher: false}))
         setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
     },[])
-
+    
     useEffect(() => {
         if(!saveAndAddNewRider && dispatcherDetails?.result?.code === 200){
             setTimeout(() => {
-                    if(windowLocation?.location?.pathname === `/dashboard/dispatchers/create`){
-                        router.replace('/dashboard/dispatchers')
-                    }else{}
-                }, 5000);
+                if(windowLocation?.location?.pathname === `/dashboard/dispatchers/create`){
+                    router.replace('/dashboard/dispatchers')
+                }else{}
+            }, 5000);
         }
     }, [dispatcherDetails?.result, windowLocation?.location?.pathname]);
 
@@ -91,7 +112,7 @@ export default function FormPageDispatcher({handleOpenForm}: any){
             setWindowLocations(window)
         }
     },[typeof window !== 'undefined'])
-
+    
     return(
         <Holder>
             {
@@ -100,10 +121,10 @@ export default function FormPageDispatcher({handleOpenForm}: any){
             <ConstantNav />
             <Section>
             {
-            dispatcherDetails.result !== "" && dispatcherDetails.info !== "" && 
-            <ErrorAndSucccessHandlers
-            name="createDispatcher"
-            successName={successMessage.createDispatcher}
+                dispatcherDetails.result !== "" && dispatcherDetails.info !== "" && 
+                <ErrorAndSucccessHandlers
+                name="createDispatcher"
+                successName={successMessage.createDispatcher}
             message={dispatcherDetails?.result?.code} 
             code={dispatcherDetails?.info?.code}
             successmessage="Dispatcher successfully added to the list!"
@@ -128,6 +149,7 @@ export default function FormPageDispatcher({handleOpenForm}: any){
             </Link>
 
             <Formik
+                  innerRef={(ref) => formRef.current = ref}
                   initialValues={{
                     address: {
                         city: "",
@@ -190,30 +212,17 @@ export default function FormPageDispatcher({handleOpenForm}: any){
                                 name="phone"
                                 type="tel"
                                 /> 
-
-                            {                               
-                            !generatePassword ?
+                              
                                 <TextInput
                                 label="Password"
                                 name="password"
-                                id={generatePassword ? "password" : "defaultPassword"}
+                                id={"password"}
                                 type={passwordString ? "password" : "text"}
                                 handlePasswordString={setPasswordString}
                                 stringPassword={passwordString} 
-                                /> : 
-                                <TextInput
-                                label="Password"
-                                name="password"
-                                value={Password()}
-                                id={generatePassword ? "password" : "defaultPassword"}
-                                type={passwordString ? "password" : "text"}
-                                handlePasswordString={setPasswordString}
-                                stringPassword={passwordString} 
-                                />
-                            }
+                                /> 
 
-
-                            <button onClick={(e) => {e.preventDefault(); setGeneratePassword(!generatePassword)}} className={generatePassword ? "font-bold text-green-500 mb-5 " : "font-bold mb-5 text-gray-800"}>{generatePassword ? "Default Password Generator is on." : "Click here to use the default password"}</button>
+                               <div onClick={(e) => {e.preventDefault(); setGeneratePassword(!generatePassword)}} className={generatePassword ? "font-bold cursor-pointer text-green-500 mb-5 " : "font-bold cursor-pointer mb-5 text-gray-800"}>{generatePassword ? "Default Password Generator is on." : "Default password generator is off"}</div>
 
                                 <TextInput
                                 label="State"

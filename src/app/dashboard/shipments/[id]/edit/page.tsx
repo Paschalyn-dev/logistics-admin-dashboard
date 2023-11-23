@@ -109,44 +109,41 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
     
     const findDestinationIndex = fetchCustomersData?.data?.findIndex((f: any) => f.id === id.destination)
     
-    const [myValidation, setValidation] = useState(
-        Yup.object().shape({
-            pickUp: Yup.object({
-                name: Yup.string().required('Please provide name for pickup.'),
-                phone: Yup.string()
-                .matches(phoneRegExp, 'Phone number is not valid')
-                .min(1, 'Must be 1 character or more.')
-                .required('Please provide phone number'),   
-                email: Yup.string().email('This email seems invalid!').required('Please provide email'),
-                address: Yup.string().required('Please provide the pick up address'),
-            }),
-            destination: Yup.object({
-                name: Yup.string().required('Please provide name for destination.'),
-                phone: Yup.string()
-                .matches(phoneRegExp, 'Phone number is not valid')
-                .min(1, 'Must be 1 character or more.')
-                .required('Please provide phone number'),   
-                email: Yup.string().email('This email seems invalid!').required('Please provide email'),
-                address: Yup.string().required('Please provide the destination address'),
-            }),
-            estimatedDistance: Yup.object({
-                text: Yup.number().notRequired(),
-                value: Yup.number(),
-            }),
-            estimatedTime: Yup.object({
-                text: Yup.number().notRequired(),
-                value: Yup.number(),
-            }),
-            name: Yup.string()
-            .min(1, 'Name must be five characters or more.')
-            .required('Please provide name for shipment.'),
-            description: Yup.string().notRequired(),
-            rider: Yup.string().required('Please choose a dispatcher from the list.'),
-            amount: Yup.string().notRequired(),
-            paymentType: Yup.string().notRequired()
-        })
-    )
-
+    const myValidation = Yup.object().shape({
+        pickUp: Yup.object({
+            name: Yup.string().required('Please provide name for pickup.'),
+            phone: Yup.string()
+            .matches(phoneRegExp, 'Phone number is not valid')
+            .min(1, 'Must be 1 character or more.')
+            .required('Please provide phone number'),   
+            email: Yup.string().email('This email seems invalid!').required('Please provide email'),
+            address: Yup.string().required('Please provide the pick up address'),
+        }),
+        destination: Yup.object({
+            name: Yup.string().required('Please provide name for destination.'),
+            phone: Yup.string()
+            .matches(phoneRegExp, 'Phone number is not valid')
+            .min(1, 'Must be 1 character or more.')
+            .required('Please provide phone number'),   
+            email: Yup.string().email('This email seems invalid!').required('Please provide email'),
+            address: Yup.string().required('Please provide the destination address'),
+        }),
+        estimatedDistance: Yup.object({
+            text: Yup.number().notRequired(),
+            value: Yup.number(),
+        }),
+        estimatedTime: Yup.object({
+            text: Yup.number().notRequired(),
+            value: Yup.number(),
+        }),
+        name: Yup.string()
+        .min(1, 'Name must be five characters or more.')
+        .required('Please provide name for shipment.'),
+        description: Yup.string().notRequired(),
+        rider: Yup.string().required('Please choose a dispatcher from the list.'),
+        amount: Yup.string().notRequired(),
+        paymentType: Yup.string().notRequired()
+    })
     function handleParcelFragility() {
         setHandleToggleParcelButtons((prev: any) => ({
             ...prev, parcelFragility: !handleToggleParcelButtons.parcelFragility
@@ -175,7 +172,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
         const newId = dispatcherAllData?.data?.filter((dispatcher: any) => dispatcher?.fullName === name);
         return newId[0]?.id;
     }
-    
+
     const updateCustomerInformation = useCallback((key: string, index: number) => {
         const { user } = fetchCustomersData?.data[index] ?? {};
         if (user) {
@@ -183,6 +180,10 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
             formikRef.current?.setFieldValue(`${key}.email`, user.email);
             formikRef.current?.setFieldValue(`${key}.phone`, user.phone);
             formikRef.current?.setFieldValue(`${key}.address`, user.address);
+            setTimeout(() => {formikRef?.current?.setFieldTouched(`${key}.name`, true)}, 100)
+            setTimeout(() => {formikRef?.current?.setFieldTouched(`${key}.email`, true)}, 100)
+            setTimeout(() => {formikRef?.current?.setFieldTouched(`${key}.phone`, true)}, 100)
+            setTimeout(() => {formikRef?.current?.setFieldTouched(`${key}.address`, true)}, 100)
         }
     }, [ fetchCustomersData?.data, formikRef.current]);
     
@@ -230,8 +231,6 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
     const updateButtons = useCallback((key: string, value: string) => {
         formikRef.current?.setFieldValue(`${key}`, value);
     }, [handleToggleParcelButtons, formikRef.current])
-
-    
     
     const handleIsNotValid = (submit: any) => {
         if(viewParcelData?.data && !editParcelDetails?.result?.length && !loading.parcel){
@@ -383,43 +382,6 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
     setLoading((prev: any) => ({...prev, parcel: false}))
     }, [viewParcelData]);
 
-    useEffect(() => {
-        setValidation(Yup.object({
-            pickUp: Yup.object({
-                name: Yup.string().required('Please provide name for pickup.'),
-                phone: Yup.string()
-                .matches(phoneRegExp, 'Phone number is not valid')
-                .min(1, 'Must be 1 character or more.')
-                .required('Please provide phone number'),   
-                email: Yup.string().email('This email seems invalid!').required('Please provide email'),
-                address: Yup.string().required('Please provide the pick up address'),
-            }),
-            destination: Yup.object({
-                name: Yup.string().required('Please provide name for destination.'),
-                phone: Yup.string()
-                .matches(phoneRegExp, 'Phone number is not valid')
-                .min(1, 'Must be 1 character or more.')
-                .required('Please provide phone number'),   
-                email: Yup.string().email('This email seems invalid!').required('Please provide email'),
-                address: Yup.string().required('Please provide the destination address'),
-            }),
-            estimatedDistance: Yup.object({
-                text: Yup.number().notRequired(),
-                value: Yup.number(),
-            }),
-            estimatedTime: Yup.object({
-                text: Yup.number().notRequired(),
-                value: Yup.number(),
-            }),
-            name: Yup.string()
-            .min(1, 'Name must be five characters or more.')
-            .required('Please provide name for shipment.'),
-            description: Yup.string().notRequired(),
-            rider: Yup.string().required('Please choose a dispatcher from the list.'),
-            amount: Yup.string().notRequired(),
-            paymentType: Yup.string().notRequired()
-        }));
-    },[findCustomerIndex, findDestinationIndex, fetchCustomersData?.data, " "])
     
     useEffect(() => {
         updateButtons('fragile', handleToggleParcelButtons.parcelFragility)

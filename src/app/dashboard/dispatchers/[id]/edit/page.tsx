@@ -1,5 +1,5 @@
 'use client'
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef, useCallback } from "react";
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from "next/navigation";
@@ -7,7 +7,7 @@ import Holder from "@/app/dashboard/holder";
 import ConstantNav from "@/app/dashboard/constantNav";
 import Section from "@/app/dashboard/section";
 import SuccessMessage from "@/app/dashboard/successmessage";
-import { useViewDispatcher } from "@/app/dashboard/services/swr-functions/customer-swr";
+import { useAllDispatchersFetcher, useViewDispatcher } from "@/app/dashboard/services/swr-functions/customer-swr";
 import Link from "next/link";
 import Loader from "@/app/dashboard/services/Loader/spinner";
 import Hero from "@/app/dashboard/preferences/hero";
@@ -28,10 +28,11 @@ import MiniText from "@/app/dashboard/minitext";
 export default function EditDispatchers({ params }: { params: {id: number}}){
     const {successMessage, loading, setLoading, setSuccessMessage} = useContext(State_data);
     const [saveAndAddNewRider, setSaveAndAddNewRider] = useState<boolean>(false);
+    const router = useRouter();
+    const formRef = useRef<any>();
     const [windowLocation, setWindowLocations] = useState<any>('');
-    const [validation, setValidation] = useState(
-        Yup.object({
-            address: Yup.object({
+    const validation = Yup.object().shape({
+            address: Yup.object().shape({
                 state: Yup.string().required('This field is required.'),
                 street: Yup.string().required('This field is required.'),
             }),
@@ -45,7 +46,6 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
             .min(1, 'Must be 1 character or more.')
             .required('This field is required.'),
           })
-    )
     const [dispatcherDetails, setDispatcherDetails] = useState<any>({
         info: "",
         result: "",
@@ -90,12 +90,27 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
         setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
     }
     
-    const router = useRouter();
     const handleSaveAndAddNewRider = (e: any) => {
         e.preventDefault();
         setSaveAndAddNewRider(!saveAndAddNewRider)
     }
-    
+
+    const updateDispatcherInformation = useCallback((key: string) => {
+        setTimeout(() => {formRef?.current?.setFieldTouched(`address.${key}`, true)}, 1000)
+    }, [ formRef.current]);
+
+    useEffect(() => {
+        if(viewDispatcherData?.data){
+            updateDispatcherInformation('state')
+        }
+    }, [viewDispatcherData?.data?.address, formRef?.current?.values?.address])
+
+    useEffect(() => {
+        if(viewDispatcherData?.data){
+            updateDispatcherInformation('street')
+        }
+    }, [viewDispatcherData?.data?.address, formRef?.current?.values?.address])
+        
     async function handleEdit(details: any, id: any){
         const response = await fetch(staffAPIURL.editDispatcher(id), {
             method: 'PUT',
@@ -173,23 +188,6 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
       }
     }, [viewDispatcherData?.data]);
     
-    useEffect(() => {
-      setValidation(Yup.object().shape({
-          address: Yup.object({
-              state: Yup.string().required('This field is required.'),
-              street: Yup.string().required('This field is required.'),
-          }),
-          fullName: Yup.string()
-          .min(5, 'Name must be five characters or more.')
-          .required('This field is required.'),
-          email: Yup.string()
-          .email('This email address seems invalid.')
-          .required('This field is required.'),
-          phone: Yup.number()
-          .min(1, 'Must be 1 character or more.')
-          .required('This field is required.'),
-      }))
-    }, [viewDispatcherData?.data, " "])
 
         return(
             <Holder>
@@ -219,21 +217,22 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                 />
             }
 
-        {
-            successMessage.isNotValid && 
-            <SuccessMessage
-            id="failed"
-            name="isNotValid"
-            messageTitle="You have not filled all the required form fields."
-            successMessageShow={successMessage.isNotValid}
-            />
-        }
+            {
+                successMessage.isNotValid && 
+                <SuccessMessage
+                id="failed"
+                name="isNotValid"
+                messageTitle="You have not filled all the required form fields."
+                successMessageShow={successMessage.isNotValid}
+                />
+            }
 
             <Link href="/dashboard/dispatchers" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                 <i className="icon ion-md-arrow-back"></i>
             </Link>
 
             <Formik
+                  innerRef={(ref) => formRef.current = ref}
                   initialValues={initialValues}
                   validationSchema={validation}
                   onSubmit={(values) => {
@@ -244,7 +243,7 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                   validateOnMount={true}
                 >
                     {
-                        ({ values, handleSubmit, isValid }) => (
+                        ({ values, handleSubmit, isValid, errors }) => (
                             <Hero formHeading={values.fullName} 
                             comingsoon="Rider" 
                             heading="Edit Rider Account" 
@@ -316,6 +315,8 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                                     />
                                 </div>
 
+                                {/* <button onMouseOver={() => console.log(errors, isValid, 'wertyuikuytredrj')}>Clcik</button> */}
+
                                 <ToggleButton 
                                 title="Save & Update Customer."
                                 icon="icon ion-md-information-circle-outline"
@@ -326,7 +327,7 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
 
                                 <Button
                                 type="submit" 
-                                handleClick={() => {isValid ? () => handleSubmit() : handleIsNotValid()}}
+                                handleClick={() => {viewDispatcherData?.data && (!Object.keys(errors).length || isValid) ? () => handleSubmit() : handleIsNotValid()}}
                                 buttonName="Save" />
                             </Form>
                             </Hero>

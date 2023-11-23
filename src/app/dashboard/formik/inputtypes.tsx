@@ -15,8 +15,8 @@ export default function TextInput ({label, id, stringPassword, handlePasswordStr
             <label htmlFor={props.name}>{label}</label>
             <input id="input" className="text-input" {...field} {...props} />
 
-            { (id === "password" || id === "defaultPassword") &&
-            <span id={id} onClick={() => handlePasswordString(!stringPassword)} className="relative bottom-10 cursor-pointer -ml-8 left-full">
+            { (id === "password") &&
+            <span id={id} onClick={(e: any) => {e.preventDefault(); handlePasswordString(!stringPassword)}} className="relative bottom-10 cursor-pointer -ml-8 left-full">
                 {props.type === "password" ? <i className="icon ion-md-eye"></i> : <i className="icon ion-md-eye-off"></i>}
             </span>
             }
