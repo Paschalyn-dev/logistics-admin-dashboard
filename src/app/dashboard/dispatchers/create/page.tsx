@@ -43,7 +43,7 @@ export default function FormPageDispatcher({handleOpenForm}: any){
     
     const updateDispatcherInformation = useCallback((value: string) => {
         formRef.current?.setFieldValue('password', value);
-        setTimeout(() => {formRef?.current?.setFieldTouched('password', true)}, 1000)
+        setTimeout(() => {formRef?.current?.setFieldTouched('password', true)}, 100)
     }, [ formRef.current?.values, generatePassword]);
     
     useEffect(() => {
@@ -55,10 +55,17 @@ export default function FormPageDispatcher({handleOpenForm}: any){
         }
     }, [generatePassword, formRef?.current?.values?.password])
 
-    const handleIsNotValid = () => {
-        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
-    }
+    const [isNotValid, setIsNotValid] = useState('');
 
+    const handleIsNotValid = () => {
+            setIsNotValid(Password())
+            setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
+    }
+    
+    useEffect(() => {
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
+    }, [isNotValid])
+    
     const handleAdministratorsPage = () => {
         router.replace('/dashboard/administrators/create')
     }
@@ -92,7 +99,7 @@ export default function FormPageDispatcher({handleOpenForm}: any){
         setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
         setCode(Password())
         if(formRef?.current?.values?.password?.length){
-            setTimeout(() => {formRef?.current?.setFieldTouched('password', true)}, 1000)
+            setTimeout(() => {formRef?.current?.setFieldTouched('password', true)}, 100)
         }
     },[])
     
@@ -276,7 +283,7 @@ export default function FormPageDispatcher({handleOpenForm}: any){
                                 />  
 {/* (e) => { e.preventDefault(); formik.handleSubmit(e)} */}
                                 <Button
-                                handleClick={() => { isValid ? (e: any) => {e.preventDefault(); handleSubmit()} : handleIsNotValid()}}
+                                handleClick={() => { isValid ? () => handleSubmit() : handleIsNotValid()}}
                                 type="submit" 
                                 buttonName="Save" />
                             </Form>

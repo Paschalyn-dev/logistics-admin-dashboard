@@ -14,6 +14,7 @@ import { State_data } from "../../context/context"
 import { dateStringChanger } from "../../services/api-url/customer-api-url"
 import { useDateHandler } from "../../date"
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading"
+import SuccessMessage from "../../successmessage"
 export default function EditParcel({ params }: { params: {id: number}}){
   const handleCloseFill = () => {
     setOpenUIBoxes((prev: any) => ({...prev, customerPopup: false}))
@@ -26,13 +27,22 @@ export default function EditParcel({ params }: { params: {id: number}}){
  useEffect(() => {
    viewCustomerMutate();
  }, []);
- const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
+ const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes, successMessage} = useContext(State_data);
  
  return(
    <Holder>
         {
            viewCustomerIsLoading || viewCustomerIsValidating &&
           <SkeletonLoading title="customer details." />
+        }
+        {
+          viewCustomerError &&
+          <SuccessMessage
+          id="failed"
+          name="error"
+          successMessageShow={successMessage.error}
+          messageTitle="Sorry, can't load customers details. Check network connection!"
+          />
         }
         <ConstantNav />
         <Section>

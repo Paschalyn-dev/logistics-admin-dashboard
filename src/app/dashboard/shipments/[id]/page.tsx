@@ -14,6 +14,7 @@ import {useState, useContext } from "react";
 import Popup from "../../services/eventhandlers/popup"
 import { State_data } from "../../context/context"
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading"
+import SuccessMessage from "../../successmessage"
 
 export default function EditParcel({ params }: { params: {id: number}}){
   const [openUIBoxes, setOpenUIBoxes] = useState(false);
@@ -28,12 +29,21 @@ const handleFetchDispatcher = (id: any) => {
   }
 }   
  const {viewParcelData, viewParcelError, viewParcelIsLoading, viewParcelIsValidating, viewParcelMutate} = useViewParcels(params.id)
- const {setDeleteWithId, deleteWithId} = useContext(State_data);
+ const {setDeleteWithId, deleteWithId, successMessage} = useContext(State_data);
     return(
       <Holder>
         {
            viewParcelIsLoading || viewParcelIsValidating &&
           <SkeletonLoading title="parcel details." />
+        }
+        {
+          viewParcelError &&
+          <SuccessMessage
+          id="failed"
+          name="error"
+          successMessageShow={successMessage.error}
+          messageTitle="Sorry, can't load shipment details. Check network connection!"
+          />
         }
         <OrdersNav />
         <Section>

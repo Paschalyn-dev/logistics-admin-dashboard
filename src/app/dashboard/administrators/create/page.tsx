@@ -43,7 +43,7 @@ export default function FormPageAdministrators(){
     }
     const updateAdministratorInformation = useCallback((value: string) => {
         formRef.current?.setFieldValue('password', value);
-        setTimeout(() => {formRef?.current?.setFieldTouched('password', true)}, 1000)
+        setTimeout(() => {formRef?.current?.setFieldTouched('password', true)}, 100)
     }, [ formRef.current?.values, generatePassword]);
 
     async function handleCreate(details: any){
@@ -59,11 +59,17 @@ export default function FormPageAdministrators(){
         setStaffDetails((prev: any) => ({...prev, result: data}));
         setLoading((prev: any) => ({...prev, administrator: false}))
     }
+    const [isNotValid, setIsNotValid] = useState('');
 
     const handleIsNotValid = () => {
-        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
+            setIsNotValid(Password())
+            setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
     }
-
+    
+    useEffect(() => {
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
+    }, [isNotValid])
+    
     useEffect(() => {
         if(staffDetails?.info !== ""){
             handleCreate(staffDetails?.info)
@@ -75,7 +81,7 @@ export default function FormPageAdministrators(){
         setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
         setCode(Password())
         if(formRef?.current?.values?.password?.length){
-            setTimeout(() => {formRef?.current?.setFieldTouched('password', true)}, 1000)
+            setTimeout(() => {formRef?.current?.setFieldTouched('password', true)}, 100)
         }
     },[])
 
@@ -255,7 +261,7 @@ export default function FormPageAdministrators(){
 
                                 <Button
                                 type='submit'
-                                handleClick={() => { isValid && !Object.keys(errors).length ? () => handleSubmit : handleIsNotValid()}} 
+                                handleClick={() => { isValid && !Object.keys(errors).length ? () => handleSubmit() : handleIsNotValid()}} 
                                 buttonName="Save" />
                             </Form>
                             </Hero>

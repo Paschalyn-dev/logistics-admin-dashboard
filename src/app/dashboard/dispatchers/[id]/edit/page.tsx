@@ -24,6 +24,7 @@ import { authorizationKey } from "@/app/dashboard/services/staff-api/api";
 import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
 import SkeletonLoading from "@/app/dashboard/services/eventhandlers/skeleton-loading";
 import MiniText from "@/app/dashboard/minitext";
+import { Console } from "console";
 
 export default function EditDispatchers({ params }: { params: {id: number}}){
     const {successMessage, loading, setLoading, setSuccessMessage} = useContext(State_data);
@@ -45,7 +46,7 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
             phone: Yup.number()
             .min(1, 'Must be 1 character or more.')
             .required('This field is required.'),
-          })
+    });
     const [dispatcherDetails, setDispatcherDetails] = useState<any>({
         info: "",
         result: "",
@@ -86,17 +87,25 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
         vehicle: ""
       });
       
+      const [isNotValid, setIsNotValid] = useState('');
+
       const handleIsNotValid = () => {
-        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
-    }
-    
+          setIsNotValid(Password())
+          setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
+      }
+      
+      useEffect(() => {
+          setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
+      }, [isNotValid])
+
+      
     const handleSaveAndAddNewRider = (e: any) => {
         e.preventDefault();
         setSaveAndAddNewRider(!saveAndAddNewRider)
     }
 
     const updateDispatcherInformation = useCallback((key: string) => {
-        setTimeout(() => {formRef?.current?.setFieldTouched(`address.${key}`, true)}, 1000)
+        setTimeout(() => {formRef?.current?.setFieldTouched(`address.${key}`, true)}, 100)
     }, [ formRef.current]);
 
     useEffect(() => {
@@ -187,7 +196,7 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
         }))
     }
 }, [viewDispatcherData?.data]);
-    
+
 
         return(
             <Holder>

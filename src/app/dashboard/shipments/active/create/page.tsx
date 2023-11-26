@@ -206,9 +206,17 @@ export default function FormPageShipments(){
         setWindowLocations(window)
     }, [typeof window !== 'undefined']);
     
+    const [isNotValid, setIsNotValid] = useState('');
+
     const handleIsNotValid = () => {
-        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
+            setIsNotValid(Password())
+            setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
     }
+    
+    useEffect(() => {
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
+    }, [isNotValid])
+    
     
     useEffect(() => {
         setLoading((prev: any) => ({...prev, parcel: false}))
@@ -475,7 +483,7 @@ export default function FormPageShipments(){
 
                                 <Button 
                                 type="submit" 
-                                handleClick={() => {isValid ? () => {handleSubmit()} : handleIsNotValid()}} 
+                                handleClick={() => {isValid ? () => handleSubmit() : handleIsNotValid()}} 
                                 buttonName="Save" 
                                 />
                             </Form>

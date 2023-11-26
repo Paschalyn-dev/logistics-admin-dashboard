@@ -13,9 +13,10 @@ import ConstantNav from "../../constantNav"
 import SubHeading from "../../preferences/website/subheading"
 import { State_data } from "../../context/context"
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
+import SuccessMessage from "../../successmessage";
 
 export default function EditParcel({ params }: { params: {id: number}}){
-  const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
+  const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes, successMessage} = useContext(State_data);
   const handleCloseFill = () => {
     setOpenUIBoxes((prev: any) => ({...prev, dispatcherPopup: false}))
   }
@@ -32,6 +33,15 @@ export default function EditParcel({ params }: { params: {id: number}}){
         {
           viewDispatcherIsValidating || viewDispatcherIsLoading &&
           <SkeletonLoading title="dispatcher details." />
+        }
+        {
+          viewDispatcherError &&
+          <SuccessMessage
+          id="failed"
+          name="error"
+          successMessageShow={successMessage.error}
+          messageTitle="Sorry, can't load dispatcher details. Check network connection!"
+          />
         }
         <ConstantNav />
         <Section>

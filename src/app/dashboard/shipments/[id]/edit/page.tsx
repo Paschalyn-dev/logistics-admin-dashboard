@@ -232,15 +232,17 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
         formikRef.current?.setFieldValue(`${key}`, value);
     }, [handleToggleParcelButtons, formikRef.current])
     
-    const handleIsNotValid = (submit: any) => {
-        if(viewParcelData?.data && !editParcelDetails?.result?.length && !loading.parcel){
-            setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
-        }
-        else{
-            setLoading((prev: any) => ({...prev, parcel: true}))
-            submit();
-        }
+
+    const [isNotValid, setIsNotValid] = useState('');
+
+    const handleIsNotValid = () => {
+            setIsNotValid(Password())
+            setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
     }
+    
+    useEffect(() => {
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
+    }, [isNotValid])
     
     const [timeAndDistance, setTimeAndDistance] = useState({
         time: 0,
@@ -442,7 +444,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                             setTimeAndDistance((prev: any) => ({...prev, time: Number(values?.meta?.estimatedTime?.text) * 3600, 
                             distance: Number(values?.meta?.estimatedDistance?.text) / 1000}))
                         }
-                        setSuccessMessage((prev:any) => ({...prev, editShipment: true}));
+                        setSuccessMessage((prev:any) => ({...prev, editShipment: true, isNotValid: false}));
                         setEditParcelDetails((prev: any) => ({...prev, info:{...values,
                             meta: {...values?.meta, 
                                 estimatedTime: {...values?.meta?.estimatedTime, 
@@ -599,7 +601,7 @@ export default function FormPageShipments({ params }: { params: {id: number}}){
                                 />  
                                 <Button 
                                 type="submit" 
-                                handleClick={() => !Object.keys(errors).length && viewParcelData?.data ? () => {handleSubmit()} :  handleIsNotValid(handleSubmit)} 
+                                handleClick={() => !Object.keys(errors).length && viewParcelData?.data ? () => handleSubmit() :  handleIsNotValid()} 
                                 buttonName="Save" 
                                 />
                             </Form>

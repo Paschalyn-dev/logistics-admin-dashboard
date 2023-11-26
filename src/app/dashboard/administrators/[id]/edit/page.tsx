@@ -23,7 +23,7 @@ import SuccessMessage from "@/app/dashboard/successmessage";
 
 export default function editAdministrators({ params }: { params: {id: number}}){
     const {successMessage, setSuccessMessage, setLoading, loading} = useContext(State_data);
-    const [windowLocation, setWindowLocations] =useState<any>('')
+    const [windowLocation, setWindowLocations] = useState<any>('')
     const formRef = useRef<any>();
     const validation = Yup.object().shape({
         address: Yup.object().shape({
@@ -79,26 +79,55 @@ export default function editAdministrators({ params }: { params: {id: number}}){
         setSaveAndAddNewStaff(!saveAndAddNewStaff)
     }
 
+    const [isNotValid, setIsNotValid] = useState('');
+
     const handleIsNotValid = () => {
-        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
+        setIsNotValid(Password())
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
     }
-
+    
     const updateAdministratorInformation = useCallback((key: string) => {
-        setTimeout(() => {formRef?.current?.setFieldTouched(`address.${key}`, true)}, 1000)
+        setTimeout(() => {formRef?.current?.setFieldTouched(key, true)}, 100)
     }, [ formRef.current]);
+    
+    console.log(formRef?.current)
+    
 
     useEffect(() => {
         if(viewStaffData?.data){
-            updateAdministratorInformation('state')
+            updateAdministratorInformation('address.state')
         }
-    }, [viewStaffData?.data?.address, formRef?.current?.values?.address])
-
+    }, [viewStaffData?.data?.address, formRef?.current?.values?.address?.state])
+    
     useEffect(() => {
         if(viewStaffData?.data){
-            updateAdministratorInformation('street')
+            updateAdministratorInformation('phone')
         }
-    }, [viewStaffData?.data?.address, formRef?.current?.values?.address])
-
+    }, [viewStaffData?.data?.phone, formRef?.current?.values?.phone])
+    
+    useEffect(() => {
+        if(viewStaffData?.data){
+            updateAdministratorInformation('fullName')
+        }
+    }, [viewStaffData?.data?.fullName, formRef?.current?.values?.fullName])
+    
+    useEffect(() => {
+        if(viewStaffData?.data){
+            updateAdministratorInformation('email')
+        }
+    }, [viewStaffData?.data?.email, formRef?.current?.values?.email])
+    
+    useEffect(() => {
+        if(viewStaffData?.data){
+            updateAdministratorInformation('address.street')
+        }
+    }, [viewStaffData?.data?.address, formRef?.current?.values?.address?.street])
+    
+    
+    useEffect(() => {
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
+    }, [isNotValid])
+    
     async function handleEdit(details: any, id: any){
         const response = await fetch(staffAPIURL.editStaff(id), {
             method: 'PUT',
@@ -113,7 +142,7 @@ export default function editAdministrators({ params }: { params: {id: number}}){
         setStaffDetails((prev: any) => ({...prev, result: data}));
         setLoading((prev: any) => ({...prev, administrator: false}))
     }
-
+    
     useEffect(() => {
         setLoading((prev: any) => ({...prev, administrator: false}))
         setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
@@ -167,6 +196,7 @@ export default function editAdministrators({ params }: { params: {id: number}}){
             setWindowLocations(window)
         }
     },[typeof window !== 'undefined'])
+
     
     return(
         <Holder>
@@ -218,7 +248,7 @@ export default function editAdministrators({ params }: { params: {id: number}}){
                     setSuccessMessage((prev: any) => ({...prev, editAdministrator: true}));
                     setStaffDetails((prev: any) => ({...prev, info: {...values}, code: Password(), result:""}));
                   }}
-                  enableReinitialize = {true}
+                  enableReinitialize={true}
                   validateOnMount={true}
                 >
                     {
@@ -270,7 +300,7 @@ export default function editAdministrators({ params }: { params: {id: number}}){
 
                                 <Button
                                 type='submit'
-                                handleClick={viewStaffData?.data && (!Object.keys(errors).length || isValid)  ? () => handleSubmit() : handleIsNotValid()}
+                                handleClick={() => {viewStaffData?.data && (!Object.keys(errors).length || isValid)  ? () => handleSubmit() : handleIsNotValid()}}
                                 buttonName="Save" />
                             </Form>
                             </Hero>

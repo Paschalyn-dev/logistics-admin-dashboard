@@ -13,6 +13,8 @@ import Popup from "../../services/eventhandlers/popup"
 import { useEffect } from "react";
 import ConstantNav from "../../constantNav";
 import { State_data } from "../../context/context"
+import SkeletonLoading from "../../services/eventhandlers/skeleton-loading"
+import SuccessMessage from "../../successmessage"
 
 export default function EditParcel({ params }: { params: {id: number}}){
   const handleCloseFill = () => {
@@ -26,9 +28,22 @@ export default function EditParcel({ params }: { params: {id: number}}){
     useEffect(() => {
       viewStaffMutate();
     }, [viewStaffMutate()]);
-    const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes} = useContext(State_data);
+    const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes, successMessage} = useContext(State_data);
     return(
       <Holder>
+        {
+          viewStaffIsValidating || viewStaffIsLoading &&
+          <SkeletonLoading title="administrator details." />
+        }
+        {
+          viewStaffError &&
+          <SuccessMessage
+          id="failed"
+          name="error"
+          successMessageShow={successMessage.error}
+          messageTitle="Sorry, can't load administrator details. Check network connection!"
+          />
+        }
         <ConstantNav />
         <Section>
           <Link href="/dashboard/administrators" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
