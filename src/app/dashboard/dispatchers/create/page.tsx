@@ -15,7 +15,7 @@ import Holder from "../../holder";
 import ConstantNav from "../../constantNav";
 import Section from "../../section";
 import { Password } from "../../formik/password";
-import { State_data } from "../../context/context";
+import { State_data, phoneRegExp } from "../../context/context";
 import { staffAPIURL } from "../../services/api-url/staff-api-url";
 import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
 import { authorizationKey } from "../../services/staff-api/api";
@@ -45,17 +45,13 @@ export default function FormPageDispatcher({handleOpenForm}: any){
         formRef.current?.setFieldValue('password', value);
         setTimeout(() => {formRef?.current?.setFieldTouched('password', true)}, 1000)
     }, [ formRef.current?.values, generatePassword]);
-
-    useEffect(()=>{
-        setCode(Password())
-    }, [])
     
     useEffect(() => {
         if(generatePassword === true){
             updateDispatcherInformation(code)
         }
         else{
-            updateDispatcherInformation('')
+            updateDispatcherInformation(formRef?.current?.values?.password)
         }
     }, [generatePassword, formRef?.current?.values?.password])
 
@@ -66,7 +62,7 @@ export default function FormPageDispatcher({handleOpenForm}: any){
     const handleAdministratorsPage = () => {
         router.replace('/dashboard/administrators/create')
     }
-
+    
     async function handleCreate(details: any){
         const response = await fetch(staffAPIURL.createDispatcher, {
             method: 'POST',
@@ -74,14 +70,13 @@ export default function FormPageDispatcher({handleOpenForm}: any){
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": authorizationKey
-    
+                
             },
         });
         const data = await response.json();
         setDispatcherDetails((prev: any) => ({...prev, result: data}));
         setLoading((prev: any) => ({...prev, dispatcher: false}))
     }
-
     
     useEffect(() => {
         if(dispatcherDetails?.result === "" && dispatcherDetails?.info !== ""){
@@ -95,6 +90,10 @@ export default function FormPageDispatcher({handleOpenForm}: any){
     useEffect(() => {
         setLoading((prev: any) => ({...prev, dispatcher: false}))
         setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
+        setCode(Password())
+        if(formRef?.current?.values?.password?.length){
+            setTimeout(() => {formRef?.current?.setFieldTouched('password', true)}, 1000)
+        }
     },[])
     
     useEffect(() => {
@@ -173,7 +172,8 @@ export default function FormPageDispatcher({handleOpenForm}: any){
                     email: Yup.string()
                     .email('This email address seems invalid.')
                     .required('This field is required.'),
-                    phone: Yup.number()
+                    phone: Yup.string()
+                    .matches(phoneRegExp, 'Phone number is not valid')
                     .min(1, 'Must be 1 character or more.')
                     .required('This field is required.'),
                     password: Yup.string()
@@ -223,7 +223,7 @@ export default function FormPageDispatcher({handleOpenForm}: any){
                                 stringPassword={passwordString} 
                                 /> 
 
-                               <div onClick={(e) => {e.preventDefault(); setGeneratePassword(!generatePassword)}} className={generatePassword ? "font-bold cursor-pointer text-green-500 mb-5 " : "font-bold cursor-pointer mb-5 text-gray-800"}>{generatePassword ? "Default Password Generator is on." : "Default password generator is off"}</div>
+                               <div onClick={(e) => {e.preventDefault(); setGeneratePassword(!generatePassword)}} className={generatePassword ? "font-bold cursor-pointer text-green-500 mb-5 " : "font-bold cursor-pointer mb-5 text-gray-800"}>{generatePassword ? "Default Password Generator is on." : "Click here to use default password."}</div>
 
                                 <TextInput
                                 label="State"
@@ -274,9 +274,9 @@ export default function FormPageDispatcher({handleOpenForm}: any){
                                 onOff={saveAndAddNewRider}
                                 description="Enable this if you want to create a new rider immediately after creating this rider."
                                 />  
-
+{/* (e) => { e.preventDefault(); formik.handleSubmit(e)} */}
                                 <Button
-                                handleClick={() => { isValid ? () => handleSubmit() : handleIsNotValid()}}
+                                handleClick={() => { isValid ? (e: any) => {e.preventDefault(); handleSubmit()} : handleIsNotValid()}}
                                 type="submit" 
                                 buttonName="Save" />
                             </Form>

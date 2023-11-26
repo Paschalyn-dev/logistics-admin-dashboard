@@ -1,5 +1,5 @@
 'use client'
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef, useCallback } from "react";
 import { Formik, Form } from 'formik';
 import Hero from "../../preferences/hero";
 import * as Yup from 'yup';
@@ -17,23 +17,34 @@ import Loader from "../../services/Loader/spinner";
 import { State_data, phoneRegExp } from "../../context/context";
 import { staffAPIURL } from "../../services/api-url/staff-api-url";
 import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
+import SuccessMessage from "../../successmessage";
 
 export default function FormPageAdministrators(){
-    const {successMessage, setSuccessMessage} = useContext(State_data);
+    const {successMessage, setSuccessMessage, setLoading, loading} = useContext(State_data);
     const [saveAndAddNewStaff, setSaveAndAddNewStaff] = useState<boolean>(false);
     const [passwordString, setPasswordString] = useState<boolean>(true)
+    const [windowLocation, setWindowLocations] =useState<any>('')
+    const formRef = useRef<any>();
+    const [code, setCode] = useState('');
     const [staffDetails, setStaffDetails] = useState<any>({
         info: "",
         result: "",
         code: ""
     })
-    const [generatePassword, setGeneratePassword] = useState<boolean>(true)
+    const [generatePassword, setGeneratePassword] = useState<boolean>(false)
     const router = useRouter()
-
+    
     const handleSaveAndAddNewStaff = (e: any) => {
         e.preventDefault();
         setSaveAndAddNewStaff(!saveAndAddNewStaff)
     }
+    const handleDispatcherPage = () => {
+        router.replace('/dashboard/dispatchers/create')
+    }
+    const updateAdministratorInformation = useCallback((value: string) => {
+        formRef.current?.setFieldValue('password', value);
+        setTimeout(() => {formRef?.current?.setFieldTouched('password', true)}, 1000)
+    }, [ formRef.current?.values, generatePassword]);
 
     async function handleCreate(details: any){
         const response = await fetch(staffAPIURL.createStaff, {
@@ -46,6 +57,11 @@ export default function FormPageAdministrators(){
         });
         const data = await response.json();
         setStaffDetails((prev: any) => ({...prev, result: data}));
+        setLoading((prev: any) => ({...prev, administrator: false}))
+    }
+
+    const handleIsNotValid = () => {
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
     }
 
     useEffect(() => {
@@ -55,18 +71,53 @@ export default function FormPageAdministrators(){
     }, [staffDetails?.code])
 
     useEffect(() => {
-        if(staffDetails?.result?.code === 200){
+        setLoading((prev: any) => ({...prev, administrator: false}))
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
+        setCode(Password())
+        if(formRef?.current?.values?.password?.length){
+            setTimeout(() => {formRef?.current?.setFieldTouched('password', true)}, 1000)
+        }
+    },[])
+
+    useEffect(() => {
+        if(staffDetails?.result === "" && staffDetails?.info !== ""){
+            setLoading((prev: any) => ({...prev, administrator: true}))
+        }
+        if(staffDetails?.info !== ""){
+            handleCreate({...staffDetails?.info});
+        }
+    }, [staffDetails?.code]);
+    
+    useEffect(() => {
+        if(generatePassword === true){
+            updateAdministratorInformation(code)
+        }
+        else{
+            updateAdministratorInformation(formRef?.current?.values?.password)
+        }
+    }, [generatePassword, formRef?.current?.values?.password])
+
+    useEffect(() => {
+        if(!saveAndAddNewStaff && staffDetails?.result?.code === 200){
             setTimeout(() => {
-                router.replace('/dashboard/administrators')
+                if(windowLocation?.location?.pathname === `/dashboard/administrators/create`){
+                    router.replace('/dashboard/administrators')
+                }else{}
             }, 5000);
         }
-    }, [staffDetails?.result])
+    }, [staffDetails?.result, windowLocation?.location?.pathname]);
 
-    const handleDispatcherPage = () => {
-        router.replace('/dashboard/dispatchers/create')
-    }
+    useEffect(() => {
+        if(typeof window !== 'undefined'){
+            setWindowLocations(window)
+        }
+    },[typeof window !== 'undefined'])
+
     return(
         <Holder>
+            {
+                loading.administrator && <Loader />
+            }
             <ConstantNav />
             <Section>  
             <Link href="/dashboard/administrators" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
@@ -74,7 +125,7 @@ export default function FormPageAdministrators(){
             </Link>
 
             {
-            // staffDetails.result !== "" && staffDetails.info !== "" && 
+            staffDetails.result !== "" && staffDetails.info !== "" && 
             <ErrorAndSucccessHandlers
             name="createAdministrator"
             successName={successMessage.createAdministrator}
@@ -89,7 +140,18 @@ export default function FormPageAdministrators(){
             />
           }
 
+          {
+                successMessage.isNotValid && 
+                <SuccessMessage
+                id="failed"
+                name="isNotValid"
+                messageTitle="You have not filled all the required form fields."
+                successMessageShow={successMessage.isNotValid}
+                />
+            }
+
             <Formik
+                  innerRef={(ref) => formRef.current = ref}
                   initialValues={{
                     role:"admin",
                     address: {
@@ -109,7 +171,7 @@ export default function FormPageAdministrators(){
                         street: Yup.string().required('This field is required.'),
                     }),
                     fullName: Yup.string()
-                    .min(5, 'Name must be five characters or more.')
+                    .min(1, 'Name must be one character or more.')
                     .required('This field is required.'),
                     email: Yup.string()
                     .email('This email address seems invalid.')
@@ -129,7 +191,7 @@ export default function FormPageAdministrators(){
                   }}
                 >
                     {
-                        ({ values, handleSubmit }) => (
+                        ({ values, isValid, errors, handleSubmit }) => (
                             <Hero formHeading={values.fullName} heading="Create Staff Account" icon="icon ion-md-contact">
                             <Form>
                                 <Select name='role' label="Role" onChange={handleDispatcherPage}>
@@ -155,26 +217,14 @@ export default function FormPageAdministrators(){
                                 type="tel"
                                 /> 
 
-{                               
-                            !generatePassword ?
                                 <TextInput
                                 label="Password"
                                 name="password"
-                                id={generatePassword ? "password" : "defaultPassword"}
+                                id={"password"}
                                 type={passwordString ? "password" : "text"}
                                 handlePasswordString={setPasswordString}
                                 stringPassword={passwordString} 
-                                /> : 
-                                <TextInput
-                                label="Password"
-                                name="password"
-                                value={Password()}
-                                id={generatePassword ? "password" : "defaultPassword"}
-                                type={passwordString ? "password" : "text"}
-                                handlePasswordString={setPasswordString}
-                                stringPassword={passwordString} 
-                                />
-                            }
+                                /> 
 
 
                             <button onClick={(e) => {e.preventDefault(); setGeneratePassword(!generatePassword)}} 
@@ -204,7 +254,8 @@ export default function FormPageAdministrators(){
                                 />  
 
                                 <Button
-                                handleClick={handleSubmit} 
+                                type='submit'
+                                handleClick={() => { isValid && !Object.keys(errors).length ? () => handleSubmit : handleIsNotValid()}} 
                                 buttonName="Save" />
                             </Form>
                             </Hero>

@@ -1,5 +1,5 @@
 'use client'
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useCallback, useRef } from "react";
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import Link from "next/link";
@@ -18,15 +18,55 @@ import { authorizationKey } from "@/app/dashboard/services/staff-api/api";
 import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
 import { useRouter } from "next/navigation";
 import ToggleButton from "@/app/dashboard/preferences/shipment/toggleButton";
+import SkeletonLoading from "@/app/dashboard/services/eventhandlers/skeleton-loading";
+import SuccessMessage from "@/app/dashboard/successmessage";
 
 export default function editAdministrators({ params }: { params: {id: number}}){
-    const {successMessage, setSuccessMessage} = useContext(State_data);
+    const {successMessage, setSuccessMessage, setLoading, loading} = useContext(State_data);
+    const [windowLocation, setWindowLocations] =useState<any>('')
+    const formRef = useRef<any>();
+    const validation = Yup.object().shape({
+        address: Yup.object().shape({
+            state: Yup.string().required('This field is required.'),
+            street: Yup.string().required('This field is required.'),
+        }),
+        fullName: Yup.string()
+        .min(1, 'Name must be one character or more.')
+        .required('This field is required.'),
+        email: Yup.string()
+        .email('This email address seems invalid.')
+        .required('This field is required.'),
+        phone: Yup.string()
+        .matches(phoneRegExp, 'Phone number is not valid')
+        .min(1, 'Must be 1 character or more.')
+        .required('This field is required.'),
+      });
     const [saveAndAddNewStaff, setSaveAndAddNewStaff] = useState<boolean>(false);
     const [staffDetails, setStaffDetails] = useState<any>({
         info: "", 
         result: "",
         code: ""
     });
+    const [initialValues, setInitialValues] = useState(
+        {
+            address: {
+              city: "",
+              country: "",
+              state: "",
+              street: ""
+          },
+          createdAt: "",
+          email: "",
+          fullName: "",
+          id: "",
+          image: "",
+          isDefaultPassword: "",
+          onboarded: "",
+          phone: "",
+          role: "",
+          updatedAt: "",
+        }
+    )
     const router = useRouter();
     const {viewStaffData, 
            viewStaffError,
@@ -38,6 +78,27 @@ export default function editAdministrators({ params }: { params: {id: number}}){
         e.preventDefault();
         setSaveAndAddNewStaff(!saveAndAddNewStaff)
     }
+
+    const handleIsNotValid = () => {
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: true}))
+    }
+
+    const updateAdministratorInformation = useCallback((key: string) => {
+        setTimeout(() => {formRef?.current?.setFieldTouched(`address.${key}`, true)}, 1000)
+    }, [ formRef.current]);
+
+    useEffect(() => {
+        if(viewStaffData?.data){
+            updateAdministratorInformation('state')
+        }
+    }, [viewStaffData?.data?.address, formRef?.current?.values?.address])
+
+    useEffect(() => {
+        if(viewStaffData?.data){
+            updateAdministratorInformation('street')
+        }
+    }, [viewStaffData?.data?.address, formRef?.current?.values?.address])
+
     async function handleEdit(details: any, id: any){
         const response = await fetch(staffAPIURL.editStaff(id), {
             method: 'PUT',
@@ -50,30 +111,74 @@ export default function editAdministrators({ params }: { params: {id: number}}){
         });
         const data = await response.json();
         setStaffDetails((prev: any) => ({...prev, result: data}));
+        setLoading((prev: any) => ({...prev, administrator: false}))
     }
 
     useEffect(() => {
+        setLoading((prev: any) => ({...prev, administrator: false}))
+        setSuccessMessage((prev: any) => ({...prev, isNotValid: false}))
+    },[])
+
+    useEffect(() => {
+        if(staffDetails?.result === "" && staffDetails?.info !== ""){
+            setLoading((prev: any) => ({...prev, administrator: true}))
+        }
         if(staffDetails?.info !== ""){
             handleEdit({...staffDetails?.info}, viewStaffData?.data?.id)
         }
     }, [staffDetails?.code]);
 
     useEffect(() => {
+        if(viewStaffData?.data){
+            setInitialValues((prev: any) => ({
+                ...prev,
+                address: {
+                    city: viewStaffData?.data?.address?.city,
+                    country: viewStaffData?.data?.address?.country,
+                    state: viewStaffData?.data?.address?.state,
+                    street: viewStaffData?.data?.address?.street
+              },
+              createdAt: viewStaffData?.data?.createdAt,
+              email: viewStaffData?.data?.email,
+              fullName: viewStaffData?.data?.fullName,
+              id: viewStaffData?.data?.id,
+              image: viewStaffData?.data?.image,
+              isDefaultPassword: viewStaffData?.data?.isDefaultPassword,
+              onboarded: viewStaffData?.data?.onboarded,
+              phone: viewStaffData?.data?.phone,
+              role: viewStaffData?.data?.role,
+              updatedAt: viewStaffData?.data?.updatedAt,
+            }))
+        }
+    }, [viewStaffData?.data])    
+
+    useEffect(() => {
         if(!saveAndAddNewStaff && staffDetails?.result?.code === 200){
             setTimeout(() => {
-                router.replace('/dashboard/dispatchers')
+                if(windowLocation?.location?.pathname === `/dashboard/administrators/${params?.id}/edit`){
+                    router.replace('/dashboard/administrators')
+                }else{}
             }, 5000);
         }
-    }, [staffDetails?.result]);
+    }, [staffDetails?.result, windowLocation?.location?.pathname]);
+
+    useEffect(() => {
+        if(typeof window !== 'undefined'){
+            setWindowLocations(window)
+        }
+    },[typeof window !== 'undefined'])
     
     return(
         <Holder>
+            {
+                loading.administrator && <Loader />
+            }
             <ConstantNav />
             <Section>
 
             {
                 (viewStaffIsLoading || viewStaffIsValidating) &&
-                <Loader />
+                <SkeletonLoading title="administrator data" />
             }     
             {
                 staffDetails.result !== "" && staffDetails.info !== "" && staffDetails?.code !== '' &&
@@ -90,88 +195,69 @@ export default function editAdministrators({ params }: { params: {id: number}}){
                 data={staffDetails?.result}
                 />
             }
+
+            {
+                successMessage.isNotValid && 
+                <SuccessMessage
+                id="failed"
+                name="isNotValid"
+                messageTitle="You have not filled all the required form fields."
+                successMessageShow={successMessage.isNotValid}
+                />
+            }
+
             <Link href="/dashboard/administrators" className="bg-gray-200 cursor-pointer rounded-full w-fit px-2 text-2xl font-bold ml-3 text-gray-900">
                     <i className="icon ion-md-arrow-back"></i>
             </Link>
 
             <Formik
-                  initialValues={{
-                      address: {
-                        city: viewStaffData?.data?.address?.city,
-                        country: viewStaffData?.data?.address?.country,
-                        state: viewStaffData?.data?.address?.state,
-                        street: viewStaffData?.data?.address?.street
-                    },
-                    createdAt: viewStaffData?.data?.createdAt,
-                    email: viewStaffData?.data?.email,
-                    fullName: viewStaffData?.data?.fullName,
-                    id: viewStaffData?.data?.id,
-                    image: viewStaffData?.data?.image,
-                    isDefaultPassword: viewStaffData?.data?.isDefaultPassword,
-                    onboarded: viewStaffData?.data?.onboarded,
-                    phone: viewStaffData?.data?.phone,
-                    role: viewStaffData?.data?.role,
-                    updatedAt: viewStaffData?.data?.updatedAt,
-                  }}
-                  validationSchema={Yup.object({
-                    address: Yup.object({
-                        state: Yup.string().required('This field is required.'),
-                        street: Yup.string().required('This field is required.'),
-                    }),
-                    fullName: Yup.string()
-                    .min(5, 'Name must be five characters or more.')
-                    .required('This field is required.'),
-                    email: Yup.string()
-                    .email('This email address seems invalid.')
-                    .required('This field is required.'),
-                    phone: Yup.string()
-                    .matches(phoneRegExp, 'Phone number is not valid')
-                    .min(1, 'Must be 1 character or more.')
-                    .required('This field is required.'),
-                  })}
+                  innerRef={(ref) => formRef.current = ref}
+                  initialValues={initialValues}
+                  validationSchema={validation}
                   onSubmit={(values) => {
                     setSuccessMessage((prev: any) => ({...prev, editAdministrator: true}));
                     setStaffDetails((prev: any) => ({...prev, info: {...values}, code: Password(), result:""}));
                   }}
                   enableReinitialize = {true}
+                  validateOnMount={true}
                 >
                     {
-                        ({ values, getFieldProps,  handleSubmit }) => (
+                        ({ values, isValid, errors, handleSubmit }) => (
                             <Hero formHeading={values.fullName} 
                             heading="Edit Staff Account" 
                             icon="icon ion-md-contact"
                             description={`${values.email} | ${values.phone}`}
                             comingsoon="Administrator">
-                            <Form onSubmit={handleSubmit}>
+                            <Form>
                                 <TextInput
                                 label="Full Name"
                                 type="text"
-                                {...getFieldProps('fullName')}
+                                name='fullName'
                                 />
 
                                 <TextInput
                                 label="Email Address"
                                 type="email"
-                                {...getFieldProps('email')}
+                                name='email'
                                 />  
 
                                 <TextInput
                                 label="Phone"
                                 type="tel"
-                                {...getFieldProps('phone')}
+                                name='phone'
                                 /> 
 
                                 <TextInput
                                 label="State"
                                 type="text"
-                                {...getFieldProps('address.state')}
+                                name='address.state'
                                 />
 
                                 <TextInput
                                 label="Address"
                                 type="text"
                                 placeholder="Enter Location"
-                                {...getFieldProps('address.street')}
+                                name='address.street'
                                 /> 
                                 
                                 <ToggleButton
@@ -183,6 +269,8 @@ export default function editAdministrators({ params }: { params: {id: number}}){
                                 />  
 
                                 <Button
+                                type='submit'
+                                handleClick={viewStaffData?.data && (!Object.keys(errors).length || isValid)  ? () => handleSubmit() : handleIsNotValid()}
                                 buttonName="Save" />
                             </Form>
                             </Hero>

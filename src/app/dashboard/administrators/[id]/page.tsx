@@ -62,8 +62,13 @@ export default function EditParcel({ params }: { params: {id: number}}){
                 + ", " + viewStaffData?.data?.address?.country
                 || 'No'} />
 
-            <EditHeading subheading="Created"/>
-            <MiniText minitext={useDateHandler(viewStaffData?.data?.createdAt)} />
+            <EditHeading subheading="Created on"/>
+            <MiniText minitext={viewStaffData?.data?.createdAt?.slice(0,10)} />
+            <MiniText minitext={"(" + useDateHandler(viewStaffData?.data?.createdAt?.slice(0, 10)) + ")"} />
+
+            <EditHeading subheading="Last updated on"/>
+            <MiniText minitext={viewStaffData?.data?.updatedAt?.slice(0,10)} />
+            <MiniText minitext={"(" + useDateHandler(viewStaffData?.data?.updatedAt?.slice(0, 10)) + ")"} />
           </Hero>
         </Section>
       </Holder>

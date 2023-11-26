@@ -37,7 +37,7 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                 street: Yup.string().required('This field is required.'),
             }),
             fullName: Yup.string()
-            .min(5, 'Name must be five characters or more.')
+            .min(1, 'Name must be one character or more.')
             .required('This field is required.'),
             email: Yup.string()
             .email('This email address seems invalid.')
@@ -147,46 +147,46 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                     }else{}
                 }, 5000);
             }
-        }, [dispatcherDetails?.result, windowLocation?.location?.pathname]);
+    }, [dispatcherDetails?.result, windowLocation?.location?.pathname]);
         
-        useEffect(() => {
-            if(typeof window !== 'undefined'){
-                setWindowLocations(window)
-            }
-        },[typeof window !== 'undefined'])
+    useEffect(() => {
+        if(typeof window !== 'undefined'){
+            setWindowLocations(window)
+        }
+    },[typeof window !== 'undefined'])
         
-        useEffect(() => {
-          if(viewDispatcherData?.data){
-              setInitialValues((prev: any) => ({
-                  ...prev,
-                  address: {
-                      city: viewDispatcherData?.data?.address?.city,
-                      country: viewDispatcherData?.data?.address?.country,
-                      state: viewDispatcherData?.data?.address?.state,
-                      street: viewDispatcherData?.data?.address?.street
-                  },
-              bioDetails: viewDispatcherData?.data?.bioDetails,
-              createdAt: viewDispatcherData?.data?.createdAt,
-              email: viewDispatcherData?.data?.email,
-              fullName: viewDispatcherData?.data?.fullName,
-              id: viewDispatcherData?.data?.id,
-              image: viewDispatcherData?.data?.image,
-              insurance: "",
-              isDefaultPassword: viewDispatcherData?.data?.isDefaultPassword,
-              licence: "",
-              misc: viewDispatcherData?.data?.misc,
-              parcels: viewDispatcherData?.data?.parcels,
-              personalWebsite: viewDispatcherData?.data?.personalWebsite,
-              phone: viewDispatcherData?.data?.phone,
-              rating: viewDispatcherData?.data?.rating,
-              roadWorthiness: "",
-              role: viewDispatcherData?.data?.role,
-              socialProfiles: viewDispatcherData?.data?.socialProfiles,
-              updatedAt: viewDispatcherData?.data?.updatedAt,
-              vehicle: ""
-          }))
-      }
-    }, [viewDispatcherData?.data]);
+    useEffect(() => {
+        if(viewDispatcherData?.data){
+            setInitialValues((prev: any) => ({
+                ...prev,
+                address: {
+                    city: viewDispatcherData?.data?.address?.city,
+                    country: viewDispatcherData?.data?.address?.country,
+                    state: viewDispatcherData?.data?.address?.state,
+                    street: viewDispatcherData?.data?.address?.street
+                },
+            bioDetails: viewDispatcherData?.data?.bioDetails,
+            createdAt: viewDispatcherData?.data?.createdAt,
+            email: viewDispatcherData?.data?.email,
+            fullName: viewDispatcherData?.data?.fullName,
+            id: viewDispatcherData?.data?.id,
+            image: viewDispatcherData?.data?.image,
+            insurance: "",
+            isDefaultPassword: viewDispatcherData?.data?.isDefaultPassword,
+            licence: "",
+            misc: viewDispatcherData?.data?.misc,
+            parcels: viewDispatcherData?.data?.parcels,
+            personalWebsite: viewDispatcherData?.data?.personalWebsite,
+            phone: viewDispatcherData?.data?.phone,
+            rating: viewDispatcherData?.data?.rating,
+            roadWorthiness: "",
+            role: viewDispatcherData?.data?.role,
+            socialProfiles: viewDispatcherData?.data?.socialProfiles,
+            updatedAt: viewDispatcherData?.data?.updatedAt,
+            vehicle: ""
+        }))
+    }
+}, [viewDispatcherData?.data]);
     
 
         return(
@@ -314,8 +314,6 @@ export default function EditDispatchers({ params }: { params: {id: number}}){
                                     document={viewDispatcherData?.data?.roadWorthiness}
                                     />
                                 </div>
-
-                                {/* <button onMouseOver={() => console.log(errors, isValid, 'wertyuikuytredrj')}>Clcik</button> */}
 
                                 <ToggleButton 
                                 title="Save & Update Customer."
