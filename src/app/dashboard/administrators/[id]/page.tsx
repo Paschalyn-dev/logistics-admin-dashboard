@@ -15,6 +15,7 @@ import ConstantNav from "../../constantNav";
 import { State_data } from "../../context/context"
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading"
 import SuccessMessage from "../../successmessage"
+import Loader from "../../services/Loader/spinner"
 
 export default function EditParcel({ params }: { params: {id: number}}){
   const handleCloseFill = () => {
@@ -63,6 +64,7 @@ export default function EditParcel({ params }: { params: {id: number}}){
                 Delete
               </button>
             </div>
+            <SkeletonLoading title="administrator details." />
             {openUIBoxes.administratorPopup && <Popup name="administrators" viewDelete={true} text="Administrators" closeFill={handleCloseFill} popupShow={openUIBoxes.administratorPopup} id={deleteWithId.administrators} />}
             <EditHeading subheading="Email Address" />
             <MiniText minitext={viewStaffData?.data?.email || 'N/A'} />
@@ -72,10 +74,10 @@ export default function EditParcel({ params }: { params: {id: number}}){
 
             <EditHeading subheading="Address"/>
             <MiniText minitext={
-                viewStaffData?.data?.address?.street 
-                + " " + viewStaffData?.data?.address?.state 
-                + ", " + viewStaffData?.data?.address?.country
-                || 'No'} />
+              viewStaffData?.data?.address?.street 
+              + " " + viewStaffData?.data?.address?.state 
+              + ", " + viewStaffData?.data?.address?.country
+              || 'None'} />
 
             <EditHeading subheading="Created on"/>
             <MiniText minitext={viewStaffData?.data?.createdAt?.slice(0,10)} />

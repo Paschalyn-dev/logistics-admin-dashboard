@@ -216,7 +216,7 @@ export default function Dispatcher(){
                     )}))}
                         </BoxesHolder>
                     { (searchData?.dispatcherResult?.data?.length === 0 || searchData?.dispatcherResult?.data === '' || searchData?.dispatcherResult?.code !== 200 && openUIBoxes.dispatcherClearData) && (
-                        <div className="flex flex-col w-full justify-center items-center">
+                        <div className={openUIBoxes.dispatcherClearData ? "flex flex-col w-full justify-center items-center" : "hidden"}>
                         <span className="-mb-16">
                             <i id="bigger" className="icon ion-md-bicycle"></i>
                         </span>

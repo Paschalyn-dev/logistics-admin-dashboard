@@ -62,14 +62,14 @@ export default function Transactions(){
                     <Boxes
                     icon="icon ion-md-calendar"
                     title="Today"
-                    amount={NumberComma(todayRevenueData?.data?.length || '0')}
+                    amount={NumberComma(todayRevenueData?.data?.length) || '0'}
                     name="Today"
                     />
 
                     <Boxes
                     icon="icon ion-md-browsers"
                     title="This Week"
-                    amount={NumberComma(weekRevenueData?.data?.length || '0')}
+                    amount={NumberComma(weekRevenueData?.data?.length) || '0'}
                     name="Calendar"
                     />
 
@@ -117,26 +117,26 @@ export default function Transactions(){
                  {fetchTransactionsData?.data?.length >= 0 && !openUIBoxes.transactionClearData && !searchData?.transactionResult?.data && <p>You have <span className="font-bold">{fetchTransactionsData?.data?.length || 0}</span> transaction{fetchTransactionsData?.data?.length > 1 && "s"}.</p>}
                   {searchData?.transactionResult !== '' && openUIBoxes.transactionClearData && <p><span className="font-bold">{searchData?.transactionResult?.data?.length || 0}</span> transaction match(es) found.</p>}
                <div className="px-5 mt-10">
-                 <div className="font-bold grid grid-cols-6 gap-4">
+                 <div className="font-bold tablet:text-base phone:text-xs grid grid-cols-7 gap-6">
                     <h3>#</h3>
                     <h3>ID</h3>
-                    <h3>Parcel</h3>
-                    <h3>Amount</h3>
+                    <h3 className="col-span-2">Parcel</h3>
+                    <h3>Amount (₦)</h3>
                     <h3>Paid</h3>
                     <h3>Date</h3>
                  </div>
                  <hr className="my-4" />
 
                  {
-                     fetchTransactionsData?.data &&
+                     fetchTransactionsData?.data && !openUIBoxes.transactionClearData &&
                      fetchTransactionsData?.data?.map((record: any, index: any) => {
                          return (
-                             <div>
-                                <Link href={`/dashboard/shipments/${record.id}`} key={index} className="grid grid-cols-6 gap-4">
+                             <div key={record?.id}>
+                                <Link title="Click to view" href={`/dashboard/shipments/${record.id}`} key={index} className="grid tablet:text-base phone:text-xs grid-cols-7 gap-6">
                                     <p className="col-span-1 text-left">{index + 1}</p>
-                                    <p className="col-span-1 text-left">{record.trackId.slice(12)}</p>
-                                    <p className="col-span-1 text-left">{record.name}</p>
-                                    <p className="col-span-1 text-left">₦{NumberComma(record.amount)}</p>
+                                    <p className="col-span-1 text-left">{record.trackId.slice(12, 16)}</p>
+                                    <p className="col-span-2 text-left">{record.name}</p>
+                                    <p className="col-span-1 text-left">{NumberComma(record.amount)}</p>
                                     <p className="col-span-1 text-left">{record.paid ? 'Yes' : 'No'}</p>
                                     <p className="col-span-1 text-left">{useDateHandler(record?.createdAt)}</p>
                                 </Link>
@@ -146,8 +146,31 @@ export default function Transactions(){
                         })
                     }
                  {
-                    fetchTransactionsData?.data?.length === 0 &&
-                    <p className="text-center text-gray-500 mt-8">No data to show.</p>
+                    !fetchTransactionsIsLoading && fetchTransactionsData?.data?.length === 0 &&
+                    <p className={!openUIBoxes.transactionClearData ? "text-center text-gray-500 mt-8" : "hidden"}>No data to show.</p>
+                 }
+
+                {
+                     searchData?.transactionResult?.data && openUIBoxes.transactionClearData &&
+                     searchData?.transactionResult?.data?.map((record: any, index: any) => {
+                         return (
+                             <div key={record?.id}>
+                                <Link title="Click to view" href={`/dashboard/shipments/${record.id}`} key={index} className="grid tablet:text-base phone:text-xs grid-cols-7 gap-6">
+                                    <p className="col-span-1 text-left">{index + 1}</p>
+                                    <p className="col-span-1 text-left">{record.trackId.slice(12, 16)}</p>
+                                    <p className="col-span-2 text-left">{record.name}</p>
+                                    <p className="col-span-1 text-left">{NumberComma(record.amount)}</p>
+                                    <p className="col-span-1 text-left">{record.paid ? 'Yes' : 'No'}</p>
+                                    <p className="col-span-1 text-left">{useDateHandler(record?.createdAt)}</p>
+                                </Link>
+                                <hr className="my-4" />
+                            </div>
+                         )
+                        })
+                    }
+                 {
+                    (searchData?.transactionResult?.data?.length === 0 || searchData?.transactionResult?.data === '' || searchData?.transactionResult?.code !== 200 && openUIBoxes.transactionClearData) && 
+                    <p className={openUIBoxes.transactionClearData ? "text-center text-gray-500 mt-8" : "hidden"}>No search found.</p>
                  }
 
                  <div className="flex mt-10 justify-between">

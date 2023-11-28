@@ -38,7 +38,7 @@ export default function Administrators(){
     return(
     <Holder>
         {
-            (fetchStaffIsLoading || fetchStaffIsValidating) && 
+            (fetchStaffIsLoading || fetchStaffIsValidating && !openUIBoxes.administratorSearch) &&
             <SkeletonLoading title="all administrators" />
         }
         {
@@ -83,7 +83,7 @@ export default function Administrators(){
                 {fetchStaffData?.data && !openUIBoxes.administratorClearData && 
                 (fetchStaffData?.data?.map((staff: any) => {
                     return(
-                    <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
+                    <div key={staff?.id} className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                             <div>
                                 <p className="capitalize text-lg mt-2">{staff?.fullName}</p>
                                 <p className="text-sm my-2 capitalize">{staff?.role}</p>
@@ -124,8 +124,8 @@ export default function Administrators(){
                                     <i className="icon ion-md-create"></i>
                                 </Link>
                                 <span  onClick={() => {
-                                        setOpenUIBoxes((prev: any) => ({...prev, administratorPopup: true}));
-                                        setDeleteWithId((prev: any) => ({...prev, administrators: staff?.id}));
+                                    setOpenUIBoxes((prev: any) => ({...prev, administratorPopup: true}));
+                                    setDeleteWithId((prev: any) => ({...prev, administrators: staff?.id}));
                                 }}  
                                  className="hover:text-red-400 text-red-500 cursor-pointer rounded-full bg-red-100 px-3 py-2">
                                 <i className="icon ion-md-trash"></i>
@@ -135,13 +135,13 @@ export default function Administrators(){
                 )}))}
                 </BoxesHolder>        
                         
-                { !fetchStaffIsLoading && fetchStaffData?.data?.length === 0 && !openUIBoxes.administratorClearData && (
-                    <div className="flex flex-col w-full justify-center items-center">
+                { !fetchStaffIsLoading && fetchStaffData?.data?.length === 0 && (
+                    <div className={!openUIBoxes.administratorClearData  ? "flex flex-col w-full justify-center items-center" : "hidden"}>
                         <span className="-mb-16">
                             <i id="bigger" className="icon ion-md-person"></i>
                         </span>
                         <br/>
-                        <SubHeading subheading="No Staff found."/>
+                        <SubHeading subheading=" You don't have any dispatcher yet."/>
                         {/* <p className="w-5/12 mt-1 text-sm text-center">You have no delivered parcel yet.</p> */}
                     </div>
                 )}
@@ -152,7 +152,7 @@ export default function Administrators(){
                     {  searchData?.administratorResult?.data && openUIBoxes.administratorClearData &&
                             (searchData?.administratorResult?.data.map((staff: any) => {
                                 return(
-                                <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
+                                <div key={staff?.id} className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                                         <div>
                                             <p className="capitalize text-lg mt-2">{staff?.fullName}</p>
                                             <p className="text-sm my-2 capitalize">{staff?.role}</p>
@@ -203,8 +203,8 @@ export default function Administrators(){
                     )}))}
                     </BoxesHolder>        
     
-                    { (searchData?.administratorResult?.data?.length === 0 || searchData?.administratorResult?.data === 'undefined' || searchData?.administratorResult?.code !== 200 && openUIBoxes.administratorClearData) && (
-                        <div className="flex flex-col w-full justify-center items-center">
+                    { (searchData?.administratorResult?.data?.length === 0 || searchData?.administratorResult?.data === '' || searchData?.administratorResult?.code !== 200 && openUIBoxes.administratorClearData) && (
+                        <div className={openUIBoxes.administratorClearData ? "flex flex-col w-full justify-center items-center" : "hidden"}>
                             <span className="-mb-16">
                                 <i id="bigger" className="icon ion-md-person"></i>
                             </span>

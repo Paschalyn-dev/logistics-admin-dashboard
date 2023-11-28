@@ -57,8 +57,6 @@ export default function Shipments(){
         }
     }
 
-    
-    
     async function handlePutDispatcher(id: any){
         const response = await fetch(customerAPIUrl.editParcels(id), {
             method: 'PUT', 

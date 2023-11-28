@@ -11,7 +11,6 @@ import { authorizationKeyCustomer } from "../services/customer-api/api";
 
 export default function SearchFilter({inputData, closeFill}: any){
     const {inputField, setInputField, searchFields, setSearchFields, createdAtEnd, setCreatedAtEnd, searchData, setSearchData, setCreatedAtStart, createdAtStart, setAmountEnd, setAmountStart, amountStart, amountEnd, transactionsRange, setTransactionsRange} = useContext<any | string>(State_data);
-    const {transactionsRangeMutate} = useTransactionsSearchRange(transactionsRange);
     const [searchToggleButtons, setSearchToggleButtons] = useState({
         trackId: true,
         parcel: true,
@@ -115,14 +114,13 @@ export default function SearchFilter({inputData, closeFill}: any){
         handleSetCreatedAtEnd();
         handleSetAmountStart();
         handleSetCreatedAtStart();
-        transactionsRangeMutate();
         setTransactionsRange({inputField, searchFields, amountStart, amountEnd, createdAtStart, createdAtEnd})
         setSearchData((prev: any) => ({...prev, transactionResult: "", transactionCode: Password()}));
         setTimeout(() => {closeFill((prev: any) => ({...prev, transactionSearch: false}));}, 500)    
     }
 
     return(
-        <>
+        <div>
     <div className="cursor-pointer z-20 bottom-0 fixed h-screen w-screen " onClick={() => closeFill((prev: any) => ({...prev, transactionSearch: false}))}/>
         <div className="flex justify-center items-start laptop:w-3/4 after-tablet:w-10/12 tablet:w-full phone:w-full"> 
         <div className="relative animate__animated animate__headShake z-30 bg-gray-50 p-6 phone:h-4/6 tablet:h-4/6 mt-10 w-3/4 rounded-lg">
@@ -150,7 +148,7 @@ export default function SearchFilter({inputData, closeFill}: any){
             />
         </div>
         <hr className="mt-1"/>
-        <form onSubmit={handleSearchSubmit} className="mt-5" autoComplete="on">
+        <form className="mt-5" autoComplete="on">
             <label htmlFor="startdate">Date Range</label>
             <div className="flex gap-5 mb-5 justify-between">
                 <input value={formData.startdate} onChange={(e) => setFormData((prev) => ({...prev, startdate: e.target.value }))} className="p-4 outline-0 text-gray-800 w-full" type="date" id="startdate" name="startdate" /> - 
@@ -162,10 +160,10 @@ export default function SearchFilter({inputData, closeFill}: any){
                 <input value={formData.startprice}  onChange={(e) => setFormData((prev) => ({...prev, startprice: e.target.value}))}  className="p-4 outline-0 w-full" placeholder="₦1000" type="number" id="startprice" name="startprice" /> - 
                 <input value={formData.endprice}  onChange={(e) => setFormData((prev) => ({...prev, endprice: e.target.value}))}  type="number" placeholder="₦4500" className="p-4 outline-0 w-full" id="endprice" name="endprice" />
             </div>
-            <button type="submit" className="bg-gray-800 w-full text-gray-50 p-2 rounded-3xl">Search</button>
+            <button onClick={handleSearchSubmit} type="submit" className="bg-gray-800 w-full text-gray-50 p-2 rounded-3xl">Search</button>
         </form>
         </div>
         </div>
-        </>
+        </div>
 )
 }
