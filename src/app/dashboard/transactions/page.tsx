@@ -149,7 +149,7 @@ export default function Transactions(){
                     !fetchTransactionsIsLoading && fetchTransactionsData?.data?.length === 0 &&
                     <p className={!openUIBoxes.transactionClearData ? "text-center text-gray-500 mt-8" : "hidden"}>No data to show.</p>
                  }
-
+                 
                 {
                      searchData?.transactionResult?.data && openUIBoxes.transactionClearData &&
                      searchData?.transactionResult?.data?.map((record: any, index: any) => {
