@@ -1,5 +1,5 @@
 'use client'
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ConstantNav from "../constantNav";
 import Heading from "../heading";
 import Section from "../section";
@@ -38,6 +38,9 @@ export default function Welcome(){
         checkProgress.push('cardVerify')
     }
 
+    useEffect(() => {
+        setSuccessMessage((prev: any) => ({...prev, completeSetup: false}))
+    }, [])
         return(
         <Holder>
             <ConstantNav />
