@@ -24,7 +24,7 @@ export default function WelcomeBoxes({step, heading, text, icon, title, img, ima
                         <p className="text-gray-500 phone:text-sm laptop:text-base">{text}</p>    
                     </div>        
                 </div>
-                <img src={img} className="w-fit h-fit p-8 animate__animated animate__zoomInRight phone:hidden laptop:block h-full w-fit tablet:block" alt={imageText} />            
+                <img src={img} className="w-2/12 p-8 animate__animated animate__zoomInRight phone:hidden laptop:block h-full tablet:block" alt={imageText} />            
             </div>
         </div>
     )

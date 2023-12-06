@@ -27,7 +27,7 @@ export default function WelcomeBoxesDefault({step, heading, text, linkName, icon
                         <p className="text-gray-500 phone:text-sm laptop:text-base">{text}</p>    
                     </div>        
                 </div>
-                <img src={img} className="w-fit p-8 animate__animated animate__zoomInRight phone:hidden laptop:block h-full tablet:block" alt={imageText} />            
+                <img src={img} className="w-3/12 p-8 animate__animated animate__zoomInRight phone:hidden laptop:block h-full tablet:block" alt={imageText} />            
             </div>
             <div className="flex flex-col w-fit pl-5 justify-center items-center">
 
