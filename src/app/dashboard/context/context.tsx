@@ -12,6 +12,7 @@ export default function Context({children}: any){
     const [customersRange, setCustomersRange] = useState<any>({});
     const [dispatchersRange, setDispatchersRange] = useState<any>({});
     const [administratorsRange, setAdministratorsRange] = useState<any>({});
+    const [transactionsRange, setTransactionsRange] = useState<any>({})
     const [messagesRange, setMessagesRange] = useState<any>({});
     const [reviewsRange, setReviewsRange] = useState<any>({});
     const [id, setId] = useState({
@@ -191,7 +192,7 @@ export default function Context({children}: any){
     })
 
     return(
-        <State_data.Provider value={{ globaldata, storedName, setStoredName, myKey, setMyKey, showDispatchers, setShowDispatcher, loading, setLoading, setGlobalData, globalPriceList, inputData, setInputData, deleteWithId, setDeleteWithId, setGlobalPriceList, inputField, setInputField, createdAtStart, setCreatedAtStart, createdAtEnd, setCreatedAtEnd, amountStart, setAmountStart, amountEnd, setAmountEnd, searchFields, setSearchFields, parcelRange, setParcelRange, customersRange, dispatcher, setDispatcher, setCustomersRange, dispatchersRange, setDispatchersRange, administratorsRange, setAdministratorsRange, messagesRange, setMessagesRange, reviewsRange, setReviewsRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage, id, setId, setSearchData, searchData }}>
+        <State_data.Provider value={{ globaldata, storedName, setStoredName, myKey, setMyKey, showDispatchers, setShowDispatcher, loading, setLoading, setGlobalData, globalPriceList, inputData, setInputData, deleteWithId, setDeleteWithId, setGlobalPriceList, inputField, setInputField, createdAtStart, setCreatedAtStart, createdAtEnd, setCreatedAtEnd, amountStart, setAmountStart, amountEnd, setAmountEnd, searchFields, setSearchFields, parcelRange, setParcelRange, customersRange, dispatcher, setDispatcher, setCustomersRange, dispatchersRange, setDispatchersRange, administratorsRange, setAdministratorsRange, transactionsRange, setTransactionsRange, messagesRange, setMessagesRange, reviewsRange, setReviewsRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage, id, setId, setSearchData, searchData }}>
             {children}
         </State_data.Provider>
     )

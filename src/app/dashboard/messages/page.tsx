@@ -27,7 +27,7 @@ export default function Message(){
     const handleCloseFill = () => {
         setOpenUIBoxes((prev: any) => ({...prev, messagePopup: false}))
     }
-
+    console.log(searchData)
     useEffect(() => {
         fetchMessagesMutate(fetchMessagesData);
     }, [openUIBoxes.messageClearData !== true]);  
@@ -74,7 +74,7 @@ export default function Message(){
                     {fetchMessagesData?.data && !openUIBoxes.messageClearData &&
                     fetchMessagesData?.data?.map((message: any) => {
                         return(
-                        <div className="h-fit bg-gray-50 text-left hover:shadow-sm w-full rounded-xl desktop:text-2xl laptop:w-10/12 px-5 mb-3 pt-2">
+                        <div key={message?.id} className="h-fit bg-gray-50 text-left hover:shadow-sm w-full rounded-xl desktop:text-2xl laptop:w-10/12 px-5 mb-3 pt-2">
                             <div className="phone:text-xs laptop:text-sm desktop:text-xl tablet:flex phone:bg-transparent phone:gap-0 mb-3 justify-start tablet:rounded-full tablet:bg-amber-200/50 w-fit tablet:px-3 tablet:py-2 tablet:gap-2 items-center">
                                 <h3 className="font-bold">{message.name}</h3>
                                 <p className="flex justify-start gap-2 items-center">{useDateHandler(message?.createdAt)} </p>
@@ -121,7 +121,7 @@ export default function Message(){
                     {  searchData?.messageResult?.data && openUIBoxes.messageClearData &&
                        searchData?.messageResult?.data?.map((message: any) => {
                         return(
-                        <div className="h-fit desktop:text-2xl text-left w-10/12 px-5 pt-2">
+                        <div key={message?.id} className="h-fit desktop:text-2xl text-left w-10/12 px-5 pt-2">
                             <div className="phone:text-xs laptop:text-sm desktop:text-xl tablet:flex phone:bg-transparent phone:gap-0 mb-3 justify-start tablet:rounded-full tablet:bg-amber-200/50 w-fit tablet:px-3 tablet:py-2 tablet:gap-2 items-center">
                                 <h3 className="font-bold">{message.name}</h3>
                                 <p className="flex justify-start gap-2 items-center">{useDateHandler(message?.createdAt)} </p>

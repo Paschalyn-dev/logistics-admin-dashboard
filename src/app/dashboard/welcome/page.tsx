@@ -176,7 +176,7 @@ export default function Welcome(){
                      code={checkProgress.length === 4 ? 200 : 0}  
                      failedmessage={`Setup failed! You have ${4 - checkProgress.length} more tabs to setup.`}
                      successmessage="Congratulations! You have succesfully completed your business setup." 
-                     buttonName="Complete Setup" 
+                     buttonName="Check complete setup" 
                      />
                 </div>
             </Section>    

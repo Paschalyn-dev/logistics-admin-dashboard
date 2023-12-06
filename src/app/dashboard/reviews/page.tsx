@@ -92,7 +92,7 @@ export default function Reviews(){
                     {  fetchAllReviewsData?.data && !openUIBoxes.reviewClearData &&
                         fetchAllReviewsData.data.map((reviews: any) => {
                             return(
-                                <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 flex justify-center items-center flex-col tablet:w-4/12 px-5 py-10">
+                                <div key={reviews.id} className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 flex justify-center items-center flex-col tablet:w-4/12 px-5 py-10">
                                     <div className="shadow-sm border px-1 py-2 text-4xl rounded-full">
                                         {reviews?.rating === "EXCELLENT" &&  '😁'}
                                         {reviews?.rating === "GOOD" &&  '🙂'}
@@ -110,7 +110,7 @@ export default function Reviews(){
                     }
 
                     { !fetchAllReviewsIsLoading && fetchAllReviewsData?.data?.length === 0 && !openUIBoxes.reviewClearData && (
-                        <div className="flex flex-col w-full justify-center items-center">
+                        <div className={openUIBoxes.reviewClearData ? "flex flex-col w-full justify-center items-center" : "hidden"}>
                             <span className="-mb-16">
                                 <i id="bigger" className="icon ion-md-star"></i>
                             </span>
@@ -122,7 +122,7 @@ export default function Reviews(){
                     {  searchData?.reviewResult?.data && openUIBoxes.reviewClearData &&
                         searchData?.reviewResult.data.map((reviews: any) => {
                             return(
-                                <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 flex justify-center items-center flex-col tablet:w-4/12 px-5 py-10">
+                                <div key={reviews.id} className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 flex justify-center items-center flex-col tablet:w-4/12 px-5 py-10">
                                     <div className="shadow-sm border px-1 py-2 text-4xl rounded-full">
                                         {reviews?.rating === "EXCELLENT" &&  '😁'}
                                         {reviews?.rating === "GOOD" &&  '🙂'}
@@ -140,7 +140,7 @@ export default function Reviews(){
                     }
 
                     { (searchData?.reviewResult?.data?.length === 0 || searchData?.reviewResult?.data === '' || searchData?.reviewResult?.code !== 200 && openUIBoxes.reviewClearData) && (
-                        <div className="flex flex-col w-full justify-center items-center">
+                        <div className={openUIBoxes.reviewClearData ? "flex flex-col w-full justify-center items-center" : "hidden"}>
                             <span className="-mb-16">
                                 <i id="bigger" className="icon ion-md-star"></i>
                             </span>
