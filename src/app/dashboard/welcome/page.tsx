@@ -10,17 +10,26 @@ import { useCardVerify, useFetchLocations, useGetBankAccount, useGetDistancePric
 import WelcomeBoxesDefault from "./welcomeboxesdefault";
 import ButtonAndMessage from "../preferences/shipment/buttonandmessage";
 import { State_data } from "../context/context";
+import { Password } from "../formik/password";
 
 export default function Welcome(){
     const [showVideo, setShowVideo] = useState<boolean>(false);
     const {getLocationsData} = useFetchLocations();
     const {getDistancePriceData} = useGetDistancePricing();
     const {getBankAccountData} = useGetBankAccount();
-    const {cardVerifyData} = useCardVerify()
+    const {cardVerifyData} = useCardVerify();
+    const [code, setCode] = useState<string>('');
     const checkProgress: string[] = [];
+
     const handleCompleteSetup = () => {
-        setSuccessMessage((prev: any) => ({...prev, completeSetup: true}))
+        setCode(Password())
+        setSuccessMessage((prev: any) => ({...prev, completeSetup: false}))
     }
+
+    useEffect(() => {
+        setSuccessMessage((prev: any) => ({...prev, completeSetup: true}))
+    }, [code])
+
     const {successMessage, setSuccessMessage} = useContext(State_data)
     if(getLocationsData?.data?.length){
         checkProgress.push('locations')
