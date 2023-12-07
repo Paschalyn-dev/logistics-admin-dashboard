@@ -79,13 +79,13 @@ export default function Shipments(){
     function sendEmailDefault(email: string, name: string, dispatcher: string){
         var email = email;
         var subject = "PARCEL SHIPMENT ON LOGISTIX AFRICA";
-        var msgBody = `Hello ${dispatcher}, ${name.slice(0, 1).toUpperCase() + name.slice(1).toLowerCase()} wants to ship a parcel on Logistix Africa. Confirm your availability and send a mail to this email with the same subject.`;
+        var msgBody = `Hello ${dispatcher}, ${name.slice(0, 1).toUpperCase() + name.slice(1).toLowerCase()} wants to ship a parcel on Logistix Africa. Confirm your availability or send a mail to this email with the same subject.`;
         window.open(`mailto:${email}?subject=${subject}&body=${msgBody}`);
     }
     
-    const handleDispatcherEmail = (riderId: number, name: string, dispatcher: string) => {
+    const handleDispatcherEmail = (name: string, dispatcher: string) => {
         const dispatcherName = handleFetchDispatcher(dispatcher)
-        const id = dispatcherAllData?.data?.filter((rider: any) => riderId === rider?.id)
+        const id = dispatcherAllData?.data?.filter((rider: any) => dispatcher === rider?.id)
         if(id){
             sendEmailDefault(id[0]?.email, name, dispatcherName);
         }
@@ -181,6 +181,11 @@ export default function Shipments(){
         setSuccessMessage((prev: any) => ({...prev, changeDispatcher: false, noRider: false}))
         setDispatcher((prev: any) => ({...prev, name: "", id: ""}))
     },[]);
+
+    const handleFiltered = (riderId: any) => {
+        const filteredArray = dispatcherAllData?.data?.filter((dispatcher:any) => dispatcher?.id === riderId)
+        return filteredArray?.length;
+    }
 
     
     return(
@@ -294,20 +299,20 @@ export default function Shipments(){
                             <div className="flex items-center justify-start gap-5">
                                 <i className="icon ion-md-person text-gray-300 px-5 py-3 bg-gray-100 rounded-full text-3xl"></i>
                                 <div>
-                                <p className="-mb-1">{ windowDetails < 700 && handleFetchDispatcher(parcel?.rider)?.length > 4 ? handleFetchDispatcher(parcel?.rider)?.slice(0, 4) + '...' : handleFetchDispatcher(parcel?.rider) || 'None'}</p>
+                                    <p className="-mb-1">{ windowDetails < 700 && handleFetchDispatcher(parcel?.rider)?.length > 4 ? handleFetchDispatcher(parcel?.rider)?.slice(0, 4) + '...' : handleFetchDispatcher(parcel?.rider) || 'None'}</p>
                                     <button onClick={() => {setCode(parcel?.id);  setPass(Password())}} className="text-blue-600 text-sm">Change</button>
                                 </div>
                             </div>
                             <div className="flex phone:gap-4 laptop:gap-2 phone:flex-col laptop:flex-row">
-                                { parcel?.rider ?
-                                    <a href={handleDispatcherNumber(parcel?.rider) ? `https://api.whatsapp.com/send?phone=${handleDispatcherNumber(parcel?.rider)}&text=Hello%20${handleFetchDispatcher(parcel?.rider)}%2C%20I%20got%20your%20contact%20from%20Logistix%20Africa%20website.%20I%20want%20to%20ship%20a%20parcel.%20My%20name%20is%20${parcel?.pickUp?.name}.` : ""} target="_blank">
+                                { handleFiltered(parcel?.rider) ?
+                                    <a href={`https://api.whatsapp.com/send?phone=${handleDispatcherNumber(parcel?.rider)}&text=Hello%20${handleFetchDispatcher(parcel?.rider)}%2C%20I%20got%20your%20contact%20from%20Logistix%20Africa%20website.%20I%20want%20to%20ship%20a%20parcel.%20My%20name%20is%20${parcel?.pickUp?.name}.`} target="_blank">
                                         <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
                                     </a> : 
                                     <button onClick={handleNoRider}>
                                         <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
                                     </button>
                                 }
-                                <button onClick={() => parcel?.rider ? handleDispatcherEmail(parcel?.rider, parcel?.name, parcel?.rider) : handleNoRider()}>
+                                <button onClick={() => handleFiltered(parcel?.rider) ? handleDispatcherEmail(parcel?.pickUp?.name, parcel?.rider) : handleNoRider()}>
                                     <i className="icon ion-md-mail text-blue-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-blue-100 rounded-full laptop:text-3xl"></i>
                                 </button>
                             </div>
@@ -382,15 +387,15 @@ export default function Shipments(){
                                 </div>
                             </div>
                             <div className="flex phone:gap-4 laptop:gap-2 phone:flex-col laptop:flex-row">
-                            { parcelRange?.rider ?
-                                    <a href={handleDispatcherNumber(parcelRange?.rider) ? `https://api.whatsapp.com/send?phone=${handleDispatcherNumber(parcelRange?.rider)}&text=Hello%20${handleFetchDispatcher(parcelRange?.rider)}%2C%20I%20got%20your%20contact%20from%20Logistix%20Africa%20website.%20I%20want%20to%20ship%20a%20parcel.%20My%20name%20is%20${parcelRange?.pickUp?.name}.` : ""} target="_blank">
+                            { handleFiltered(parcelRange?.rider) ?
+                                    <a href={`https://api.whatsapp.com/send?phone=${handleDispatcherNumber(parcelRange?.rider)}&text=Hello%20${handleFetchDispatcher(parcelRange?.rider)}%2C%20I%20got%20your%20contact%20from%20Logistix%20Africa%20website.%20I%20want%20to%20ship%20a%20parcel.%20My%20name%20is%20${parcelRange?.pickUp?.name}.`} target="_blank">
                                         <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
                                     </a> : 
                                     <button onClick={handleNoRider}>
                                         <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
                                     </button>
                                 }
-                                <button onClick={() => parcelRange?.rider ? handleDispatcherEmail(parcelRange?.rider, parcelRange?.name, parcelRange?.rider) : handleNoRider()}>
+                                <button onClick={() => handleFiltered(parcelRange?.rider) ? handleDispatcherEmail(parcelRange?.pickUp?.name, parcelRange?.rider) : handleNoRider()}>
                                     <i className="icon ion-md-mail text-blue-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-blue-100 rounded-full laptop:text-3xl"></i>
                                 </button>
                             </div>

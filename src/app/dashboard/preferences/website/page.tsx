@@ -22,7 +22,7 @@ export default function WebsitePreferences(){
         result: "",
         code: ""
     })
-    const [formData, setFormData] = useState<any>({
+    const [formData, setFormData] = useState<any>({        
         active: getBusinessData?.data?.active,
         additionalInfo: getBusinessData?.data?.additionalInfo,
         entryText: getBusinessData?.data?.entryText,
@@ -63,8 +63,55 @@ export default function WebsitePreferences(){
         title: getBusinessData?.data?.title,
         updatedAt: getBusinessData?.data?.updatedAt,
         verified: getBusinessData?.data?.verified,
-        website: getBusinessData?.data?.whatsapp,
+        website: getBusinessData?.data?.website,
     });
+
+    useEffect(() => {
+        setFormData((prev: any) => ({
+            ...prev,
+        active: getBusinessData?.data?.active || "",
+        additionalInfo: getBusinessData?.data?.additionalInfo  || "",
+        entryText: getBusinessData?.data?.entryText  || "",
+        address: {
+            city: getBusinessData?.data?.address?.city || "",
+            country: getBusinessData?.data?.address?.country || "",
+            state: getBusinessData?.data?.address?.state || "",
+            street: getBusinessData?.data?.address?.street || "",
+        },
+        channel: getBusinessData?.data?.channel || "",
+        chargeBearer: getBusinessData?.data?.chargeBearer || "",
+        contact: {
+            email: getBusinessData?.data?.contact?.email || "",
+            phone: getBusinessData?.data?.contact?.phone || "",
+            whatsapp: getBusinessData?.data?.contact?.whatsapp || ""
+        },
+        createdAt: getBusinessData?.data?.createdAt || "",
+        disabled: getBusinessData?.data?.disabled || "",
+        email: getBusinessData?.data?.email || "",
+        favRiders: getBusinessData?.data?.favRiders || "",
+        fullName: getBusinessData?.data?.fullName || "",
+        image: getBusinessData?.data?.image || "",
+        maintenance: getBusinessData?.data?.maintenance || "",
+        paymentMethods: getBusinessData?.data?.paymentMethods || "",
+        phone: getBusinessData?.data?.phone || "",
+        platform: getBusinessData?.data?.platform || "",
+        pricingPlan: getBusinessData?.data?.pricingPlan || "",
+        rc: getBusinessData?.data?.rc || "",
+        shippedParcel: getBusinessData?.data?.shippedParcel || "",
+        sitedata: getBusinessData?.data?.sitedata || "",
+        socialAccounts: {
+            facebook: getBusinessData?.data?.socialAccounts?.facebook || "",
+            instagram: getBusinessData?.data?.socialAccounts?.instagram || "",
+            linkedln: getBusinessData?.data?.socialAccounts?.linkedln || "",
+            twitter: getBusinessData?.data?.socialAccounts?.twitter || ""
+        },
+        test: getBusinessData?.data?.test || "",
+        title: getBusinessData?.data?.title || "",
+        updatedAt: getBusinessData?.data?.updatedAt || "",
+        verified: getBusinessData?.data?.verified || "",
+        website: getBusinessData?.data?.website || "",
+        }))
+    }, [getBusinessData?.data])
     
     const handleToggleOnOff = () => {
         setFormData((prev: any) => ({...prev, maintenance: !formData.maintenance}));
@@ -204,11 +251,11 @@ export default function WebsitePreferences(){
                         <label htmlFor="street" className="text-gray-500 text-base">Office Address</label>
                         <input name="street" value={formData.address.street} onChange={handleInnerFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
                         <label htmlFor="email" className="text-gray-500 text-base">Email Address</label>
-                        <input name="email" value={formData?.email} onChange={handleFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
+                        <input name="email" value={formData?.email} onChange={handleContact} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
                         <label htmlFor="phone" className="text-gray-500 text-base">Phone</label>
-                        <input name="phone" value={formData?.phone} onChange={handleFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
+                        <input name="phone" value={formData?.phone} onChange={handleContact} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
                         <label htmlFor="whatsapp" className="text-gray-500 text-base">Whatsapp Contact</label>
-                        <input name="whatsapp" value={formData?.whatsapp} onChange={handleFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
+                        <input name="whatsapp" value={formData?.whatsapp} onChange={handleContact} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
                     </div>
                     <div>
                         <SubHeading subheading="Social Media" />

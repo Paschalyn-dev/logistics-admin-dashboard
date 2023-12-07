@@ -114,7 +114,7 @@ export default function Overview(){
                         <img src="https://charts.livegap.com/Gallery/images/Chart-10.png" alt="chart" />
                     </div> */}
 
-                    <div className="grid my-8 phone:grid-flow-row phone:grid-rows-3 laptop:grid-rows-2 laptop:grid-flow-col gap-4">
+                    <div className="grid my-8 phone:grid-flow-row phone:grid-rows-auto laptop:grid-rows-2 laptop:grid-flow-col gap-4">
                      <div className="laptop:col-span-2 shadow-xs bg-gray-50 p-5 rounded-3xl col-span-2">
                         <div className="flex justify-start items-center gap-2">
                             <i className="icon ion-md-locate" title="Location"></i>
@@ -122,10 +122,13 @@ export default function Overview(){
                         </div>
                     { getLocationsData?.data?.length ?
                     <div> 
-                        <div className="flex justify-start flex-wrap my-4 items-center gap-5 text-xs text-gray-500/50">
+                        <div className="w-fit overflow-y-auto h-60 my-4 text-xs text-gray-500/50">
+                           <div className="w-96 flex flex-wrap gap-5 justify-start items-center">
+
                             {getLocationsData?.data?.map((state: string) => (
                                 <h3 onClick={() => setLocation(state)} className={location === state ? "bg-amber-500/10 text-amber-500 p-2 text-base rounded-full cursor-pointer text-center" : "p-2 rounded-full text-base cursor-pointer text-center"}>{state}</h3>
                             ))}
+                    </div>
                         </div>
 
                             <div className="flex justify-between w-full scroll-width-3 overflow-x-auto items-start gap-3">
@@ -152,7 +155,7 @@ export default function Overview(){
                                 />                           
                             </div>
                         </div> 
-                        : 
+                         : 
                         <div className="flex py-16 justify-center items-center gap-2 flex-col">
                             <i id="bigger" className="icon ion-md-pin"></i>
                             { getLocationsError ? 
@@ -176,7 +179,7 @@ export default function Overview(){
                             <i className="icon ion-md-laptop" title="Laptop"></i>
                             <h1 className="text-lg">Activities</h1>
                         </div>
-                        <div className="text-center phone:relative phone:top-20  laptop:relative laptop:top-16">
+                        <div className="text-center laptop:relative laptop:top-16">
                             <i id="bigger" className="icon ion-md-laptop" title="Laptop"></i>
                             <h1 className="text-base">Coming Soon</h1>
                             <p 
@@ -186,7 +189,9 @@ export default function Overview(){
                         </div>
                     </div>
 
-                   <div className="laptop:row-span-3 shadow-xs col-span-2 flex flex-col justify-between bg-gray-50 rounded-3xl p-5">
+                    {/* third box */}
+
+                   <div className="laptop:row-span-3 gap-10 shadow-xs col-span-2 flex flex-col justify-start bg-gray-50 rounded-3xl p-5">
                     <div>
                         <div className="flex justify-start gap-3 items-center">
                           <i className="icon ion-md-bicycle"></i>
@@ -197,9 +202,9 @@ export default function Overview(){
                             Helps you know the Dispatchers that have delivered the most parcels
                         </p>
                     </div>
-
-                    <div className="flex gap-8">
-                        { dispatcherAllData?.data?.map((dispatcher: any, index: any) => (
+                    <hr />
+                    <div className="flex overflow-y-auto gap-8 flex-wrap w-fit phone:h-60 laptop:h-screen justify-start items-start">
+                        { dispatcherAllData?.data?.sort((a: any, b: any) => Number(a.parcels) - Number(b.parcels))?.map((dispatcher: any, index: any) => (
                             <div>
                                 <div className="flex justify-start text-gray-500 text-sm items-center gap-1">
                                     <span className="w-2 rounded-sm h-2 bg-green-600"></span>
@@ -208,7 +213,7 @@ export default function Overview(){
                                 <h1>{dispatcher?.parcels || 0}%</h1>
                             </div>
                         ))
-                        }
+                    }
                     </div>
                    </div>
                   </div>
