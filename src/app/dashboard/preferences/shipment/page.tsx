@@ -240,12 +240,6 @@ export default function ShipmentPreferences(){
     }, [changePayment?.code])
 
     useEffect(() => {
-        if(state.showStates){
-            getLocationsMutate()
-        }
-    },[state.showStates])
-
-    useEffect(() => {
         if(priceAndLocationsDelete?.locationsDeleteInfo){
             handleLocationsDelete(priceAndLocationsDelete?.locationsDeleteInfo)
         }
@@ -253,9 +247,6 @@ export default function ShipmentPreferences(){
 
     useEffect(() => {
         getBusinessMutate();
-        dispatch({type: "SHOWSTATES", payload: false})
-        getDistancePriceMutate();
-        getLocationsMutate();
         setSuccessMessage((prev: any) => ({...prev, locationsSaved: false}));
     }, [])
 
@@ -362,7 +353,7 @@ export default function ShipmentPreferences(){
                     <div>
                         <span className="flex justify-between mb-2 items-center">
                             <button onClick={handleShowStates} title="Select States" className="text-green-400 my-4 font-bold">Select States</button>
-                            <button onClick={() => {() => setGlobalData([]); setPriceAndLocationsDelete((prev: any) => ({...prev, locationsAdded: true}))}} className="text-red-500 text-xs font-bold">CLEAR</button>
+                            <button onClick={() => {setGlobalData([]); setPriceAndLocationsDelete((prev: any) => ({...prev, locationsAdded: true}))}} className="text-red-500 text-xs font-bold">CLEAR</button>
                         </span>
                         
                         <div className="mb-3 rounded-lg bg-gray-200 h-fit w-full p-5">
