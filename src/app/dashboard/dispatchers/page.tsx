@@ -96,7 +96,7 @@ export default function Dispatcher(){
                             <div key={dispatcher?.id} className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                             <div className="flex justify-between">
                                 <div>
-                                    <p className="text-lg">{dispatcher.fullName}</p>
+                                    <p className="capitalize text-lg mt-2">{dispatcher?.fullName[0] === dispatcher?.fullName[0].toUpperCase() ? dispatcher?.fullName : dispatcher?.fullName[0].toUpperCase() + dispatcher?.fullName?.slice(1).toLowerCase()}</p>
                                     <p className="text-base">{dispatcher.parcels ? dispatcher.parcels : "0"} Parcel{dispatcher.parcels > 1 && "s"}</p>
                                     <p className="text-xs">{useDateHandler(dispatcher?.createdAt)}</p>
                                 </div>
@@ -165,7 +165,7 @@ export default function Dispatcher(){
                         <div key={dispatcher?.id} className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                             <div className="flex justify-between">
                                 <div>
-                                    <p className="text-lg">{dispatcher.fullName}</p>
+                                <p className="capitalize text-lg mt-2">{dispatcher?.fullName[0] === dispatcher?.fullName[0].toUpperCase() ? dispatcher?.fullName : dispatcher?.fullName[0].toUpperCase() + dispatcher?.fullName?.slice(1).toLowerCase()}</p>
                                     <p className="text-base">{dispatcher.parcels ? dispatcher.parcels : "0"} Parcel{dispatcher.parcels > 1 && "s"}</p>
                                     <p className="text-xs">{useDateHandler(dispatcher?.createdAt)}</p>
                                 </div>

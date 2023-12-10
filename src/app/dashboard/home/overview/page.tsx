@@ -11,7 +11,6 @@ import BoxesHolder from "../../boxesholder";
 import { useActiveShipmentsCount, useAllDispatchersFetcher, useCompanyRevenue, useCountParcel, useCustomerCount, useDeliveredParcels, useLateParcels, useTodayRevenue } from "../../services/swr-functions/customer-swr";
 import { useCountDispatcher, useCountStaff, useFetchLocations} from "../../services/swr-functions/staff-swr";
 import { NumberComma } from "../../numberComma";
-import { State_data } from "../../context/context";
 import Input from "../../input";
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
 
@@ -27,13 +26,17 @@ export default function Overview(){
     const {countRidersData} = useCountDispatcher();
     const {todayRevenueData} = useTodayRevenue();
     const {getLocationsData, getLocationsError, getLocationsIsLoading, getLocationsIsValidating} = useFetchLocations();
-    const {dispatcherAllData} = useAllDispatchersFetcher();
+    const {dispatcherAllData, dispatcherAllIsValiddating, dispatcherAllIsLoading} = useAllDispatchersFetcher();
     return(
             <Holder>
                 {
                     getLocationsIsLoading || getLocationsIsValidating &&
                     <SkeletonLoading title="locations..." loadingSearching="Loading" />  
                 }
+                {
+                    dispatcherAllIsValiddating || dispatcherAllIsLoading &&
+                    <SkeletonLoading title="dispatchers..." loadingSearching="Loading"/>
+                 }
                 <HomeNav />
                 <Section>
                     <div>
@@ -122,17 +125,15 @@ export default function Overview(){
                         </div>
                     { getLocationsData?.data?.length ?
                     <div> 
-                        <div className="w-fit overflow-y-auto h-60 my-4 text-xs text-gray-500/50">
-                           <div className="w-96 flex flex-wrap gap-5 justify-start items-center">
-
-                            {getLocationsData?.data?.map((state: string) => (
-                                <h3 onClick={() => setLocation(state)} className={location === state ? "bg-amber-500/10 text-amber-500 p-2 text-base rounded-full cursor-pointer text-center" : "p-2 rounded-full text-base cursor-pointer text-center"}>{state}</h3>
-                            ))}
-                    </div>
+                        <div className="w-fit overflow-y-auto h-fit mb-10 mt-4 text-xs text-gray-500/50">
+                            <div className="w-96 flex overflow-x-auto gap-5 justify-start items-center">
+                                {getLocationsData?.data?.map((state: string) => (
+                                    <h3 onClick={() => setLocation(state)} className={location === state ? "bg-amber-500/10 text-amber-500 p-2 text-base rounded-full cursor-pointer text-center" : "p-2 rounded-full text-base cursor-pointer text-center"}>{state}</h3>
+                                ))}
+                            </div>
                         </div>
 
                             <div className="flex justify-between w-full scroll-width-3 overflow-x-auto items-start gap-3">
-        
                                 <SmallBoxes
                                 icon="icon ion-md-cash"
                                 title="Revenue"

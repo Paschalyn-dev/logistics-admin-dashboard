@@ -8,6 +8,7 @@ import HandleSuccessMessage from "./handlesuccessmessage";
 import { staffAPIURL } from "../../services/api-url/staff-api-url";
 import { Password } from "../../formik/password";
 import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
+import Loader from "../../services/Loader/spinner";
 
 type CALCULATOR = {
     showCalculator: boolean;
@@ -16,7 +17,7 @@ type CALCULATOR = {
 }
 
 export default function AddItem({showCalculator, mutate, handleShowCalculator}: CALCULATOR){
-    const {globalPriceList, successMessage} = useContext<any | number[]>(State_data);
+    const {globalPriceList, successMessage, setLoading, loading} = useContext<any | number[]>(State_data);
     const [checkQuantity, setCheckQuantity] = useState<any>({
         from: 0, 
         to: 0, 
@@ -39,11 +40,14 @@ export default function AddItem({showCalculator, mutate, handleShowCalculator}: 
             },
         });
         const data = await response.json();
+        setLoading((prev: any) => ({...prev, deliveryPrice: false}))
         setPriceAndLocations((prev: any) => ({...prev, priceResult: data}));
-        mutate();
     }
 
     useEffect(() => {
+        if(priceAndLocations?.priceInfo !== "" && priceAndLocations?.priceResult === ""){
+            setLoading((prev: any) => ({...prev, deliveryPrice: true}))
+        }
         if(priceAndLocations?.priceInfo !== ""){
             handleShowPriceRangeData(priceAndLocations.priceInfo);
         }
@@ -77,6 +81,10 @@ export default function AddItem({showCalculator, mutate, handleShowCalculator}: 
 
     return(
         <div>
+            {
+                loading.deliveryPrice && 
+                <Loader />
+            }
             <div>
                 { priceAndLocations.priceInfo !== "" && priceAndLocations.priceResult !== "" &&
                     <ErrorAndSucccessHandlers

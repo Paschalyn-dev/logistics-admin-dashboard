@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Holder from "../../holder";
 import Section from "../../section";
-import { useAccountVerify, useCardVerify, useFetchBankCodesAndLogos, useGetBankAccount } from "../../services/swr-functions/staff-swr";
+import { useCardVerify, useFetchBankCodesAndLogos, useGetBankAccount } from "../../services/swr-functions/staff-swr";
 import Hero from "../hero";
 import PreferencesNav from "../preferencesnav";
 import SubHeading from "../website/subheading";
@@ -15,6 +15,9 @@ import { authorizationKeyCustomer } from "../../services/customer-api/api";
 import { Password } from "../../formik/password";
 import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
 import SuccessMessage from "../../successmessage";
+import { usePaystackPayment } from 'react-paystack';
+import PayStackHookExample from "./paystack";
+import Loader from "../../services/Loader/spinner";
 
 export default function Payments(){
   const [chargeBearer, setChargeBearer] =  useState<any>({
@@ -22,7 +25,7 @@ export default function Payments(){
     result: "",
     code: ""
   });
-  const {successMessage, setSuccessMessage} = useContext(State_data);
+  const {successMessage, setLoading, loading, setSuccessMessage} = useContext(State_data);
   const {bankCodesAndDetailsData, bankCodesAndDetailsError, bankCodesAndDetailsIsLoading, bankCodesAndDetailsIsValidating, bankCodesAndDetailsMutate} = useFetchBankCodesAndLogos();
   const {cardVerifyData, cardVerifyError, cardVerifyIsLoading, cardVerifyIsValidating, cardVerifyMutate} = useCardVerify();
   const {getBankAccountData, getBankAccountError, getBankAccountIsIsLoading, getBankAccountIsMutate, getBankAccountIsValidating} =  useGetBankAccount();
@@ -37,9 +40,13 @@ export default function Payments(){
   });
   const data = await response.json();
   setChargeBearer((prev: any) => ({...prev, result: data}))
+  setLoading((prev: any) => ({...prev, chargeBearer: false}))
   }
 
   useEffect(() => {
+    if(chargeBearer.info !== ''){
+      setLoading((prev: any) => ({...prev, chargeBearer: true}))
+    }
     if(chargeBearer.info !== ''){
       handleChargeBearer({chargeBearer: chargeBearer.info})
     }
@@ -54,14 +61,16 @@ export default function Payments(){
     }
     return logo;
   }
-
+  
   return(
     <Holder>
+          {
+            loading.chargeBearer && <Loader />
+          }
           {
             cardVerifyIsLoading || cardVerifyIsValidating && 
             <SkeletonLoading title="debit card..." loadingSearching="Loading" />
           }
-
           {
             bankCodesAndDetailsIsLoading || bankCodesAndDetailsIsValidating || 
             getBankAccountIsIsLoading || getBankAccountIsValidating &&
@@ -105,22 +114,24 @@ export default function Payments(){
 
                   <SubHeading subheading="Payment Account" /> 
                   <p className="text-gray-500">We will be sending the amount charged on every shipment to this account</p> 
-                  { getBankAccountData?.data && 
+                  { getBankAccountData?.data ? 
                       <div className="bg-amber-500 border-2 border-amber-500/50 shadow-xl h-full tablet:w-5/12 before-laptop:w-4/12 phone:w-full mt-5 text-gray-50 p-6 rounded-xl">
                           <img src={getBankDetails(getBankAccountData?.data?.bankCode)} className="w-10 rounded-lg" alt={getBankAccountData?.data?.bankCode} />
                           <h4 className="font-thin mt-12 text-lg">{getBankAccountData?.data?.accountNumber}</h4>
                           <h3 className="uppercase font-bold">{cardVerifyData?.data?.card?.account_name}</h3>
-                      </div>
+                      </div> :
+                    <PayStackHookExample />
                   }
                   <SubHeading subheading="Debit Card" />
                   <p className="text-gray-500">We will need this to charge your card monthly as you use Logistix.</p> 
-                  { cardVerifyData?.data && 
+                  { cardVerifyData?.data ?
                       <div className="bg-amber-500 border-2 border-amber-500/50 shadow-xl h-full tablet:w-5/12 before-laptop:w-4/12 phone:w-full mt-5 text-gray-50 p-6 rounded-xl">
                           <img src={getBankDetails(cardVerifyData?.data?.card?.bank)} className="w-10 rounded-lg" alt={cardVerifyData?.data?.card?.bank} />
                           <h4 className="font-bold tracking-widest mt-12 text-xl">{cardVerifyData?.data?.card?.bin.slice(0, 4)} {cardVerifyData?.data?.card?.bin.slice(4)}<span className="text-2xl">.. ....</span> {cardVerifyData?.data?.card?.last4}</h4>
                           <p className="my-1 font-thin">{cardVerifyData?.data?.card?.exp_month}/{cardVerifyData?.data?.card?.exp_year.slice(2)}</p>
                           <h3 className="uppercase font-thin">{cardVerifyData?.data?.card?.account_name}</h3>
-                      </div>
+                      </div> :
+                      <PayStackHookExample />
                   }
                 </Hero>
             </Section>

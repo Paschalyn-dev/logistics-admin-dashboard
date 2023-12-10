@@ -6,7 +6,7 @@ export type BUTTON = {
     handleClick?: any;
     title?: boolean;
     name?: any;
-    code?: number;
+    code?: any;
     mutate?: any;
     error?: any;
 }

@@ -85,7 +85,7 @@ export default function Administrators(){
                     return(
                     <div key={staff?.id} className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                             <div>
-                                <p className="capitalize text-lg mt-2">{staff?.fullName}</p>
+                                <p className="capitalize text-lg mt-2">{staff?.fullName[0] === staff?.fullName[0].toUpperCase() ? staff?.fullName : staff?.fullName[0].toUpperCase() + staff?.fullName?.slice(1).toLowerCase()}</p>
                                 <p className="text-sm my-2 capitalize">{staff?.role}</p>
                                 <p className="text-xs">{useDateHandler(staff?.createdAt)}</p>
                             </div>
@@ -154,7 +154,7 @@ export default function Administrators(){
                                 return(
                                 <div key={staff?.id} className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                                         <div>
-                                            <p className="capitalize text-lg mt-2">{staff?.fullName}</p>
+                                            <p className="capitalize text-lg mt-2">{staff?.fullName[0] === staff?.fullName[0].toUpperCase() ? staff?.fullName : staff?.fullName[0].toUpperCase() + staff?.fullName?.slice(1).toLowerCase()}</p>
                                             <p className="text-sm my-2 capitalize">{staff?.role}</p>
                                             <p className="text-xs">{useDateHandler(staff?.createdAt)}</p>
                                         </div>

@@ -43,6 +43,8 @@ export const customerAPIUrl= {
     weekRevenue: `https://logapi.logistixng.com/api/b2c/parcels/range?range=[{%22field%22:%22createdAt%22,%22start%22:%22${dateStringChanger(firstDay)}T23:00:00.000Z%22,%22end%22:%22${dateStringChanger(lastDay)}T22:59:59.999Z%22}]&query={%22company%22:${company}}`,
     monthRevenue:  `https://logapi.logistixng.com/api/b2c/parcels/range?range=[{%22field%22:%22createdAt%22,%22start%22:%22${Lmonth}T23:00:00.000Z%22,%22end%22:%22${Cmonth}T22:59:59.999Z%22}]&query={%22company%22:${company}}`,
     changeDp: `https://logapi.logistixng.com/api/b2c/business/dp/${company}`,
+    getLocations: `https://logapi.logistixng.com/api/b2c/user/locations`,
+    createCard: `  https://logapi.logistixng.com/api/b2c/card`,
     searchParcels: ({inputField, searchFields}: any) => `https://logapi.logistixng.com/api/b2c/parcels/range?search=${inputField?.activeShipments}&searchFields=${searchFields?.activeShipments}&query={%22company%22:${company}}&range=[]`,
     // searchParcels: ({inputField, searchFields, createdAtStart, createdAtEnd, amountStart, amountEnd}: any) => `https://logapi.logistixng.com/api/b2c/parcels/range?search=${inputField?.activeShipments}&searchFields=${searchFields?.activeShipments}&query={%22company%22:${company}}&range=[]`,
     searchCustomers: ({inputField, searchFields}: any) => `https://logapi.logistixng.com/api/b2c/search/subscribers?search=${inputField?.customersRange}&searchFields=${searchFields?.customersRange}`,

@@ -2,6 +2,8 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import Context from './dashboard/context/context';
+import { useBusiness, useGetBusiness } from './dashboard/services/swr-functions/customer-swr';
+import { useEffect } from 'react';
 const inter = Inter({ subsets: ['latin'] })
 
 // export const metadata = {
@@ -10,10 +12,16 @@ const inter = Inter({ subsets: ['latin'] })
 // }
 
 export default function RootLayout({
-  children,
-}: {
+  children, }: {
   children: React.ReactNode
-}) {
+}) 
+{
+  const {getBusinessData, getBusinessMutate} = useGetBusiness();
+  
+  useEffect(() => {
+    getBusinessMutate()
+  },[getBusinessData?.data])
+
   return (
     <html lang="en">
       <head>
@@ -22,6 +30,8 @@ export default function RootLayout({
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
         />
+        <link rel="icon" type="image/x-icon" href={getBusinessData?.data?.image}></link>
+        <script src="https://js.paystack.co/v1/inline.js"></script>
         <link href="https://unpkg.com/ionicons@4.5.10-0/dist/css/ionicons.min.css" rel="stylesheet" />
       </head>
       <Context>

@@ -6,8 +6,10 @@ import { logout } from "./services/libs/staff-auth";
 import { customerLogout } from "./services/libs/customer-auth";
 import { useRouter } from "next/navigation";
 import { usePathname } from 'next/navigation';
+import { useGetBusiness } from "./services/swr-functions/customer-swr";
 
 export default function Sidebar() {
+  const {getBusinessData, getBusinessError, getBusinessIsLoading, getBusinessIsValidating, getBusinessMutate} = useGetBusiness();
   const pathname = usePathname();
   const [clicked, setClicked] = useState<any>(pathname);
   const [windowWidth, setWindowWidth]= useState<number>(0);
@@ -29,7 +31,6 @@ export default function Sidebar() {
   useEffect(() => {
     setWindowWidth(window.innerWidth);
   }, []);
-
   
   useEffect(() => {
     setClicked(pathname)
@@ -38,11 +39,11 @@ export default function Sidebar() {
     return(
       <div className={ windowWidth <= 1025 ? "animate__animated animate__slideInLeft fixed flex flex-col justify-start items-center z-20 top-0 bottom-0 left-0 text-white w-fit h-full bg-stone-900 text-center shadow-lg" : "fixed flex flex-col justify-start items-center z-20 top-0 bottom-0 left-0 text-white w-fit h-full bg-stone-900 text-center shadow-lg"}>
         <div className="z-20 sticky h-fit w-fit bg-stone-900 py-8 px-12 shadow">
-          <img src="https://cakenus.logistix.africa/logo-icon.svg" alt="logo" className="w-12 m-auto mb-3" />
-          <h4 className="font-bold mb-1">CakenUs Services</h4>
+          <img src={getBusinessData?.data?.image} alt="logo" className="w-12 m-auto mb-3" />
+          <h4 className="font-bold mb-1">{getBusinessData?.data?.title}</h4>
           <div className="flex justify-around items-center gap-1">
             <p className="font-light text-xs p-1 border mt-1 border-gray-700 shadow rounded-full">Super Administrator</p>
-            <span><i className="icon ion-md-globe" title="Globe"></i></span>
+            <a target="_blank" href="https://cakenus.logistix.africa"><i className="icon ion-md-globe" title="Globe"></i></a>
           </div>
         </div>
         

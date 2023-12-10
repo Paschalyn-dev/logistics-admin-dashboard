@@ -74,6 +74,17 @@ export const customerRangeFetcher = async (customersRangeQuery: any) => {
     return data;
 }
 
+export const getLocationsFetcher = async (locationsRangeQuery: any) => {
+    const response = await fetch(customerAPIUrl.getLocations, {
+        method: 'GET',
+        headers: {
+            'Authorization': authorizationKeyCustomer
+        }
+    });
+    const data = await response.json();
+    return data;
+}
+
 //search dispatchers
 export const dispatchersRangeFetcher = async (dispatchersRangeQuery: any) => {
     const response = await fetch(customerAPIUrl.searchDispatchers(dispatchersRangeQuery), {

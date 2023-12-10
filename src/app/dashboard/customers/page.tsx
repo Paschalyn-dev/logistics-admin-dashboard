@@ -79,7 +79,7 @@ export default function Customers(){
                             return (
                                 <div key={customer?.id} className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                                     <p className="text-xs">{useDateHandler(customer?.user?.createdAt)}</p>
-                                    <h3 className="text-lg">{customer?.user?.name}</h3>
+                                    <p className="capitalize text-lg mt-2">{customer?.user?.name[0] === customer?.user?.name[0].toUpperCase() ? customer?.user?.name : customer?.user?.name[0].toUpperCase() + customer?.user?.name?.slice(1).toLowerCase()}</p>
                                     <p>{customer?.user?.parcels || 0} { customer?.user?.parcels > 1? 'parcels' : 'parcel'} shipped</p>
                                     <hr className="my-2" />
 
@@ -131,7 +131,7 @@ export default function Customers(){
                             return (
                             <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                                 <p className="text-xs">{useDateHandler(customer?.user?.createdAt)}</p>
-                                <h3 className="text-lg">{customer?.user?.name}</h3>
+                                <p className="capitalize text-lg mt-2">{customer?.user?.name[0] === customer?.user?.name[0].toUpperCase() ? customer?.user?.name : customer?.user?.name[0].toUpperCase() + customer?.user?.name?.slice(1).toLowerCase()}</p>
                                 <p>{customer?.user?.parcels || 0} parcels shipped</p>
                                 <hr className="my-2" />
 

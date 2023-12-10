@@ -23,13 +23,24 @@ export default function Context({children}: any){
         name: "",
         id: 0
     })
+    const [staffDetails, setStaffDetails] = useState({
+        authToken: "",
+        email: "",
+        id: 0
+    })
     const [loading, setLoading] = useState({
         staffL: false,
         customerL: false,
         parcel: false,
         customer: false,
         dispatcher: false,
-        administrator: false
+        administrator: false,
+        website: false,
+        chargeBearer: false,
+        locations: false,
+        payment: false,
+        deliveryPrice: false,
+        deleteDeliveryPrice: false
     })
     const [searchData, setSearchData] = useState<any>({
         parcelInfo: "",
@@ -53,6 +64,17 @@ export default function Context({children}: any){
         reviewInfo: "",
         reviewResult: "",
         reviewCode:  "",
+    })
+    const [priceAndLocationsDelete, setPriceAndLocationsDelete] = useState<any>({
+        priceInfo: "",
+        priceResult: "",
+        priceCode: "",
+        locationsCode: "",
+        locationsAdded: true,
+        locationsResult: "",
+        locationsDeleteInfo: "",
+        locationsDeleteResult: "",
+        locationsDeleteCode: "",
     })
     const [inputField, setInputField] = useState<any>({
         activeShipments: "",
@@ -137,9 +159,10 @@ export default function Context({children}: any){
 
     const [successMessage, setSuccessMessage] = useState({
         input: false,
+        distancePricesWelcomePage: true,
         error: true,
         changeDispatcher: false,
-        saveLocations: false,
+        locationsSaved: false,
         activeShipment: true,
         isNotValid: false,
         deliveredShipment: true,
@@ -163,7 +186,6 @@ export default function Context({children}: any){
         saveWebsite: false,
         chargeBearer: false,
         paymentOptions: false,
-        deliveryLocations: false,
         messages: true,
         websiteError: true,
         deliveryPrice: true,
@@ -192,7 +214,7 @@ export default function Context({children}: any){
     })
 
     return(
-        <State_data.Provider value={{ globaldata, storedName, setStoredName, myKey, setMyKey, showDispatchers, setShowDispatcher, loading, setLoading, setGlobalData, globalPriceList, inputData, setInputData, deleteWithId, setDeleteWithId, setGlobalPriceList, inputField, setInputField, createdAtStart, setCreatedAtStart, createdAtEnd, setCreatedAtEnd, amountStart, setAmountStart, amountEnd, setAmountEnd, searchFields, setSearchFields, parcelRange, setParcelRange, customersRange, dispatcher, setDispatcher, setCustomersRange, dispatchersRange, setDispatchersRange, administratorsRange, setAdministratorsRange, transactionsRange, setTransactionsRange, messagesRange, setMessagesRange, reviewsRange, setReviewsRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage, id, setId, setSearchData, searchData }}>
+        <State_data.Provider value={{ globaldata, storedName, setStaffDetails, priceAndLocationsDelete, setPriceAndLocationsDelete, staffDetails, setStoredName, myKey, setMyKey, showDispatchers, setShowDispatcher, loading, setLoading, setGlobalData, globalPriceList, inputData, setInputData, deleteWithId, setDeleteWithId, setGlobalPriceList, inputField, setInputField, createdAtStart, setCreatedAtStart, createdAtEnd, setCreatedAtEnd, amountStart, setAmountStart, amountEnd, setAmountEnd, searchFields, setSearchFields, parcelRange, setParcelRange, customersRange, dispatcher, setDispatcher, setCustomersRange, dispatchersRange, setDispatchersRange, administratorsRange, setAdministratorsRange, transactionsRange, setTransactionsRange, messagesRange, setMessagesRange, reviewsRange, setReviewsRange, openUIBoxes, setOpenUIBoxes, successMessage, setSuccessMessage, id, setId, setSearchData, searchData }}>
             {children}
         </State_data.Provider>
     )

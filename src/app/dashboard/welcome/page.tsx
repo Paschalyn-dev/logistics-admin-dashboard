@@ -11,13 +11,15 @@ import WelcomeBoxesDefault from "./welcomeboxesdefault";
 import ButtonAndMessage from "../preferences/shipment/buttonandmessage";
 import { State_data } from "../context/context";
 import { Password } from "../formik/password";
+import SkeletonLoading from "../services/eventhandlers/skeleton-loading";
+import SuccessMessage from "../successmessage";
 
 export default function Welcome(){
     const [showVideo, setShowVideo] = useState<boolean>(false);
-    const {getLocationsData} = useFetchLocations();
-    const {getDistancePriceData} = useGetDistancePricing();
-    const {getBankAccountData} = useGetBankAccount();
-    const {cardVerifyData} = useCardVerify();
+    const {getLocationsData, getLocationsIsLoading, getLocationsIsValidating, getLocationsError} = useFetchLocations();
+    const {getDistancePriceData, getDistancePriceError, getDistancePriceIsLoading, getDistancePriceIsValidating} = useGetDistancePricing();
+    const {getBankAccountData, getBankAccountIsIsLoading, getBankAccountIsValidating, getBankAccountError} = useGetBankAccount();
+    const {cardVerifyData, cardVerifyIsLoading, cardVerifyIsValidating, cardVerifyError} = useCardVerify();
     const [code, setCode] = useState<string>('');
     const checkProgress: string[] = [];
 
@@ -52,6 +54,30 @@ export default function Welcome(){
     }, [])
         return(
         <Holder>
+            {
+                cardVerifyIsLoading || cardVerifyIsValidating &&
+                <SkeletonLoading title="card details..." loadingSearching="Loading" />
+            }
+            {
+                getBankAccountIsValidating || getBankAccountIsIsLoading &&
+                <SkeletonLoading title="account details..." loadingSearching="Loading"/>
+            }
+            {
+                getDistancePriceIsLoading || getDistancePriceIsValidating &&
+                <SkeletonLoading title="distance prices..." loadingSearching="Loading"/>
+            }
+            {
+                getLocationsIsLoading || getLocationsIsValidating &&
+                <SkeletonLoading title="locations..." loadingSearching="Loading"/>
+            }
+            {  getBankAccountError || getDistancePriceError || getLocationsError || cardVerifyError &&
+                <SuccessMessage 
+                name="distancePricesWelcomePage"
+                id="failed"
+                messageTitle="Error occured! Check network connection."
+                successMessageShow={successMessage?.distancePricesWelcomePage}
+                />
+            }
             <ConstantNav />
             <Section>
                 <div className="flex flex-row justify-start items-center">

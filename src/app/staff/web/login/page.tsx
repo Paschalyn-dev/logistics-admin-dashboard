@@ -20,6 +20,7 @@ import Loader from "@/app/dashboard/services/Loader/spinner";
 
 export default function Staff(){
     const router = useRouter();
+    const {staffDetails, setStaffDetails} = useContext(State_data)
     const [passwordString, setPasswordString] = useState<boolean>(true)
     const [staff, setStaff] = useState<any>({
         info: '',
@@ -46,6 +47,7 @@ useEffect(() => {
     if(staff?.result?.code === 200 && staff?.result?.data?.isDefaultPassword === false) {
         login(user.authToken)
         // staffStore.push(user);
+        setStaffDetails((prev: any) => ({...prev, email: user?.email, id: user?.id, authToken: user?.authToken}))
         let timer = setTimeout(() => {
             router.replace('/dashboard/welcome');
         }, 5000);
@@ -53,6 +55,7 @@ useEffect(() => {
     }
     if(staff?.result?.code === 200 && staff?.result?.data?.isDefaultPassword === true){
         router.replace('/staff/web/changepassword')
+        setStaffDetails((prev: any) => ({...prev, email: user?.email, id: user?.id, authToken: user?.authToken}))
         // staffStore.push(user);
     }  
 }
@@ -67,9 +70,10 @@ useEffect(() => {
     }
 }, [staff?.info?.code])
 
+
 return(
         <div className="w-screen relative h-screen overflow-x-hidden">
-                {loading.staffL && <Loader />}
+            {loading.staffL && <Loader />}
             <Image  
             alt="background" 
             src={image} 
@@ -121,7 +125,6 @@ return(
                             }}   
                         >
                             {({handleSubmit}) => (
-                                <>
                             <Form autoComplete="on">
                                 <TextInput
                                 placeholder='Email address here...'
@@ -153,7 +156,6 @@ return(
                                 handleClick={handleSubmit}
                                 />
                         </Form>
-                        </>
                             )}
                         </Formik>
                     </div>

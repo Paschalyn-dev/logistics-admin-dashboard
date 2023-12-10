@@ -4,7 +4,9 @@ import { State_data } from "././context/context"
 import { useState } from "react";
 import DarkFill from "./darkfill";
 import Button from "./button";
-import { useLocations } from "./services/swr-functions/staff-swr";
+import { useFetchLocations, useLocations } from "./services/swr-functions/staff-swr";
+import { array } from "yup";
+import { Password } from "./formik/password";
 type States = {
     handleShow: any;
     show: boolean;
@@ -17,26 +19,29 @@ export default function States({handleShow, show}: States){
 "Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa","Niger","Ogun","Ondo",
 "Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara"
 ];
-const {setGlobalData, globaldata} = useContext<any | string>(State_data);
+const {setGlobalData, globaldata, setPriceAndLocationsDelete} = useContext<any | string>(State_data);
 const [search, setSearch] = useState<string>('');
 const [searched, setSearched] = useState<string[]>([]);
-const {locationsData, locationsMutate} = useLocations(globaldata)
 const [check, setCheck] = useState<string[]>([]);
+const [checkIt, setCheckIt] = useState<string[]>([]);
 function handleCheckAll(event:any){
     if(event.target.checked){
         setCheck([...statesInNig]);
+        setCheckIt([...statesInNig])
     }
     else {
         setCheck([])
+        setCheckIt([])
     }
 }
-
 function handleStateChange(event:any, state:string){
     if(event.target.checked){
         setCheck([...check, state])
+        setCheckIt((prev: any) => [...prev, state].filter((val: string, id: number, array: any) => array.indexOf(val) === id));
     }
     else{
         setCheck(item => item.filter(value => value !== state))
+        setCheckIt((prev: any) => [...prev]?.filter((data: string) => data !== state));
     }
 }
 
@@ -51,18 +56,33 @@ useEffect(() => {
 }, [search])
 
 const handleDone = () => {
-    if(locationsData?.data?.length === 0){
-        setGlobalData((prev: string[]) => [...prev, ...check].filter((val,id,array) => array.indexOf(val) == id));
-    }
-    if(locationsData?.data?.length > 0){
-        setGlobalData(() => [ ...locationsData?.data, ...check].filter((val,id,array) => array.indexOf(val) == id));
-    }
+    // if(getLocationsData?.data?.length !== 0){
+        // setGlobalData([])
+        // setGlobalData((prev: string[]) => [...prev, ...check].filter((val,id,array) => array.indexOf(val) == id));
+    // }
+    // if(getLocationsData?.data?.length > 0){
+        // handleShow(false)        
+        // setGlobalData(() => [ ...getLocationsData?.data, ...check].filter((val,id,array) => array.indexOf(val) == id));
+        // }
+    setGlobalData(() => [ ...check, ...checkIt].filter((val,id,array) => array.indexOf(val) == id));
+    setCheckIt(() => [...globaldata])
+    setPriceAndLocationsDelete((prev: any) => ({...prev, locationsAdded: false}))
+    handleShow(false)
 }
 
-console.log(globaldata)
+function handleClose(){
+    handleShow(false)
+}
+
+const {getLocationsMutate} = useFetchLocations();
 
 useEffect(() => {
-    locationsMutate();
+    handleShow(true)
+},[])
+
+useEffect(() => {
+    getLocationsMutate();
+    setCheckIt((prev: string[]) => [...globaldata, ...prev].filter((val: string, id: number, array: any) => array.indexOf(val) === id))
 }, [globaldata])
 
     return(
@@ -80,7 +100,6 @@ useEffect(() => {
                     <input type="text" className="text-green-700 bg-gray-200 outline-0 h-fit w-full" placeholder="Search State" value={search} onChange={handleSearch} />
                 </div>
 
-
                  <span className="flex text-sm mt-3 text-gray-500 justify-between items-center">
                  <div className="flex justify-start gap-3 items-center">
                     <input 
@@ -92,7 +111,7 @@ useEffect(() => {
                     />
                     <label htmlFor="selectAll">{check.length === statesInNig.length ? "Unselect All" : "Select All"}</label>
                    </div>
-                   {check.length > 0 && <p>{check.length} selected</p>}
+                   <p>{checkIt.length || '0'} selected</p>
                  </span>
 
                  <hr className="my-2" />
@@ -102,13 +121,13 @@ useEffect(() => {
                     <div>
                     {
                        !search.length && statesInNig.map((state: string) => (
-                        <div className="flex justify-start gap-2 items-center">
+                        <div key={Password()} className="flex justify-start gap-2 items-center">
                             <input 
                             type="checkbox" 
                             id={state}   
                             name={state} 
                             className="accent-green-500"
-                            checked={check.includes(state)}
+                            checked={!checkIt?.includes(state) ? check.includes(state) : checkIt?.includes(state)}
                             onChange={event => handleStateChange(event, state)}
                             value={state}
                             />
@@ -119,15 +138,15 @@ useEffect(() => {
                     ))}
 
                     {
-                        search.length && searched.length ?
+                        search.length > 0 && searched.length &&
                             searched?.map((state: string) => (
-                                <div className="flex justify-start gap-2 items-center">
+                                <div key={Password()} className="flex justify-start gap-2 items-center">
                                     <input 
                                     type="checkbox" 
                                     id={state}   
                                     name={state} 
                                     className="accent-green-500"
-                                    checked={check.includes(state)}
+                                    checked={!checkIt?.includes(state) ? check.includes(state) : checkIt?.includes(state)}
                                     onChange={event => handleStateChange(event, state)}
                                     value={state}
                                     />
@@ -135,10 +154,10 @@ useEffect(() => {
                                     htmlFor={state}>{state}</label>
                                     <br/>
                                 </div>                            
-                        )) : ""}
+                        ))}
 
                         {
-                            search.length && !searched.length && <h1 className="text-red-600 animate__animated animate__headShake">Not Found</h1>
+                            search.length > 0 && !searched.length && <h1 className="text-red-600 animate__animated animate__headShake">Not Found</h1>
                         }
 
                     </div>
@@ -146,7 +165,7 @@ useEffect(() => {
 
                  <span className="font-bold mt-3 w-full laptop:text-base desktop:text-lg phone:text-sm w-fit flex justify-between items-center relative">
                     <Button buttonName="Done" handleClick={handleDone}/>
-                    <button onClick={() => handleShow(false)} className="font-bold mt-2 text-red-600">Cancel</button>
+                    <button onClick={handleClose} className="font-bold mt-2 text-red-600">Cancel</button>
                  </span>
                 </div>
             </div>

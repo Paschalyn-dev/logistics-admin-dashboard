@@ -1,4 +1,5 @@
 export const CUSTOMERSWRKEYS = {
+    getLocations: 'GET_LOCATIONS',
     customerKey: "CUSTOMER_CREDENTIALS",
     forgotPassword: "CUSTOMER_FORGOT_PASSWORD",
     changePassword: 'CUSTOMER_CHANGE_PASSWORD',
