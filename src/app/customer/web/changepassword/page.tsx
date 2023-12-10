@@ -14,9 +14,11 @@ import { customerAPIUrl } from "@/app/dashboard/services/api-url/customer-api-ur
 import { authorizationKeyCustomer } from "@/app/dashboard/services/customer-api/api";
 import ErrorAndSucccessHandlers from "@/app/dashboard/services/eventhandlers/error-and-success-handlers";
 import Loader from "@/app/dashboard/services/Loader/spinner";
+import { useGetBusiness } from "@/app/dashboard/services/swr-functions/customer-swr";
 
 export default function     CustomerChangePassword(){
     const [passwordString, setPasswordString] = useState<boolean>(true);
+    const {getBusinessData} = useGetBusiness()
     const [changePassword, setChangePassword] = useState<any>({
         info: "",
         result: ""
@@ -70,8 +72,8 @@ export default function     CustomerChangePassword(){
         <div className="w-full absolute phone:top-0 after-tablet:top-10 laptop:top-0 flex justify-center items-center h-full">
             <div className="tablet:w-2/4 after-tablet:w-1/3 laptop:w-2/4 phone:w-11/12 p-5 rounded-3xl" id="transparent">
                 <div className="flex flex-col justify-center items-center">
-                    <Image className="w-10 mb-2" src={logo} alt="logo" />
-                    <h5 className="text-sm text-gray-800">CakenUs Services</h5>
+                    <Image className="w-10 mb-2" src={getBusinessData?.data?.image} alt="logo" />
+                    <h5 className="text-sm text-gray-800">{getBusinessData?.data?.title}</h5>
                 </div>
                 {
                     changePassword.result !== "" && changePassword.info !== "" && 

@@ -8,7 +8,7 @@ import Section from "../../section";
 import Holder from "../../holder";
 import Time from "@/app/time";
 import BoxesHolder from "../../boxesholder";
-import { useActiveShipmentsCount, useAllDispatchersFetcher, useCompanyRevenue, useCountParcel, useCustomerCount, useDeliveredParcels, useLateParcels, useTodayRevenue } from "../../services/swr-functions/customer-swr";
+import { useActiveShipmentsCount, useAllDispatchersFetcher, useCompanyRevenue, useCountParcel, useCustomerCount, useDeliveredParcels, useGetBusiness, useLateParcels, useTodayRevenue } from "../../services/swr-functions/customer-swr";
 import { useCountDispatcher, useCountStaff, useFetchLocations} from "../../services/swr-functions/staff-swr";
 import { NumberComma } from "../../numberComma";
 import Input from "../../input";
@@ -24,6 +24,7 @@ export default function Overview(){
     const {parcelLatesData} = useLateParcels();
     const {countStaffData} = useCountStaff();
     const {countRidersData} = useCountDispatcher();
+    const {getBusinessData} = useGetBusiness()
     const {todayRevenueData} = useTodayRevenue();
     const {getLocationsData, getLocationsError, getLocationsIsLoading, getLocationsIsValidating} = useFetchLocations();
     const {dispatcherAllData, dispatcherAllIsValiddating, dispatcherAllIsLoading} = useAllDispatchersFetcher();
@@ -42,7 +43,7 @@ export default function Overview(){
                     <div>
                         <div className="flex w-fit justify-start gap-3 font-bold phone:text-xl tablet:text-2xl laptop:text-3xl desktop:text-4xl bigger-desktop:text-5xl items-center">
                             <Time />
-                            <Link href="/" className="text-gray-500/90">CakenUs Services</Link>
+                            <Link href="/" className="text-gray-500/90">{getBusinessData?.data?.title}</Link>
                         </div>
                         <p className="text-gray-500 ">Here's how your business is doing.</p>
                     </div>
