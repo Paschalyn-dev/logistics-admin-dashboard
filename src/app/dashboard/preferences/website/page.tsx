@@ -266,7 +266,7 @@ export default function WebsitePreferences(){
                   <div className="flex phone:flex-col laptop:gap-10 phone:text-center phone:justify-center laptop:justify-start laptop:flex-row phone:items-center laptop:items-center w-full h-fit">
                     <div>
                         <span className="rounded-full relative flex justify-center items-center p-1">
-                            <img className={uploadFile?.info ? "rounded-full brightness-50 bg-gray-200/40 p-1 shadow h-15 w-40" : "rounded-full h-15 w-40 bg-gray-200/40 p-1 shadow"} title={uploadFile?.info} src={uploadFile?.info ? imageSRC : getBusinessData?.data?.image} alt="logo" />
+                            <img className={uploadFile?.info ? "rounded-full brightness-50 bg-gray-200/40 p-1 shadow h-40 w-40" : "rounded-full h-40 w-40 bg-gray-200/40 p-1 shadow"} title={uploadFile?.info} src={uploadFile?.info ? imageSRC : getBusinessData?.data?.image} alt="logo" />
                             {uploadFile?.info && <button onClick={() => setUploadFile((prev: any) => ({...prev, code: Password()}))} className='absolute bg-green-700 p-1 rounded-xl text-gray-50 hover:bg-green-800 left-14'>Upload</button>}
                         </span>
                     <span className="relative w-full flex justify-center gap-20 items-center bottom-10">             
