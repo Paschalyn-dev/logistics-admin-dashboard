@@ -20,7 +20,7 @@ export default function EditParcel({ params }: { params: {id: number}}){
     setOpenUIBoxes((prev: any) => ({...prev, customerPopup: false}))
   }
   const {viewCustomerData,
-    viewCustomerError,
+ viewCustomerError,
  viewCustomerIsLoading,
  viewCustomerIsValidating,
  viewCustomerMutate} = useViewCustomers(params.id);

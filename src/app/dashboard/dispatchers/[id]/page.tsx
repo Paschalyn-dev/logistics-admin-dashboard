@@ -16,11 +16,11 @@ import SkeletonLoading from "../../services/eventhandlers/skeleton-loading";
 import SuccessMessage from "../../successmessage";
 
 export default function EditParcel({ params }: { params: {id: number}}){
-  const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes, successMessage} = useContext(State_data);
-  const handleCloseFill = () => {
-    setOpenUIBoxes((prev: any) => ({...prev, dispatcherPopup: false}))
-  }
-  const {viewDispatcherData,
+    const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes, successMessage} = useContext(State_data);
+    const handleCloseFill = () => {
+      setOpenUIBoxes((prev: any) => ({...prev, dispatcherPopup: false}))
+    }
+    const {viewDispatcherData,
     viewDispatcherError,
     viewDispatcherIsLoading,
     viewDispatcherIsValidating,

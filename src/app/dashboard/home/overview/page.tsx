@@ -43,7 +43,7 @@ export default function Overview(){
                     <div>
                         <div className="flex w-fit justify-start gap-3 font-bold phone:text-xl tablet:text-2xl laptop:text-3xl desktop:text-4xl bigger-desktop:text-5xl items-center">
                             <Time />
-                            <Link href="/" className="text-gray-500/90">{getBusinessData?.data?.title}</Link>
+                            <Link href="/dashboard/profile" className="text-gray-500/90">{getBusinessData?.data?.title}</Link>
                         </div>
                         <p className="text-gray-500 ">Here's how your business is doing.</p>
                     </div>
@@ -117,8 +117,7 @@ export default function Overview(){
                     {/* <div>
                         <img src="https://charts.livegap.com/Gallery/images/Chart-10.png" alt="chart" />
                     </div> */}
-
-                    <div className="grid my-8 phone:grid-flow-row phone:grid-rows-auto laptop:grid-rows-2 laptop:grid-flow-col gap-4">
+                    <div className="grid my-8 w-full phone:grid-flow-row phone:grid-rows-auto laptop:grid-rows-2 laptop:grid-flow-col gap-4">
                      <div className="laptop:col-span-2 shadow-xs bg-gray-50 p-5 rounded-3xl col-span-2">
                         <div className="flex justify-start items-center gap-2">
                             <i className="icon ion-md-locate" title="Location"></i>
@@ -128,9 +127,9 @@ export default function Overview(){
                     <div> 
                         <div className="w-fit overflow-y-auto h-fit mb-10 mt-4 text-xs text-gray-500/50">
                             <div className="w-96 flex overflow-x-auto gap-5 justify-start items-center">
-                                {getLocationsData?.data?.map((state: string) => (
-                                    <h3 onClick={() => setLocation(state)} className={location === state ? "bg-amber-500/10 text-amber-500 p-2 text-base rounded-full cursor-pointer text-center" : "p-2 rounded-full text-base cursor-pointer text-center"}>{state}</h3>
-                                ))}
+                                {getLocationsData?.data?.map((state: string, i: number) => (
+                                    <h3 key={i} onClick={() => setLocation(state)} className={location === state ? "bg-amber-500/10 text-amber-500 p-2 text-base rounded-full cursor-pointer text-center" : "p-2 rounded-full text-base cursor-pointer text-center"}>{state}</h3>
+                                    ))}
                             </div>
                         </div>
 
@@ -158,7 +157,7 @@ export default function Overview(){
                             </div>
                         </div> 
                          : 
-                        <div className="flex py-16 justify-center items-center gap-2 flex-col">
+                         <div className="flex py-16 justify-center items-center gap-2 flex-col">
                             <i id="bigger" className="icon ion-md-pin"></i>
                             { getLocationsError ? 
                                 <h1 className="text-lg text-red-500">Error occured!</h1> :
@@ -193,7 +192,7 @@ export default function Overview(){
 
                     {/* third box */}
 
-                   <div className="laptop:row-span-3 gap-10 shadow-xs col-span-2 flex flex-col justify-start bg-gray-50 rounded-3xl p-5">
+                   <div className="laptop:row-span-3 phone:gap-10 laptop:gap-20 shadow-xs col-span-2 flex flex-col justify-start bg-gray-50 rounded-3xl p-5">
                     <div>
                         <div className="flex justify-start gap-3 items-center">
                           <i className="icon ion-md-bicycle"></i>
@@ -205,9 +204,9 @@ export default function Overview(){
                         </p>
                     </div>
                     <hr />
-                    <div className="flex overflow-y-auto gap-8 flex-wrap w-fit phone:h-60 laptop:h-screen justify-start items-start">
+                    <div className="flex overflow-y-auto gap-8 flex-wrap w-fit phone:h-60 laptop:h-96 justify-start items-start">
                         { dispatcherAllData?.data?.sort((a: any, b: any) => Number(a.parcels) - Number(b.parcels))?.map((dispatcher: any, index: any) => (
-                            <div>
+                            <div key={index}>
                                 <div className="flex justify-start text-gray-500 text-sm items-center gap-1">
                                     <span className="w-2 rounded-sm h-2 bg-green-600"></span>
                                     <p>{dispatcher?.fullName.length > 10 ? dispatcher.fullName.slice(0, 10) + "..." : dispatcher?.fullName}</p>

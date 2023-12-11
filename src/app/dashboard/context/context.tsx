@@ -40,7 +40,9 @@ export default function Context({children}: any){
         locations: false,
         payment: false,
         deliveryPrice: false,
-        deleteDeliveryPrice: false
+        deleteDeliveryPrice: false,
+        passwordUpdate: false,
+        profileUpdate: false
     })
     const [searchData, setSearchData] = useState<any>({
         parcelInfo: "",
@@ -64,6 +66,7 @@ export default function Context({children}: any){
         reviewInfo: "",
         reviewResult: "",
         reviewCode:  "",
+        profileUpdate: false
     })
     const [priceAndLocationsDelete, setPriceAndLocationsDelete] = useState<any>({
         priceInfo: "",
@@ -161,6 +164,7 @@ export default function Context({children}: any){
         input: false,
         distancePricesWelcomePage: true,
         error: true,
+        passwordUpdate: false,
         changeDispatcher: false,
         locationsSaved: false,
         activeShipment: true,

@@ -17,6 +17,7 @@ import { Password } from "../../formik/password";
 import Button from "../../button";
 import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
 import Loader from "../../services/Loader/spinner";
+import DefaultInput from "../../profile/input";
 
 export default function WebsitePreferences(){
     const [imageSRC, setImageSRC] = useState<any>('')
@@ -69,8 +70,6 @@ export default function WebsitePreferences(){
         verified: false,
         website: '',
     });
-
-    console.log(getBusinessData?.data?.contact?.whatsapp)
 
     useEffect(() => {
         if(getBusinessData?.data){
@@ -284,7 +283,7 @@ export default function WebsitePreferences(){
 
                     <div className="flex phone:flex-col laptop:flex-col phone:justify-center laptop:justify-start laptop:items-start phone:items-center">
                         <Heading heading="Website Preferences" />
-                        <p className="phone:text-sm laptop:text-base -mt-3 text-gray-500">Customize what your frontpage at <a className="text-gray-900" href="https://cakenus.logistix.africa">https://cakenus.logistix.africa</a> looks like.</p>
+                        <p className="phone:text-sm laptop:text-base -mt-3 text-gray-500">Customize what your frontpage at <a className="text-gray-900" target="_blank" href="https://cakenus.logistix.africa">https://cakenus.logistix.africa</a> looks like.</p>
                     </div>
                   </div>
 
@@ -296,22 +295,22 @@ export default function WebsitePreferences(){
                          <p>Default</p>                         
                     </div>
                     <SubHeading subheading="Title" />
-                    <input name="title" value={formData?.title} onChange={handleFormData} type="text" className="w-full bg-gray-100 p-3 rounded-lg outline-0 "  />
+                    <DefaultInput name="title" value={formData?.title} onChange={handleFormData} type="text" className="w-full bg-gray-100 p-3 rounded-lg outline-0 "  />
                     <SubHeading subheading="Entry Text" />
-                    <input name="entry_text" value={formData?.entryText} onChange={handleFormData} type="text" className="w-full bg-gray-100 p-3 rounded-lg outline-0 "/>
+                    <DefaultInput name="entry_text" value={formData?.entryText} onChange={handleFormData} type="text" className="w-full bg-gray-100 p-3 rounded-lg outline-0 "/>
                     <SubHeading subheading="Maintenance Mode"/>
                     <p className="mt-2 text-sm">If for any reason you need to take your website offline, you can turn on maintenance mode.</p>
                     <ToggleButton onOff={formData.maintenance} handleOnOff={handleToggleOnOff} title={formData.maintenance ? "Turn On" : "Turn Off"} />
                     <SubHeading subheading="Contact Information" />
                     <div className="mt-2">
                         <label htmlFor="street" className="text-gray-500 text-base">Office Address</label>
-                        <input name="street" value={formData.address.street} onChange={handleInnerFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
+                        <DefaultInput name="street" value={formData.address.street} onChange={handleInnerFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
                         <label htmlFor="email" className="text-gray-500 text-base">Email Address</label>
-                        <input name="email" value={formData?.email} onChange={handleFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
+                        <DefaultInput name="email" value={formData?.email} onChange={handleFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
                         <label htmlFor="phone" className="text-gray-500 text-base">Phone</label>
-                        <input name="phone" value={formData?.phone} onChange={handleFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
+                        <DefaultInput name="phone" value={formData?.phone} onChange={handleFormData} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
                         <label htmlFor="whatsapp" className="text-gray-500 text-base">Whatsapp Contact</label>
-                        <input name="whatsapp" value={formData?.contact?.whatsapp} onChange={handleContact} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
+                        <DefaultInput name="whatsapp" value={formData?.contact?.whatsapp} onChange={handleContact} type="text" className="w-full mb-8 bg-gray-100 p-3 rounded-lg outline-0 "  />
                     </div>
                     <div>
                         <SubHeading subheading="Social Media" />

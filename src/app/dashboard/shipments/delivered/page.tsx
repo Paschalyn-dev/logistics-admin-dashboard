@@ -54,9 +54,9 @@ export default function Delivered(){
 
             <BoxesHolder>
                {deliveredParcelsData?.data && 
-                    (deliveredParcelsData.data.map((parcel: any) => {
+                    (deliveredParcelsData.data.map((parcel: any, index: number) => {
                         return(
-                        <div className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
+                        <div key={index} className="bg-gray-50 hover:shadow-lg rounded-xl h-fit phone:w-11/12 tablet:w-5/12 p-5">
                             <div className="flex justify-between">
                                 <div>
                                     <p className="text-green-600 text-xs">DELIVERED</p>

@@ -25,6 +25,9 @@ export default function HomeNav(){
 
     useEffect(() => {
       setClickIt(pathname)
+      if(pathname.includes('/dashboard/profile')){
+        setClickIt('/dashboard/home/overview')
+      }
     }, [pathname])  
 
 

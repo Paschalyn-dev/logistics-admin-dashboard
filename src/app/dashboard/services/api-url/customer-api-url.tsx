@@ -22,6 +22,7 @@ export function dateStringChanger(date: any){
 }
 
 export const customerAPIUrl= {
+    updateProfile: (id: number) => `https://logapi.logsitixng.com/api/b2c/user/${id}`,
     fetchCustomer: "https://logapi.logistixng.com/api/b2c/user/login",
     forgotCustomerPassword: 'https://logapi.logistixng.com/api/b2c/user/forgotPassword',
     changePassword: 'https://logapi.logistixng.com/api/b2c/user/changePassword',

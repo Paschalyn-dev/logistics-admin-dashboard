@@ -34,7 +34,11 @@ export default function Sidebar() {
   
   useEffect(() => {
     setClicked(pathname)
+    if(pathname.includes('/dashboard/profile')){
+      setClicked('/dashboard/home/overview')
+    }
   }, [pathname])
+
 
     return(
       <div className={ windowWidth <= 1025 ? "animate__animated animate__slideInLeft fixed flex flex-col justify-start items-center z-20 top-0 bottom-0 left-0 text-white w-fit h-full bg-stone-900 text-center shadow-lg" : "fixed flex flex-col justify-start items-center z-20 top-0 bottom-0 left-0 text-white w-fit h-full bg-stone-900 text-center shadow-lg"}>
