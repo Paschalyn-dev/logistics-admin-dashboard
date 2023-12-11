@@ -284,9 +284,9 @@ export default function Profile(){
 
                     <div className="bg-red-50 my-20 py-10 rounded-lg w-full px-5 h-fit">
                         <div className="flex gap-5 mb-6 flex-wrap justify-between items-center">
-                            <div className="flex justify-start items-center">
-                                <i className="icon ion-md-danger" />
-                                <p className="text-gray-500 text-lg font-bold">Danger Zone</p>
+                            <div className="flex text-gray-500 text-lg justify-start gap-2 items-center">
+                                <i className="icon ion-md-sad" />
+                                <p className="font-bold">Danger Zone</p>
                             </div>
                             <p className="rounded-lg text-sm text-green-500 bg-green-100 p-2">COMING SOON</p>
                         </div>
