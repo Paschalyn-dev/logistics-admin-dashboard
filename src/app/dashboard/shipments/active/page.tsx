@@ -306,10 +306,10 @@ export default function Shipments(){
                             <div className="flex phone:gap-4 laptop:gap-2 phone:flex-col laptop:flex-row">
                                 { handleFiltered(parcel?.rider) ?
                                     <a href={`https://api.whatsapp.com/send?phone=${handleDispatcherNumber(parcel?.rider)}&text=Hello%20${handleFetchDispatcher(parcel?.rider)}%2C%20I%20got%20your%20contact%20from%20Logistix%20Africa%20website.%20I%20want%20to%20ship%20a%20parcel.%20My%20name%20is%20${parcel?.pickUp?.name}.`} target="_blank">
-                                        <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
+                                        <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 h-fit w-fit phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
                                     </a> : 
                                     <button onClick={handleNoRider}>
-                                        <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
+                                        <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 h-fit w-fit phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
                                     </button>
                                 }
                                 <button onClick={() => handleFiltered(parcel?.rider) ? handleDispatcherEmail(parcel?.pickUp?.name, parcel?.rider) : handleNoRider()}>
@@ -389,10 +389,10 @@ export default function Shipments(){
                             <div className="flex phone:gap-4 laptop:gap-2 phone:flex-col laptop:flex-row">
                             { handleFiltered(parcelRange?.rider) ?
                                     <a href={`https://api.whatsapp.com/send?phone=${handleDispatcherNumber(parcelRange?.rider)}&text=Hello%20${handleFetchDispatcher(parcelRange?.rider)}%2C%20I%20got%20your%20contact%20from%20Logistix%20Africa%20website.%20I%20want%20to%20ship%20a%20parcel.%20My%20name%20is%20${parcelRange?.pickUp?.name}.`} target="_blank">
-                                        <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
+                                        <i className="icon ion-md-call text-green-300 phone:px-4 h-fit w-fit phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
                                     </a> : 
                                     <button onClick={handleNoRider}>
-                                        <i className="icon ion-md-call text-green-300 phone:px-4 phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
+                                        <i className="icon ion-md-call text-green-300 phone:px-4 h-fit w-fit phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
                                     </button>
                                 }
                                 <button onClick={() => handleFiltered(parcelRange?.rider) ? handleDispatcherEmail(parcelRange?.pickUp?.name, parcelRange?.rider) : handleNoRider()}>

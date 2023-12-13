@@ -27,6 +27,7 @@ import SkeletonLoading from "../services/eventhandlers/skeleton-loading";
 
 export default function Profile(){
     const [imageSRC, setImageSRC] = useState<any>('')
+    const [base, setBase] = useState<any>();
     const router = useRouter();
     const [formDataUpdate, setFormDataUpdate] = useState<any>({
         info: "",
@@ -117,6 +118,16 @@ export default function Profile(){
         setSuccessMessage((prev: any) => ({...prev, passwordUpdate: false}))
     }
 
+    const imageChange = (e: any) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setUploadFile((prev: any) => ({...prev, info: e.target.files[0], result: ""}));
+        };
+    };
+    
+    const removeSelectedImage = () => {
+        setUploadFile((prev: any) => ({...prev, info: ''}));
+    };
+
     const handleInnerFormData = (event: any) => {
         const {name, value} = event.target;
         setFormData((prev: any) => { 
@@ -128,6 +139,34 @@ export default function Profile(){
         setFormDataUpdate((prev: any) => ({...prev, code: Password(), info: formData, result: ""}))
         setSuccessMessage((prev: any) => ({...prev, profileUpdate: false}))
     }
+
+    const handleUpload = async() => {
+        if(window.FormData){
+            const fileReader = new FormData();
+            if(uploadFile?.info){
+                fileReader.append('name', 'business-cakenus')
+                fileReader.append('file', uploadFile?.info);
+                    setBase(fileReader);
+                    setUploadFile((prev: any) => ({...prev, code: Password()}))
+                }
+            }
+            setSuccessMessage((prev: any) => ({...prev, changeDp: false}))
+    }
+
+    async function handleChangeDP() {
+        const response = await fetch(customerAPIUrl.changeDp, {
+            method: 'POST',
+            body: base,
+            headers: {
+                    // "Content-Type": "multipart/form-data",
+                    "Authorization": authorizationKeyCustomer
+                },
+            });
+            const data = await response.json();
+            setUploadFile((prev: any) => ({...prev, result: data}));
+            setLoading((prev: any) => ({...prev, changeDP: false}))
+            setSuccessMessage((prev: any) => ({...prev, changeDp: true}))
+        }
 
     async function passwordUpdateFetcher(profileDetails: any) {
         const response = await fetch(staffAPIURL.changePassword, {
@@ -177,6 +216,28 @@ export default function Profile(){
         }
     },[formDataUpdate?.code])
 
+    useEffect(() => {
+        if(uploadFile?.result){
+            getBusinessMutate(getBusinessData?.data)
+            setUploadFile((prev: any) => ({...prev, info: ""}));
+        }
+    }, [uploadFile?.result])
+
+    useEffect(() => {
+        if(uploadFile?.info !== "" && uploadFile?.result === ""){
+            setLoading((prev: any) => ({...prev, changeDP: true}))
+        }
+        if(uploadFile?.info !== ""){
+            handleChangeDP();
+        }
+    }, [uploadFile?.code]);
+                    
+    useEffect(() => {
+        if(uploadFile?.info !== ""){
+            setImageSRC(URL.createObjectURL(uploadFile?.info))
+        }
+    },[uploadFile?.info])
+
     return(
         <Holder>
             {
@@ -184,7 +245,7 @@ export default function Profile(){
                 <SkeletonLoading title="profile details..." loadingSearching="Loading" />
             }
             {
-                loading.passwordUpdate || loading.profileUpdate && <Loader />
+                loading.passwordUpdate || loading.profileUpdate || loading.changeDP && <Loader />
             }
             {  passwordUpdate.info !== "" && passwordUpdate.result !== "" &&
                 <ErrorAndSucccessHandlers
@@ -214,6 +275,20 @@ export default function Profile(){
                 data={formDataUpdate?.result}
                 />
             }
+            {  successMessage.changeDp && uploadFile.result !== "" &&
+                <ErrorAndSucccessHandlers
+                name="changeDp"
+                successName={successMessage.changeDp}
+                message={uploadFile?.result?.code} 
+                code={uploadFile?.code}
+                successmessage="Your profile image has been updated!"
+                failedmessage="Sorry, your profile image cannot be updated!" 
+                staffAndCustomer={uploadFile?.result}
+                error={uploadFile?.result?.code !== 200}
+                loading={uploadFile?.result === "" && uploadFile?.info !== "" && uploadFile?.code !== ""}
+                data={uploadFile?.result}
+                />
+            }
             <HomeNav />
             <Section>
                 <Link href="/dashboard/home/overview">
@@ -222,24 +297,30 @@ export default function Profile(){
                     </div>
                 </Link>
                 <div className="bg-gray-50 mt-5 p-5 rounded-2xl w-full relative h-full">
-                    <div className="flex phone:flex-col laptop:gap-10 phone:text-center phone:justify-center laptop:justify-start laptop:flex-row phone:items-center laptop:items-center w-full h-fit">
-                        <div>
-                            <span className="rounded-full relative flex justify-center items-center p-1">
-                                <img className={uploadFile?.info ? "rounded-full brightness-50 bg-gray-200/40 p-1 shadow h-40 w-40" : "rounded-full h-40 w-40 bg-gray-200/40 p-1 shadow"} title={uploadFile?.info} src={uploadFile?.info ? imageSRC : getBusinessData?.data?.image} alt="logo" />
-                                {uploadFile?.info && <button onClick={() => setUploadFile((prev: any) => ({...prev, code: Password()}))} className='absolute bg-green-700 p-1 rounded-xl text-gray-50 hover:bg-green-800 left-14'>Upload</button>}
-                            </span>
-                        <span className="relative w-full flex justify-center gap-20 items-center bottom-10">             
-                        <span title={uploadFile?.info} className="relative rounded-full shadow h-fit cursor-pointer bg-gray-50 w-6">
-                                <label title={uploadFile?.info} className=" cursor-pointer rounded-full" htmlFor="upload">
-                                    <i className="icon ion-md-camera"></i>
-                                </label>
-                                <input id='upload' name='upload' accept="image/*" type="file" className="absolute w-0 z-1 top-10 left-10 text-sm text-gray-50" />
-                            </span> 
-                            <button className="rounded-full shadow h-fit bg-gray-50 w-6">
-                                <i className="icon ion-md-close"></i>
-                            </button>
-                        </span>
-                        </div>
+                  <div className="flex phone:flex-col laptop:gap-10 phone:text-center phone:justify-center laptop:justify-start laptop:flex-row phone:items-center laptop:items-center w-full h-fit">
+                    <div>
+                            { uploadFile?.info !== "" ? 
+                                <span className="rounded-full relative flex justify-center items-center p-1">
+                                    <img className="rounded-full brightness-50 bg-gray-200/40 p-1 shadow h-40 w-40" title={uploadFile?.info} src={imageSRC} alt="logo" />
+                                    <button onClick={handleUpload} className='absolute bg-green-700 p-1 rounded-xl text-gray-50 hover:bg-green-800 left-14'>Upload</button>
+                                </span>
+                                :
+                                <div>
+                                    <img className="rounded-full h-40 w-40 bg-gray-200/40 p-1 shadow" title={getBusinessData?.data?.title} src={getBusinessData?.data?.image} alt="logo" />
+                                </div>
+                            }
+                    <span className="relative w-full flex justify-center gap-20 items-center bottom-10">             
+                       <span title={uploadFile?.info} className="relative rounded-full shadow h-fit cursor-pointer bg-gray-50 w-6">
+                            <label title={uploadFile?.info} className=" cursor-pointer rounded-full" htmlFor="upload">
+                                <i className="icon ion-md-camera"></i>
+                            </label>
+                            <input id='upload' name='upload' onChange={imageChange} accept="image/*" type="file" className="absolute w-0 z-1 top-10 left-10 text-sm text-gray-50" />
+                        </span> 
+                        <button onClick={removeSelectedImage} className="rounded-full shadow h-fit bg-gray-50 w-6">
+                            <i className="icon ion-md-close"></i>
+                        </button>
+                    </span>
+                    </div>
 
                         <div className="flex phone:flex-col laptop:flex-col phone:justify-center laptop:justify-start laptop:items-start phone:items-center">
                             <Heading heading={formData?.fullName ? formData?.fullName : getBusinessData?.data?.title} />

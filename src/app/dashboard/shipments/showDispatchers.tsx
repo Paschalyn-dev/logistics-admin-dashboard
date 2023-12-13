@@ -61,14 +61,14 @@ export default function ShowDispatchers ({show, mutate, setShow}: any){
                     <div className="overflow-y-auto overflow-x-hidden h-3/5">
                         {  search.text === "" ?
                             dispatcherAllData?.data?.map((dispatcher: any, i: number) => (
-                                <div  onClick={() => handleClick(dispatcher.fullName)} className={fullName === dispatcher?.fullName  ? "p-2 rounded-lg flex gap-3 bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex gap-3 mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
+                                <div key={i} onClick={() => handleClick(dispatcher.fullName)} className={fullName === dispatcher?.fullName  ? "p-2 rounded-lg flex gap-3 bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex gap-3 mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
                                     <p>{i + 1}</p>
                                     <p>{dispatcher.fullName}</p>
                                 </div>
                             ))
                             :
                             search.objects.map((searches: any, i: number) => (
-                                <div  onClick={() => handleClick(searches.fullName)} className={searches.fullName === fullName ? "p-2 rounded-lg flex gap-3 bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex gap-3 mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
+                                <div key={i}  onClick={() => handleClick(searches.fullName)} className={searches.fullName === fullName ? "p-2 rounded-lg flex gap-3 bg-amber-100 mr-2 my-2 cursor-pointer":"p-2 rounded-lg flex gap-3 mr-2 my-2 hover:bg-gray-200 cursor-pointer"}>
                                     <p>{i + 1}</p>
                                     <p>{searches.fullName}</p>
                                 </div>

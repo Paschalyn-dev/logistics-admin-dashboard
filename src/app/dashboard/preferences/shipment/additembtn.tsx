@@ -13,10 +13,9 @@ import Loader from "../../services/Loader/spinner";
 type CALCULATOR = {
     showCalculator: boolean;
     handleShowCalculator: any;
-    mutate: any;
 }
 
-export default function AddItem({showCalculator, mutate, handleShowCalculator}: CALCULATOR){
+export default function AddItem({showCalculator, handleShowCalculator}: CALCULATOR){
     const {globalPriceList, successMessage, setLoading, loading} = useContext<any | number[]>(State_data);
     const [checkQuantity, setCheckQuantity] = useState<any>({
         from: 0, 

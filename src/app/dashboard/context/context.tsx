@@ -30,6 +30,7 @@ export default function Context({children}: any){
     })
     const [loading, setLoading] = useState({
         staffL: false,
+        changeDP: false,
         customerL: false,
         parcel: false,
         customer: false,
@@ -164,6 +165,7 @@ export default function Context({children}: any){
         input: false,
         distancePricesWelcomePage: true,
         error: true,
+        changeDp: false,
         passwordUpdate: false,
         changeDispatcher: false,
         locationsSaved: false,

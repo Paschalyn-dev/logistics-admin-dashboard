@@ -260,10 +260,6 @@ export default function ShipmentPreferences(){
     return(
         <Holder>
             {
-                loading.locations || loading.payment || loading.deleteDeliveryPrice &&
-                <Loader />
-            }
-            {
                 businessChangeIsLoading || businessChangeIsValidating &&
                 <SkeletonLoading title="payment methods" loadingSearching="Loading" />
             }
@@ -328,6 +324,10 @@ export default function ShipmentPreferences(){
             }
             <PreferencesNav />
             <Section>
+            {
+                (loading.locations || loading.payment || loading.deleteDeliveryPrice) &&
+                <Loader />
+            }
              <Hero icon="icon ion-md-cube" heading="Shipment Preferences" description="Customize your shipment preferences by mapping Parcel size against Distance and Price">
                 <div className="text-left">
                     <SubHeading subheading="Payment Options" />
@@ -436,7 +436,7 @@ export default function ShipmentPreferences(){
                     </div>
                    }
                    </div>
-                    <AddItem showCalculator={state.showCalculator} mutate={getDistancePriceMutate()} handleShowCalculator={handleShowCalculator} />
+                    <AddItem showCalculator={state.showCalculator}  handleShowCalculator={handleShowCalculator} />
                     {state.showCalculator && <OpenCalculator handleNoShow={handleShowCalculator} />}
                 </div>
              </Hero>

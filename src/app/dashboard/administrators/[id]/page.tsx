@@ -10,12 +10,10 @@ import {useDateHandler} from "../../date"
 import EditHeading from "../../editHeading"
 import {useContext } from "react";
 import Popup from "../../services/eventhandlers/popup"
-import { useEffect } from "react";
 import ConstantNav from "../../constantNav";
 import { State_data } from "../../context/context"
 import SkeletonLoading from "../../services/eventhandlers/skeleton-loading"
 import SuccessMessage from "../../successmessage"
-import Loader from "../../services/Loader/spinner"
 
 export default function EditParcel({ params }: { params: {id: number}}){
   const handleCloseFill = () => {
@@ -24,11 +22,7 @@ export default function EditParcel({ params }: { params: {id: number}}){
   const {viewStaffData,
     viewStaffError,
     viewStaffIsLoading,
-    viewStaffIsValidating,
-    viewStaffMutate} = useViewStaff(params.id)
-    useEffect(() => {
-      viewStaffMutate();
-    }, [viewStaffMutate()]);
+    viewStaffIsValidating} = useViewStaff(params.id)
     const {setDeleteWithId, deleteWithId, openUIBoxes, setOpenUIBoxes, successMessage} = useContext(State_data);
     return(
       <Holder>

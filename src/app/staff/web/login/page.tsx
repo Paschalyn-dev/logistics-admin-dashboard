@@ -17,6 +17,7 @@ import { staffAPIURL } from "@/app/dashboard/services/api-url/staff-api-url";
 import { State_data } from "@/app/dashboard/context/context";
 import Loader from "@/app/dashboard/services/Loader/spinner";
 import { useGetBusiness } from "@/app/dashboard/services/swr-functions/customer-swr";
+import { authorizationKey } from "@/app/dashboard/services/staff-api/api";
 
 
 export default function Staff(){
@@ -46,6 +47,7 @@ export default function Staff(){
 useEffect(() => {
     if(staff?.result !== ""){
     const user = staff?.result?.data;
+    login(authorizationKey) //DON'T FORGET TO REMOVE THIS LINE
     if(staff?.result?.code === 200 && staff?.result?.data?.isDefaultPassword === false) {
         login(user.authToken)
         // staffStore.push(user);

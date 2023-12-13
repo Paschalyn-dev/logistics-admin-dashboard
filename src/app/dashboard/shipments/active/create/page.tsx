@@ -463,8 +463,8 @@ export default function FormPageShipments(){
                                 <SubHeading subheading="Payment" />
 
                                 <Select label="Payment Option" name="paymentType">
-                                    <option value="PAY_ON_DELIVERY">Pay On Delivery</option>
                                     <option value="PAY_ON_PICKUP">Pay On Pickup</option>
+                                    <option value="PAY_ON_DELIVERY">Pay On Delivery</option>
                                 </Select>
 
                                 <ToggleButton

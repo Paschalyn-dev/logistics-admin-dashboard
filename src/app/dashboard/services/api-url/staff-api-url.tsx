@@ -2,6 +2,7 @@ export const data = 'cakenus';
 export const company = 18;
 
 export const staffAPIURL = {
+    changeDp: `https://logapi.logistixng.com/api/b2b/${data}/staff/dp`,
     changePassword: `https://logapi.logistixng.com/api/b2b/${data}/staff/changePassword`,
     createStaff: `https://logapi.logistixng.com/api/b2b/${data}/staff`,
     stafflogin:  `https://logapi.logistixng.com/api/b2b/${data}/staff/login`,

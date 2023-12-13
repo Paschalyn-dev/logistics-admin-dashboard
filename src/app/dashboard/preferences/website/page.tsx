@@ -18,8 +18,10 @@ import Button from "../../button";
 import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-success-handlers";
 import Loader from "../../services/Loader/spinner";
 import DefaultInput from "../../profile/input";
+import { staffAPIURL } from "../../services/api-url/staff-api-url";
 
 export default function WebsitePreferences(){
+    const [base, setBase] = useState<any>();
     const [imageSRC, setImageSRC] = useState<any>('')
     const {getBusinessData, getBusinessError, getBusinessIsLoading, getBusinessIsValidating, getBusinessMutate} = useGetBusiness();
     const [updateWebsite, setUpdateWebsite] = useState<any>({
@@ -153,17 +155,32 @@ export default function WebsitePreferences(){
             return {...prev, socialAccounts: {...formData.socialAccounts, [name]: value}}
         })
     }
-    
+
+    console.log(successMessage.changeDp, loading.changeDP, 'dp')
+
+    const handleUpload = async() => {
+        if(window.FormData){
+            const fileReader = new FormData();
+            if(uploadFile?.info){
+                fileReader.append('name', 'business-cakenus')
+                fileReader.append('file', uploadFile?.info);
+                    setBase(fileReader);
+                    setUploadFile((prev: any) => ({...prev, code: Password()}))
+                }
+            }
+            setSuccessMessage((prev: any) => ({...prev, changeDp: false}))
+    }
+
     const imageChange = (e: any) => {
         if (e.target.files && e.target.files.length > 0) {
-            setUploadFile((prev: any) => ({...prev, info: e.target.files[0]}));
-        }
+            setUploadFile((prev: any) => ({...prev, info: e.target.files[0], result: ""}));
+        };
     };
-
+    
     const removeSelectedImage = () => {
         setUploadFile((prev: any) => ({...prev, info: ''}));
     };
-
+    
     async function websiteUpdateFetcher(websiteDetails: any) {
         const response = await fetch(customerAPIUrl.business, {
             method: 'PUT',
@@ -177,41 +194,40 @@ export default function WebsitePreferences(){
         setUpdateWebsite((prev: any) => ({...prev, result: data}))
         setSuccessMessage((prev: any) => ({...prev, saveWebsite: true}))
         setLoading((prev: any) => ({...prev, website: false}))
-        getBusinessMutate();
+        getBusinessMutate(getBusinessData?.data);
     }
-    
+        
     async function handleChangeDP() {
-        const myFormData = new FormData();
-        myFormData.append('file', uploadFile.info);
         const response = await fetch(customerAPIUrl.changeDp, {
             method: 'POST',
-            body: myFormData,
+            body: base,
             headers: {
-                "Content-Type": "application/json",
-                "Authorization": authorizationKeyCustomer
-            },
-        });
-        const data = await response.json();
-        setUploadFile((prev: any) => ({...prev, result: data}));
-    }
-    
+                    // "Content-Type": "multipart/form-data",
+                    "Authorization": authorizationKeyCustomer
+                },
+            });
+            const data = await response.json();
+            setUploadFile((prev: any) => ({...prev, result: data}));
+            setLoading((prev: any) => ({...prev, changeDP: false}))
+            setSuccessMessage((prev: any) => ({...prev, changeDp: true}))
+        }
+        
     useEffect(() => {
+        if(uploadFile?.result){
+            getBusinessMutate(getBusinessData?.data)
+            setUploadFile((prev: any) => ({...prev, info: ""}));
+        }
+    }, [uploadFile?.result])
+
+    useEffect(() => {
+        if(uploadFile?.info !== "" && uploadFile?.result === ""){
+            setLoading((prev: any) => ({...prev, changeDP: true}))
+        }
         if(uploadFile?.info !== ""){
-            // const reader = new FileReader();
-            // reader.readAsBinaryString(uploadFile?.info);
-            // const getAll = reader?.getAll('business-cakenus');
-            // reader.addEventListener("load", () => setImageSRC(reader.result));
-            
-            // handleChangeDP({name: 'business-cakenus', file: imageSRC});
             handleChangeDP();
-            // reader.onload = () => {
-            //     setImageSRC(reader?.result)
-            // }
-            // console.log(reader?.result, imageSRC)
         }
     }, [uploadFile?.code]);
-    
-
+                    
     useEffect(() => {
         if(uploadFile?.info !== ""){
             setImageSRC(URL.createObjectURL(uploadFile?.info))
@@ -230,8 +246,10 @@ export default function WebsitePreferences(){
     return(
         <Holder>
             {
-                loading.website && <Loader />
+                (loading.website  || loading.changeDP) && <Loader />
             }
+            {/* <Loader /> */}
+            <PreferencesNav />
             {
                 getBusinessIsLoading || getBusinessIsValidating &&
                 <SkeletonLoading title="website details"  loadingSearching="Fetching" />
@@ -259,15 +277,34 @@ export default function WebsitePreferences(){
                 data={updateWebsite?.result}
                 />
             }
-            <PreferencesNav />
+            {  successMessage.changeDp && uploadFile.result !== "" &&
+                <ErrorAndSucccessHandlers
+                name="changeDp"
+                successName={successMessage.changeDp}
+                message={uploadFile?.result?.code} 
+                code={uploadFile?.code}
+                successmessage="Your profile image has been updated!"
+                failedmessage="Sorry, your profile image cannot be updated!" 
+                staffAndCustomer={uploadFile?.result}
+                error={uploadFile?.result?.code !== 200}
+                loading={uploadFile?.result === "" && uploadFile?.info !== "" && uploadFile?.code !== ""}
+                data={uploadFile?.result}
+                />
+            }
             <Section>
                 <div className="bg-gray-50 mt-5 p-5 rounded-2xl w-full relative h-full">
                   <div className="flex phone:flex-col laptop:gap-10 phone:text-center phone:justify-center laptop:justify-start laptop:flex-row phone:items-center laptop:items-center w-full h-fit">
                     <div>
-                        <span className="rounded-full relative flex justify-center items-center p-1">
-                            <img className={uploadFile?.info ? "rounded-full brightness-50 bg-gray-200/40 p-1 shadow h-40 w-40" : "rounded-full h-40 w-40 bg-gray-200/40 p-1 shadow"} title={uploadFile?.info} src={uploadFile?.info ? imageSRC : getBusinessData?.data?.image} alt="logo" />
-                            {uploadFile?.info && <button onClick={() => setUploadFile((prev: any) => ({...prev, code: Password()}))} className='absolute bg-green-700 p-1 rounded-xl text-gray-50 hover:bg-green-800 left-14'>Upload</button>}
-                        </span>
+                            { uploadFile?.info !== "" ? 
+                                <span className="rounded-full relative flex justify-center items-center p-1">
+                                    <img className="rounded-full brightness-50 bg-gray-200/40 p-1 shadow h-40 w-40" title={uploadFile?.info} src={imageSRC} alt="logo" />
+                                    <button onClick={handleUpload} className='absolute bg-green-700 p-1 rounded-xl text-gray-50 hover:bg-green-800 left-14'>Upload</button>
+                                </span>
+                                :
+                                <div>
+                                    <img className="rounded-full h-40 w-40 bg-gray-200/40 p-1 shadow" title={getBusinessData?.data?.title} src={getBusinessData?.data?.image} alt="logo" />
+                                </div>
+                            }
                     <span className="relative w-full flex justify-center gap-20 items-center bottom-10">             
                        <span title={uploadFile?.info} className="relative rounded-full shadow h-fit cursor-pointer bg-gray-50 w-6">
                             <label title={uploadFile?.info} className=" cursor-pointer rounded-full" htmlFor="upload">
