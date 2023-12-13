@@ -299,7 +299,7 @@ export default function Shipments(){
                             <div className="flex items-center justify-start gap-5">
                                 <i className="icon ion-md-person text-gray-300 px-5 py-3 bg-gray-100 rounded-full text-3xl"></i>
                                 <div>
-                                    <p className="-mb-1">{ windowDetails < 700 && handleFetchDispatcher(parcel?.rider)?.length > 4 ? handleFetchDispatcher(parcel?.rider)?.slice(0, 4) + '...' : handleFetchDispatcher(parcel?.rider) || 'None'}</p>
+                                    <p className="-mb-1">{ windowDetails < 700 && handleFetchDispatcher(parcel?.rider)?.length > 4 ? handleFetchDispatcher(parcel?.rider)?.slice(0, 4) + '...' : handleFetchDispatcher(parcel?.rider)?.slice(0, 7) + '...' || 'None'}</p>
                                     <button onClick={() => {setCode(parcel?.id);  setPass(Password())}} className="text-blue-600 text-sm">Change</button>
                                 </div>
                             </div>
@@ -382,17 +382,17 @@ export default function Shipments(){
                             <div className="flex items-center justify-start gap-5">
                                 <i className="icon ion-md-person text-gray-300 px-5 py-3 bg-gray-100 rounded-full text-3xl"></i>
                                 <div>
-                                <p className="-mb-1">{ windowDetails < 700 && handleFetchDispatcher(parcelRange?.rider)?.length > 4 ? handleFetchDispatcher(parcelRange?.rider)?.slice(0, 4) + '...' : handleFetchDispatcher(parcelRange?.rider) || 'None'}</p>
+                                <p className="-mb-1">{ windowDetails < 700 && handleFetchDispatcher(parcelRange?.rider)?.length > 4 ? handleFetchDispatcher(parcelRange?.rider)?.slice(0, 4) + '...' : handleFetchDispatcher(parcelRange?.rider)?.slice(0, 7) + '...' || 'None'}</p>
                                 <button onClick={() => {setCode(parcelRange?.id);  setPass(Password())}} className="text-blue-600 text-sm">Change</button>
                                 </div>
                             </div>
                             <div className="flex phone:gap-4 laptop:gap-2 phone:flex-col laptop:flex-row">
                             { handleFiltered(parcelRange?.rider) ?
                                     <a href={`https://api.whatsapp.com/send?phone=${handleDispatcherNumber(parcelRange?.rider)}&text=Hello%20${handleFetchDispatcher(parcelRange?.rider)}%2C%20I%20got%20your%20contact%20from%20Logistix%20Africa%20website.%20I%20want%20to%20ship%20a%20parcel.%20My%20name%20is%20${parcelRange?.pickUp?.name}.`} target="_blank">
-                                        <i className="icon ion-md-call text-green-300 phone:px-4 h-fit w-fit phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
+                                        <i className="icon ion-md-call text-green-300 phone:px-4 h-fit w-fit phone:py-2 phone:text-2xl laptop:px-4 laptop:py-2 bg-green-100 rounded-full laptop:text-3xl"></i>
                                     </a> : 
                                     <button onClick={handleNoRider}>
-                                        <i className="icon ion-md-call text-green-300 phone:px-4 h-fit w-fit phone:py-2 phone:text-2xl laptop:px-5 laptop:py-3 bg-green-100 rounded-full laptop:text-3xl"></i>
+                                        <i className="icon ion-md-call text-green-300 phone:px-4 h-fit w-fit phone:py-2 phone:text-2xl laptop:px-4 laptop:py-2 bg-green-100 rounded-full laptop:text-3xl"></i>
                                     </button>
                                 }
                                 <button onClick={() => handleFiltered(parcelRange?.rider) ? handleDispatcherEmail(parcelRange?.pickUp?.name, parcelRange?.rider) : handleNoRider()}>
