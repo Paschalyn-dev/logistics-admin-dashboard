@@ -23,6 +23,7 @@ export default function RootLayout({ children }: {children: React.ReactNode }) {
         />
         <link rel="icon" type="image/x-icon" href={getBusinessData?.data?.image}></link>
         <script src="https://js.paystack.co/v1/inline.js" async />
+        <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js" async></script>
         <link href="https://unpkg.com/ionicons@4.5.10-0/dist/css/ionicons.min.css" rel="stylesheet" />
       </head>
       <body>

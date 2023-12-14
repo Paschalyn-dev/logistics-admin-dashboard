@@ -30,6 +30,40 @@
   font-family: 'Hind Siliguri', sans-serif;
 }
 
+/* #opacity{
+  opacity: 0.1;
+} */
+
+#reviews{
+  font-size: 40px;
+  font-weight: bold;
+}
+
+#big-font{
+  font-size: 55px;
+  font-weight: bold;
+}
+#medium-font{
+  font-weight: 500;
+}
+
+#bg-website{
+  opacity: 0.1;
+  background: url('https://as2.ftcdn.net/v2/jpg/01/99/79/91/1000_F_199799127_0ZCUDkCD1NQQ65jvcY4sO1sxOdN5cpOT.jpg');
+}
+
+#purple-box{
+  background-color: rgb(255, 220, 255);
+}
+
+#image{
+  width: 150px;
+}
+
+#green-box{
+  background-color: rgb(208, 255, 208);
+}
+
 #white-color{
   color: rgba(var(--graycolor-rgba));
   transform: scale(1.5);

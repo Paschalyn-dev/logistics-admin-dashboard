@@ -23,6 +23,8 @@ module.exports = {
         
         'after-laptop': '1280px',
 
+        'small-laptop': '1350px',
+
         'before-desktop': '1536px',
 
         'desktop': '2560px',
