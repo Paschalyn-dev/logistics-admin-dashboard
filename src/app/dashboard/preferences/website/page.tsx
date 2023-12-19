@@ -19,6 +19,7 @@ import ErrorAndSucccessHandlers from "../../services/eventhandlers/error-and-suc
 import Loader from "../../services/Loader/spinner";
 import DefaultInput from "../../profile/input";
 import { staffAPIURL } from "../../services/api-url/staff-api-url";
+import Cookies from "js-cookie";
 
 export default function WebsitePreferences(){
     const [base, setBase] = useState<any>();
@@ -242,7 +243,7 @@ export default function WebsitePreferences(){
             websiteUpdateFetcher(updateWebsite?.info)
         }
     },[updateWebsite?.code])
-    
+        
     return(
         <Holder>
             {
@@ -351,9 +352,10 @@ export default function WebsitePreferences(){
                     </div>
                     <div>
                         <SubHeading subheading="Social Media" />
+                        <p className="my-2 font-thin text-sm">Enter usernames only</p>
                         <div className="flex items-center my-5 bg-white gap-3 rounded-xl w-full justify-start p-4">
                             <i id="icon" className="icon ion-logo-facebook"></i>
-                            <input name="facebook" type="text" onChange={handleSocialAccounts} value={formData.socialAccounts.facebook} className="bg-white outline-0 h-fit w-full" placeholder="facebook" />
+                            <input name="facebook" type="text" onChange={handleSocialAccounts} value={formData.socialAccounts.facebook} className="bg-white outline-0 h-fit w-full" placeholder="facebook " />
                         </div>
                         <div className="flex items-center mb-5 bg-white gap-3 rounded-xl w-full justify-start p-4">
                             <i id="icon" className="icon ion-logo-twitter"></i>

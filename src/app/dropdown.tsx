@@ -12,7 +12,6 @@ export default function DropDown({mouseLeave}: any){
     const {setIsLoggedOut} = useContext(State_data);
     function handleSignOut(){
         logout();
-        () => setIsLoggedOut(true);
         customerLogout();
         router.replace('/staff/web/login');
     }

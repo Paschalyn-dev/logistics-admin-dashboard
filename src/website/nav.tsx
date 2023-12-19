@@ -1,20 +1,20 @@
 'use client'
 import Button from "@/app/dashboard/button";
 import { State_data } from "@/app/dashboard/context/context";
+import { logout } from "@/app/dashboard/services/libs/staff-auth";
 import { useGetBusiness } from "@/app/dashboard/services/swr-functions/customer-swr"
 import DropDown from "@/app/dropdown";
+import Cookies from "js-cookie";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 
 export default function NavWebsite(){
   const {getBusinessData} = useGetBusiness();
-  const {isLoggedOut} = useContext(State_data)
   const [showDropDown, setShowDropDown] = useState<boolean>(false)
   const [mywindow, setWindow] = useState<any>(0)
   const router = useRouter();
   const title = getBusinessData?.data?.title?.split(' ')
-  console.log(isLoggedOut, showDropDown)
   useEffect(function onFirstMount() {
     function checkWidth(){
       setWindow(window.innerWidth);
@@ -39,6 +39,19 @@ export default function NavWebsite(){
       setShowDropDown(false);
     }
 
+    const handleRouteLogin = () => {
+      router.replace('/staff/web/login')
+    }
+    const [token, setToken] = useState<string>('')
+
+    const checkSignOut = Cookies.get('logistix.user.auth')
+
+    useEffect(() => {
+      if(checkSignOut?.length){
+        setToken(checkSignOut)
+      }
+    },[checkSignOut !== undefined])
+
     return(
       <div>
 
@@ -49,30 +62,32 @@ export default function NavWebsite(){
             </Link>
             <div className="flex justify-start gap-3 items-center">
                 { mywindow > 760 &&
-                     <>
-                        <Button
-                        buttonName="Ship A Parcel" 
-                        handleClick={handleRouter}
-                        />
-                        <a className="mx-3" target="_blank" href="https://radar.logistix.africa/">Track Parcel</a>
-                    </>
+                  <>
+                    <Button
+                    buttonName="Ship A Parcel" 
+                    handleClick={handleRouter}
+                    />
+                    <a className="mx-3" target="_blank" href="https://radar.logistix.africa/">Track Parcel</a>
+                </>
                 }
-                { isLoggedOut ? 
-                  <div className="flex font-thin phone:text-sm tablet:text-base bg-gray-100 p-2 cursor-pointer rounded-3xl items-center justify-start gap-2">
-                   <p>Sign In</p>
+                { token && token === undefined ? 
+                  <button onClick={handleRouteLogin} className="flex font-thin phone:text-sm tablet:text-base bg-gray-100 p-2 cursor-pointer rounded-3xl items-center justify-start gap-2">
+                    <span>Sign In</span>
                     <i className="icon ion-md-arrow-right" />
-                  </div> 
+                  </button> 
                   :
-                  <div onMouseOut={handleShowDropDown} className="flex font-thin phone:text-sm tablet:text-base bg-gray-100 p-2 cursor-pointer rounded-3xl items-center justify-start gap-2">
-                    <i className="icon ion-md-contact text-xl" />
-                    <p>{mywindow > 760 ? 'Hi,' : ""} {title?.length > 2 ? title?.slice(0, 2) : title?.slice(0)}</p>
+                  <div onMouseOut={handleShowDropDown}>
+                    <div className="flex font-thin phone:text-sm tablet:text-base bg-gray-100 p-2 cursor-pointer rounded-3xl items-center justify-start gap-2">
+                      <i className="icon ion-md-contact text-xl" />
+                      <p>{mywindow > 760 ? 'Hi,' : ""} {title?.length > 2 ? title?.slice(0, 2) : title?.slice(0)}</p>
+                    </div>
+                    {
+                      showDropDown && <DropDown mouseLeave={handleNoShowDropDown}/>
+                    }
                   </div>
                 }
             </div>
         </div>
-                {
-                  showDropDown  && !isLoggedOut && <DropDown mouseLeave={handleNoShowDropDown}/>
-                }
         </div>
     )
 }

@@ -32,13 +32,13 @@ export default function DefaultBody(){
                     </div>
                 </Link>
 
-                <a href="https://radar.logistix.africa" target="_blank" id="purple-box" className="flex flex-col rounded-xl h-52 w-40 text-center justify-center items-center gap-5">
+                <Link href="https://radar.logistix.africa" target="_blank" id="purple-box" className="flex flex-col rounded-xl h-52 w-40 text-center justify-center items-center gap-5">
                     <img src="https://cakenus.logistix.africa/track.svg" alt="Track a shipment"/>
                     <div>
                         <h2 className="text-purple-500 text-lg">Track</h2>
                         <p className="text-purple-800 text-xs">A PARCEL</p>
                     </div>
-                </a>
+                </Link>
             </div>
         </div>
     )

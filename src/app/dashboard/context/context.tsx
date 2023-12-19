@@ -19,8 +19,7 @@ export default function Context({children}: any){
         customer: 0,
         destination: 0
     });
-    const [isLoggedOut, setIsLoggedOut] = useState<boolean>(false)
-
+    
     const [dispatcher, setDispatcher] = useState<any>({
         name: "",
         id: 0

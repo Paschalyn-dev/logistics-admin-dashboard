@@ -149,6 +149,7 @@
 
 body{
   overflow-x: hidden;
+  overflow-y: auto;
   /* background: rgb(var(--background-start-rgb)); */
   background: rgb(243, 244, 246);
 }
