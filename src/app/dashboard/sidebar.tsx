@@ -47,7 +47,7 @@ export default function Sidebar() {
           <h4 className="font-bold mb-1">{getBusinessData?.data?.title}</h4>
           <div className="flex justify-around items-center gap-1">
             <p className="font-light text-xs p-1 border mt-1 border-gray-700 shadow rounded-full">Super Administrator</p>
-            <a target="_blank" href="https://cakenus.logistix.africa"><i className="icon ion-md-globe" title="Globe"></i></a>
+            <Link target="_blank" href="/"><i className="icon ion-md-globe" title="Globe"></i></Link>
           </div>
         </div>
         
