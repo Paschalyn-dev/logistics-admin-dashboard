@@ -6,10 +6,28 @@ import Footer from "./footer";
 
 export default function CustomerReviews(){
     const {fetchAllReviewsData} = useAllFetchReviews();
+    const length = fetchAllReviewsData?.data?.length;
     const excellentRatings = fetchAllReviewsData?.data?.filter((data: any) => data.rating === "EXCELLENT").length;
     const goodRatings = fetchAllReviewsData?.data?.filter((data: any) => data.rating === "GOOD").length;
     const poorRatings = fetchAllReviewsData?.data?.filter((data: any) => data.rating === "POOR").length;
-    const [mywindow, setWindow] = useState<any>(0)
+    const [mywindow, setWindow] = useState<number>(0);
+    console.log(length)
+    const [slicedReviews, setSliceReviews] = useState<number>(2)
+    const handleMoreReviews = () => {
+        if(slicedReviews < length){
+            setSliceReviews((prev: number) => prev + 2);
+            if(length > 20){
+                setSliceReviews((prev: number) => prev + Math.ceil(length / 3));
+            }
+        }
+        if(slicedReviews === length){
+            setSliceReviews((prev: number) => Math.abs(prev - 2));
+            if(length > 20){
+                setSliceReviews((prev: number) => prev - Math.ceil(length / 3));
+            }
+        }
+    }
+
     useEffect(function onFirstMount() {
         function checkWidth(){
           setWindow(window.innerWidth);
@@ -43,7 +61,7 @@ export default function CustomerReviews(){
                 </div>
                 <div className="h-fit flex flex-wrap justify-center items-start gap-5 mt-5 w-full p-1">
                     {  fetchAllReviewsData?.data &&
-                        fetchAllReviewsData.data.map((reviews: any) => {
+                        fetchAllReviewsData.data.slice(0, slicedReviews).map((reviews: any) => {
                             return(
                                 <div key={reviews.id} className="bg-gray-50 hover:shadow-lg rounded-xl h-60 phone:w-11/12 flex justify-center items-center flex-col tablet:w-4/12 shadow px-5 py-10">
                                     <div className="shadow-sm border px-1 py-2 text-4xl rounded-full">
@@ -62,7 +80,7 @@ export default function CustomerReviews(){
                         })
                     }
             </div>
-            <button className="mt-16 rounded-lg text-lg shadow p-4">More Reviews <span><i className="icon ion-md-arrow-down" /></span></button>
+            <button onClick={handleMoreReviews} className="mt-16 rounded-lg text-lg shadow p-4">{length === slicedReviews ? 'Show Less' : 'More Reviews'} <span><i className={`icon ion-md-arrow-${length === slicedReviews ? 'up' : 'down'}`} /></span></button>
         </div>
         <Message />
         </div>

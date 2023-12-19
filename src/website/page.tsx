@@ -1,5 +1,5 @@
 'use client'
-import Footer from "./footer";
+import Footer from './footer';
 import DefaultBody from "./mainbody";
 import NavWebsite from "./nav";
 import CustomerReviews from "./reviews";
@@ -14,7 +14,7 @@ export default function Website(){
             className="opacity-10 absolute -z-1 w-screen h-screen"
             /> */}
             <NavWebsite />
-            <DefaultBody />    
+            <DefaultBody />  
             <CustomerReviews />
             <Footer />
         </div>

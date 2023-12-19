@@ -1,6 +1,6 @@
 'use client'
 // import { parsedUrlQueryToParams } from "next/dist/server/future/route-matches/route-match";
-import {createContext, useState} from "react";
+import {createContext, useEffect, useState} from "react";
 export const phoneRegExp = /^[+]?((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 // export const phoneRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/
 export const State_data = createContext<any>(null);
@@ -19,6 +19,8 @@ export default function Context({children}: any){
         customer: 0,
         destination: 0
     });
+    const [isLoggedOut, setIsLoggedOut] = useState<boolean>(false)
+
     const [dispatcher, setDispatcher] = useState<any>({
         name: "",
         id: 0
@@ -38,6 +40,7 @@ export default function Context({children}: any){
         administrator: false,
         website: false,
         chargeBearer: false,
+        sendMessage: false,
         locations: false,
         payment: false,
         deliveryPrice: false,
@@ -163,6 +166,7 @@ export default function Context({children}: any){
 
     const [successMessage, setSuccessMessage] = useState({
         input: false,
+        sendMessageError: false,
         distancePricesWelcomePage: true,
         error: true,
         changeDp: false,

@@ -133,7 +133,8 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: rgb(var(--background-start-rgb)); 
+  background: none; 
+  /* background: rgb(var(--background-start-rgb));  */
 }
  
 ::-webkit-scrollbar-thumb {
