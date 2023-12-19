@@ -19,6 +19,7 @@ export default function DefaultBody(){
       useEffect(() => {
         setWindow(window.innerWidth);
       }, []);
+      
     return(
         <div className="flex flex-col justify-center p-10 my-20 w-full phone:h-full after-laptop:h-screen">
             <h1 className={mywindow > 760 ? "text-gray-600" : "text-3xl font-bold text-gray-600"} id={mywindow > 760 ? "big-font" : ""}>{Time()}</h1>
