@@ -26,17 +26,17 @@ export default function Footer(){
                         <h1 className="font-bold phone:text-lg tablet:text-xl">{getBusinessData?.data?.title}</h1>
                         <p className="text-gray-600">{getBusinessData?.data?.address?.street}</p>
                     </div>
-                    <a href="https://logistix.africa" target="_blank" > 
+                    <Link href="https://logistix.africa" target="_blank" > 
                         <img className="bg-gray-100 rounded-lg" id="image" src="https://cakenus.logistix.africa/logistix-badge.svg" alt="Made Possible with Logistix" />
-                    </a>
+                    </Link>
                 </div>
 
                 <div className="flex tablet:w-3/12 gap-5 flex-col tablet:justify-start text-left phone:text-xs tablet:text-base phone:justify-center">
                     <h1 className="font-normal text-black phone:text-sm tablet:text-base">Quick Links</h1>
-                    <Link className="text-gray-600 font-thin phone:text-xs tablet:text-sm" href="/ship">Ship A Parcel</Link>
-                    <Link className="text-gray-600 font-thin phone:text-xs tablet:text-sm" href="https://radar.logistix.africa">Track Your Parcel</Link>
-                    <Link className="text-gray-600 font-thin phone:text-xs tablet:text-sm" href="/dashboard/staff/web/login">Sign In</Link>
-                    <Link className="text-gray-600 font-thin phone:text-xs tablet:text-sm" href="https://help.logistix.africa/">Help Center</Link>
+                    <Link className="tablet:text-gray-600 phone:text-gray-800 font-thin phone:text-xs tablet:text-sm" href="/ship">Ship A Parcel</Link>
+                    <Link className="tablet:text-gray-600 phone:text-gray-800 font-thin phone:text-xs tablet:text-sm" href="https://radar.logistix.africa">Track Your Parcel</Link>
+                    <Link className="tablet:text-gray-600 phone:text-gray-800 font-thin phone:text-xs tablet:text-sm" href="/dashboard/staff/web/login">Sign In</Link>
+                    <Link className="tablet:text-gray-600 phone:text-gray-800 font-thin phone:text-xs tablet:text-sm" href="https://help.logistix.africa/">Help Center</Link>
                 </div>
 
                 <div className="flex tablet:w-3/12 gap-5 flex-col tablet:justify-start text-left phone:text-xs tablet:text-base phone:justify-center">
