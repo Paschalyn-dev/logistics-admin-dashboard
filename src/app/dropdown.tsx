@@ -18,7 +18,7 @@ export default function DropDown({mouseLeave}: any){
     
     return(
         <div onMouseLeave={mouseLeave} className="float-right right-5 absolute z-2 mt-3">
-            <div className="flex tablet:font-thin phone:font-base text-gray-600 phone:text-sm laptop:text-base flex-col gap-4 bg-gray-50 shadow-lg w-fit h-fit p-5 rounded-lg ">
+            <div className="flex tablet:font-thin phone:font-normal text-gray-600 phone:text-sm laptop:text-base flex-col gap-4 bg-gray-50 shadow-lg w-fit h-fit p-5 rounded-lg ">
                 <Link href="/dashboard/welcome">Dashboard</Link>
                 <Link href="/dashboard/profile">View Profile</Link>
                 <button onClick={handleSignOut} className="text-red-400">Sign Out</button>

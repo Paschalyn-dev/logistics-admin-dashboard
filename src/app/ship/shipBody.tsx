@@ -87,7 +87,7 @@ export default function ShipParcel(){
                     </Link>
 
                     <Heading heading="Ship Parcel"/>
-                    <p className="font-thin text-gray-500 -mt-5">Help us with the details of your parcel.</p>
+                    <p className="tablet:font-thin phone:font-normal text-gray-500 -mt-5">Help us with the details of your parcel.</p>
 
                     <div className="flex mt-10 mb-2 overflow-x-auto w-full justify-start gap-7 items-center">
                         <button onClick={handleParcel} className={pages.includes('parcel') && currentPage === 'parcel' ? "flex cursor-pointer gap-2 items-center justify-center" : pages.includes('parcel') && currentPage !== 'parcel' ? "flex cursor-pointer text-gray-500 gap-2 items-center justify-center" : "flex gap-2 cursor-not-allowed items-center justify-center text-gray-400"} disabled={!pages.includes('parcel')}>
@@ -182,27 +182,27 @@ export default function ShipParcel(){
 
 
                 {currentPage === 'payment' && <div>
-                    <p className="text-gray-600/90 font-thin">Kindly confirm the details of your Shipping before proceeding to payment.</p>
+                    <p className="text-gray-600/90 tablet:font-thin phone:font-normal">Kindly confirm the details of your Shipping before proceeding to payment.</p>
                     <div className="px-5 py-3 mt-6 mb-4 rounded-xl bg-gray-100/50">
                         <Heading heading={formData.ship} />
                         <hr className="my-4 border-dashed"/>
                         <div className="my-5 overflow-x-auto">
                             <h2 className="rounded-lg w-fit p-3 bg-gray-200/50 text-sm">Shipping From</h2>
-                            <p className="font-thin my-1 mx-2 text-sm">{formData.sender.address}</p>
-                            <p className="font-thin text-gray-600/90 my-1 mx-2 text-sm">{formData.sender.name}</p>
-                            <p className="font-thin text-gray-600/90 my-1 mx-2 text-sm">{formData.sender.email}</p>
-                            <p className="font-thin text-gray-600/90 my-1 mx-2 text-sm">{formData.sender.phone}</p>
+                            <p className="tablet:font-thin phone:font-normal my-1 mx-2 text-sm">{formData.sender.address}</p>
+                            <p className="tablet:font-thin phone:font-normal text-gray-600/90 my-1 mx-2 text-sm">{formData.sender.name}</p>
+                            <p className="tablet:font-thin phone:font-normal text-gray-600/90 my-1 mx-2 text-sm">{formData.sender.email}</p>
+                            <p className="tablet:font-thin phone:font-normal text-gray-600/90 my-1 mx-2 text-sm">{formData.sender.phone}</p>
                         </div>
                         <hr className="border-dashed"/>
                         <div className="my-5">
                             <h2 className="rounded-lg w-fit p-3 bg-gray-200/50 text-sm">Shipping To</h2>
-                            <p className="font-thin my-1 mx-2 text-sm">{formData.receiver.address}</p>
-                            <p className="font-thin text-gray-600/90 my-1 mx-2 text-sm">{formData.receiver.name}</p>
-                            <p className="font-thin text-gray-600/90 my-1 mx-2 text-sm">{formData.receiver.email}</p>
-                            <p className="font-thin text-gray-600/90 my-1 mx-2 text-sm">{formData.receiver.phone}</p>
+                            <p className="tablet:font-thin phone:font-normal my-1 mx-2 text-sm">{formData.receiver.address}</p>
+                            <p className="tablet:font-thin phone:font-normal text-gray-600/90 my-1 mx-2 text-sm">{formData.receiver.name}</p>
+                            <p className="tablet:font-thin phone:font-normal text-gray-600/90 my-1 mx-2 text-sm">{formData.receiver.email}</p>
+                            <p className="tablet:font-thin phone:font-normal text-gray-600/90 my-1 mx-2 text-sm">{formData.receiver.phone}</p>
                         </div>
                     </div>
-                    <p className="font-thin text-gray-600/80">Payment Option</p>
+                    <p className="tablet:font-thin phone:font-normal text-gray-600/80">Payment Option</p>
                     <div className="flex my-5 flex-wrap w-full justify-between items-center gap-5">
                         <img className="w-64 float-center" src="https://149626172.v2.pressablecdn.com/wp-content/uploads/2021/09/TransparentSecuredbyPaystackBadge-SA.png" alt="paystack" />
                             

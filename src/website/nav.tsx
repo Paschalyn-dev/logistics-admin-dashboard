@@ -77,7 +77,7 @@ export default function NavWebsite(){
                   </button> 
                   :
                   <div onMouseOut={handleShowDropDown}>
-                    <div className="flex tablet:font-thin phone:font-base phone:text-sm tablet:text-base bg-gray-100 p-2 cursor-pointer rounded-3xl items-center justify-start gap-2">
+                    <div className="flex tablet:font-thin phone:font-normal phone:text-sm tablet:text-base bg-gray-100 p-2 cursor-pointer rounded-3xl items-center justify-start gap-2">
                       <i className="icon ion-md-contact text-xl" />
                       <p>{mywindow > 760 ? 'Hi,' : ""} {title?.length > 2 ? title?.slice(0, 2) : title?.slice(0)}</p>
                     </div>
